@@ -1,22 +1,28 @@
-﻿# Environment variables and secrets
-.env
-
-# Virtual environment
-venv/
-.venv/
-
-# Python cache
+﻿# Python bytecode and cache
 __pycache__/
 *.py[cod]
+*$py.class
 
-# Local SQLite database
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Sensitive environment variables
+.env
+.env.local
+
+# Local databases
 db.sqlite3
-*.sqlite3
+db.sqlite3-journal
 
-# Django collected static files and uploaded media
+# Static collected files and media
 staticfiles/
 media/
 
-# Editor settings
+# IDE and OS files
 .vscode/
 .idea/
+.DS_Store
+Thumbs.db
