@@ -13,12 +13,18 @@
                 <p class="eve-tagline">Smart scheduling for teams that keep things moving.</p>
             </div>
 
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endif %}
+
             <form method="post" action="{% url 'login:login' %}">
                 {% csrf_token %}
 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="you@company.com" required>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ email|default:'' }}" placeholder="you@company.com" required>
                 </div>
 
                 <div class="mb-3">
@@ -31,7 +37,7 @@
 
             <p class="text-center mt-4 mb-0 eve-switch-link">
                 Do not have an account?
-                <a href="{% url 'accounts:register' %}">Register</a>
+                <a href="{% url 'register:register' %}">Register</a>
             </p>
 
         </div>

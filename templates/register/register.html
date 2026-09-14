@@ -12,26 +12,28 @@
                 <h2 class="eve-brand-title mt-3">Create your Eve Account</h2>
             </div>
 
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endif %}
+
             <form method="post" action="{% url 'register:register' %}">
                 {% csrf_token %}
-                    {% if error %}
-                        <div class="alert alert-danger">
-                            {{ error }}
-                        </div>
-                    {% endif %}
+
                 <div class="mb-3">
                     <label for="full_name" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="full_name" name="full_name" placeholder="Juan Dela Cruz" required>
+                    <input type="text" class="form-control" id="full_name" name="full_name" value="{{ full_name|default:'' }}" placeholder="Juan Dela Cruz" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="you@company.com" required>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ email|default:'' }}" placeholder="you@company.com" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="company" class="form-label">Company / Organization</label>
-                    <input type="text" class="form-control" id="company" name="company" placeholder="Your company or organization" required>
+                    <input type="text" class="form-control" id="company" name="company" value="{{ company|default:'' }}" placeholder="Your company or organization" required>
                 </div>
 
                 <div class="row">

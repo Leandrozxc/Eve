@@ -1,9 +1,16 @@
+from django.contrib import messages
 from django.contrib.auth.models import User
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.shortcuts import redirect, render
+
+from apps.userprofile.models import Profile
+from apps.usersettings.models import UserSettings
 
 
 def register_view(request):
+    if request.user.is_authenticated:
+        return redirect('home:home')
+
     if request.method == 'POST':
         full_name = request.POST.get('full_name', '').strip()
         email = request.POST.get('email', '').strip().lower()
@@ -11,25 +18,39 @@ def register_view(request):
         password = request.POST.get('password', '')
         confirm_password = request.POST.get('confirm_password', '')
 
-        if not full_name or not email or not company or not password:
+        if not full_name or not email or not password:
             return render(
                 request,
                 'register/register.html',
-                {'error': 'Please complete all required fields.'},
+                {
+                    'error': 'Please complete all required fields.',
+                    'full_name': full_name,
+                    'email': email,
+                    'company': company,
+                },
             )
 
         if password != confirm_password:
             return render(
                 request,
                 'register/register.html',
-                {'error': 'Passwords do not match.'},
+                {
+                    'error': 'Passwords do not match.',
+                    'full_name': full_name,
+                    'email': email,
+                    'company': company,
+                },
             )
 
         if User.objects.filter(username=email).exists():
             return render(
                 request,
                 'register/register.html',
-                {'error': 'An account with this email already exists. Please use another email.'},
+                {
+                    'error': 'An account with this email already exists.',
+                    'full_name': full_name,
+                    'company': company,
+                },
             )
 
         name_parts = full_name.split(maxsplit=1)
@@ -37,20 +58,29 @@ def register_view(request):
         last_name = name_parts[1] if len(name_parts) > 1 else ''
 
         try:
-            User.objects.create_user(
-                username=email,
-                email=email,
-                password=password,
-                first_name=first_name,
-                last_name=last_name,
-            )
+            with transaction.atomic():
+                user = User.objects.create_user(
+                    username=email,
+                    email=email,
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name,
+                )
+                Profile.objects.create(user=user, full_name=full_name)
+                UserSettings.objects.create(user=user)
+
         except IntegrityError:
             return render(
                 request,
                 'register/register.html',
-                {'error': 'An account with this email already exists. Please use another email.'},
+                {
+                    'error': 'Could not create account. Please try again.',
+                    'full_name': full_name,
+                    'company': company,
+                },
             )
 
+        messages.success(request, 'Registration successful! You may now log in.')
         return redirect('login:login')
 
     return render(request, 'register/register.html')
