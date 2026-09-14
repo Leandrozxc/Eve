@@ -1,0 +1,268 @@
+:root {
+    --eve-black: #1d1d1f;
+    --eve-gray-900: #2c2c2e;
+    --eve-gray-600: #6e6e73;
+    --eve-gray-300: #d2d2d7;
+    --eve-gray-100: #f5f5f7;
+    --eve-white: #ffffff;
+    --eve-accent: #243b6b;
+    --eve-accent-hover: #16324f;
+    --eve-teal: #16a6a3;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--eve-white);
+    color: var(--eve-black);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    letter-spacing: -0.01em;
+}
+
+/* Navbar */
+.eve-navbar {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--eve-gray-300);
+    padding: 0.9rem 0;
+}
+
+.eve-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: var(--eve-black) !important;
+    text-decoration: none;
+    letter-spacing: -0.02em;
+}
+
+.eve-logo-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--eve-black);
+    color: var(--eve-white);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.eve-logo-large {
+    width: 56px;
+    height: 56px;
+    font-size: 1.5rem;
+    background-color: var(--eve-black);
+}
+
+.eve-nav-link {
+    color: var(--eve-gray-600);
+    font-weight: 400;
+    font-size: 0.92rem;
+    border: none;
+    background: none;
+    padding: 0.4rem 0.9rem;
+}
+
+.eve-nav-link:hover {
+    color: var(--eve-black);
+    background: none;
+}
+
+/* Layout */
+.eve-main {
+    flex: 1;
+    padding: 4rem 0;
+}
+
+.eve-messages {
+    max-width: 560px;
+    margin: 0 auto 2rem auto;
+}
+
+.eve-messages .alert {
+    border-radius: 0.75rem;
+    border: 1px solid var(--eve-gray-300);
+    background-color: var(--eve-gray-100);
+    color: var(--eve-black);
+    font-size: 0.92rem;
+}
+
+.eve-footer {
+    background-color: var(--eve-white);
+    border-top: 1px solid var(--eve-gray-300);
+    padding: 1.5rem 0;
+    color: var(--eve-gray-600);
+    font-size: 0.82rem;
+}
+
+/* Auth screens */
+.eve-auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 72vh;
+}
+
+.eve-auth-card {
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid var(--eve-gray-300);
+    border-radius: 1.25rem;
+    box-shadow: none;
+    background-color: var(--eve-white);
+}
+
+.eve-brand-title {
+    color: var(--eve-black);
+    font-weight: 600;
+    font-size: 1.9rem;
+    letter-spacing: -0.02em;
+}
+
+.eve-tagline {
+    color: var(--eve-gray-600);
+    font-weight: 400;
+    font-size: 0.95rem;
+}
+
+.form-label {
+    color: var(--eve-black);
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.form-control {
+    border: 1px solid var(--eve-gray-300);
+    border-radius: 0.7rem;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.95rem;
+    background-color: var(--eve-gray-100);
+}
+
+.form-control:focus {
+    border-color: var(--eve-accent);
+    box-shadow: 0 0 0 3px rgba(36, 59, 107, 0.1);
+    background-color: var(--eve-white);
+}
+
+.eve-switch-link {
+    color: var(--eve-gray-600);
+    font-size: 0.9rem;
+}
+
+.eve-switch-link a {
+    color: var(--eve-accent);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.eve-switch-link a:hover {
+    text-decoration: underline;
+}
+
+.eve-btn-primary {
+    background-color: var(--eve-accent);
+    color: var(--eve-white);
+    border: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.7rem 1.2rem;
+    border-radius: 0.7rem;
+    transition: background-color 0.2s ease;
+}
+
+.eve-btn-primary:hover {
+    background-color: var(--eve-accent-hover);
+    color: var(--eve-white);
+}
+
+.eve-btn-outline {
+    border: 1px solid var(--eve-gray-300);
+    color: var(--eve-black);
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.55rem 1.4rem;
+    border-radius: 0.7rem;
+    background-color: transparent;
+    transition: all 0.2s ease;
+}
+
+.eve-btn-outline:hover {
+    background-color: var(--eve-gray-100);
+    color: var(--eve-black);
+}
+
+/* Home screen */
+.eve-home-hero {
+    padding: 3rem 0 1rem 0;
+}
+
+.eve-welcome-title {
+    color: var(--eve-black);
+    font-weight: 600;
+    font-size: 3rem;
+    letter-spacing: -0.03em;
+}
+
+.eve-welcome-subtitle {
+    color: var(--eve-gray-600);
+    font-size: 1.15rem;
+    font-weight: 400;
+    max-width: 520px;
+    margin: 0.5rem auto 0 auto;
+}
+
+.eve-home-screen-text {
+    color: var(--eve-gray-300);
+    font-weight: 700;
+    letter-spacing: 0.3rem;
+    font-size: 1.4rem;
+    margin-top: 2.5rem;
+}
+
+.eve-feature-card {
+    border: 1px solid var(--eve-gray-300);
+    border-radius: 1.1rem;
+    box-shadow: none;
+    background-color: var(--eve-gray-100);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.eve-feature-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--eve-gray-600);
+}
+
+.eve-feature-icon {
+    font-size: 1.8rem;
+    color: var(--eve-accent);
+}
+
+.eve-feature-card .card-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--eve-black);
+}
+
+.eve-feature-card .card-text {
+    color: var(--eve-gray-600);
+    font-size: 0.88rem;
+}
+
+@media (max-width: 576px) {
+    .eve-welcome-title {
+        font-size: 2.1rem;
+    }
+    .eve-home-screen-text {
+        font-size: 1.1rem;
+    }
+}

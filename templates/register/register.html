@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="eve-auth-wrapper">
+    <div class="card eve-auth-card">
+        <div class="card-body p-4 p-md-5">
+
+            <div class="text-center mb-4">
+                <span class="eve-logo-circle eve-logo-large">E</span>
+                <h2 class="eve-brand-title mt-3">Create your Eve Account</h2>
+            </div>
+
+            <form method="post" action="{% url 'register:register' %}">
+                {% csrf_token %}
+                    {% if error %}
+                        <div class="alert alert-danger">
+                            {{ error }}
+                        </div>
+                    {% endif %}
+                <div class="mb-3">
+                    <label for="full_name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="full_name" name="full_name" placeholder="Juan Dela Cruz" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="you@company.com" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="company" class="form-label">Company / Organization</label>
+                    <input type="text" class="form-control" id="company" name="company" placeholder="Your company or organization" required>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-enter password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn eve-btn-primary w-100 mt-2">Register</button>
+            </form>
+                
+            <p class="text-center mt-4 mb-0 eve-switch-link">
+                Already have an account?
+                <a href="{% url 'login:login' %}">Login</a>
+            </p>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

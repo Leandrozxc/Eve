@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="eve-home-hero text-center">
+    <h1 class="eve-welcome-title">Welcome to Eve</h1>
+    <p class="eve-welcome-subtitle">Your smart scheduling and team coordination platform.</p>
+    <h2 class="eve-home-screen-text">HOME SCREEN</h2>
+</div>
+
+<div class="row mt-5 g-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card eve-feature-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar3 eve-feature-icon"></i>
+                <h5 class="card-title mt-3">Shift Scheduling</h5>
+                <p class="card-text">Plan and assign employee shifts with ease.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card eve-feature-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-person-check eve-feature-icon"></i>
+                <h5 class="card-title mt-3">Employee Availability</h5>
+                <p class="card-text">Track when staff are available to work.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card eve-feature-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-clock-history eve-feature-icon"></i>
+                <h5 class="card-title mt-3">Attendance Tracking</h5>
+                <p class="card-text">Monitor clock-ins, clock-outs, and absences.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card eve-feature-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-list-task eve-feature-icon"></i>
+                <h5 class="card-title mt-3">Team Tasks</h5>
+                <p class="card-text">Assign and follow up on daily team tasks.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-5 mb-4">
+    <a href="{% url 'accounts:logout' %}" class="btn eve-btn-outline">Logout</a>
+</div>
+{% endblock %}
