@@ -1,60 +1,68 @@
 {% extends 'base.html' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Create Your Account{% endblock %}
 
 {% block content %}
 <div class="eve-auth-wrapper">
-    <div class="card eve-auth-card">
-        <div class="card-body p-4 p-md-5">
+    <div class="card eve-auth-card" style="max-width: 480px;">
+        <div class="text-center">
+            <div class="eve-auth-logo">
+                <i class="bi bi-person-plus-fill"></i>
+            </div>
+            <h1 class="eve-auth-title">Create your Eve Account</h1>
+            <p class="eve-auth-subtitle">One account for all your organizations and team shift schedules.</p>
+        </div>
 
-            <div class="text-center mb-4">
-                <span class="eve-logo-circle eve-logo-large">E</span>
-                <h2 class="eve-brand-title mt-3">Create your Eve Account</h2>
+        {% if error %}
+            <div class="alert alert-danger border-0 mb-4 d-flex align-items-center gap-2" style="border-radius: var(--apple-radius-md);" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <div class="small">{{ error }}</div>
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'register:register' %}">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="full_name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="full_name" name="full_name" value="{{ full_name|default:'' }}" placeholder="e.g. Alex Mercer" required autofocus>
             </div>
 
-            {% if error %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ email|default:'' }}" placeholder="alex@company.com" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="company" class="form-label">Primary Organization / Company</label>
+                <input type="text" class="form-control" id="company" name="company" value="{{ company|default:'' }}" placeholder="e.g. Acme Event Management" required>
+                <div class="form-text" style="color: var(--apple-text-secondary); font-size: 0.78rem;">
+                    You will automatically be assigned as Owner of this organization.
                 </div>
-            {% endif %}
+            </div>
 
-            <form method="post" action="{% url 'register:register' %}">
-                {% csrf_token %}
-
-                <div class="mb-3">
-                    <label for="full_name" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="full_name" name="full_name" value="{{ full_name|default:'' }}" placeholder="Juan Dela Cruz" required>
+            <div class="row g-2 mb-4">
+                <div class="col-md-6">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Create password" required>
                 </div>
-
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="email" name="email" value="{{ email|default:'' }}" placeholder="you@company.com" required>
+                <div class="col-md-6">
+                    <label for="confirm_password" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-enter password" required>
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label for="company" class="form-label">Company / Organization</label>
-                    <input type="text" class="form-control" id="company" name="company" value="{{ company|default:'' }}" placeholder="Your company or organization" required>
-                </div>
+            <button type="submit" class="btn eve-btn-primary w-100 py-2">
+                Create Account
+                <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+        </form>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="confirm_password" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-enter password" required>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn eve-btn-primary w-100 mt-2">Register</button>
-            </form>
-                
-            <p class="text-center mt-4 mb-0 eve-switch-link">
-                Already have an account?
-                <a href="{% url 'login:login' %}">Login</a>
-            </p>
-
+        <div class="text-center mt-4 pt-3" style="border-top: 1px solid var(--apple-border);">
+            <span class="small" style="color: var(--apple-text-secondary);">Already have an account?</span>
+            <a href="{% url 'login:login' %}" class="small fw-semibold text-decoration-none ms-1" style="color: var(--apple-blue);">
+                Sign in &rarr;
+            </a>
         </div>
     </div>
 </div>

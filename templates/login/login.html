@@ -1,53 +1,67 @@
 {% extends 'base.html' %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Sign In{% endblock %}
 
 {% block content %}
 <div class="eve-auth-wrapper">
     <div class="card eve-auth-card">
-        <div class="card-body p-4 p-md-5">
+        <div class="text-center">
+            <div class="eve-auth-logo">
+                <i class="bi bi-calendar2-check-fill"></i>
+            </div>
+            <h1 class="eve-auth-title">Sign in to Eve</h1>
+            <p class="eve-auth-subtitle">Manage your organizations, events, and shift schedules.</p>
+        </div>
 
-            <div class="text-center mb-4">
-                <span class="eve-logo-circle eve-logo-large">E</span>
-                <h2 class="eve-brand-title mt-3">Eve</h2>
-                <p class="eve-tagline">Smart scheduling for teams that keep things moving.</p>
+        {% if error %}
+            <div class="alert alert-danger border-0 mb-4 d-flex align-items-center gap-2" style="border-radius: var(--apple-radius-md);" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <div class="small">{{ error }}</div>
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'login:login' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email or Username</label>
+                <input type="text" class="form-control" id="email" name="email" value="{{ email|default:'' }}" placeholder="owner@demo.com or demo_owner" required autofocus>
             </div>
 
-            {% if error %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <label for="password" class="form-label mb-0">Password</label>
                 </div>
-            {% endif %}
-
-            <form method="post" action="{% url 'login:login' %}">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{{ next }}">
-
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email address or Username</label>
-                    <input type="text" class="form-control" id="email" name="email" value="{{ email|default:'' }}" placeholder="owner@demo.com or demo_owner" required autofocus>
-                </div>
-
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
-                </div>
-
-                <button type="submit" class="btn eve-btn-primary w-100 mt-2">Login</button>
-            </form>
-
-            <div class="alert alert-light border small mt-4 mb-0 text-muted">
-                <strong>Demo Accounts (Password: <code>demo12345</code>)</strong><br>
-                &bull; Owner: <code>owner@demo.com</code> or <code>demo_owner</code><br>
-                &bull; Manager: <code>manager@demo.com</code> or <code>demo_manager</code><br>
-                &bull; Staff: <code>staff1@demo.com</code> or <code>demo_staff_one</code>
+                <input type="password" class="form-control mt-1" id="password" name="password" placeholder="Enter your password" required>
             </div>
 
-            <p class="text-center mt-3 mb-0 eve-switch-link">
-                Do not have an account?
-                <a href="{% url 'register:register' %}">Register</a>
-            </p>
+            <button type="submit" class="btn eve-btn-primary w-100 py-2">
+                Continue
+                <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+        </form>
 
+        <!-- Apple-style Demo Accounts Callout -->
+        <div class="p-3 mt-4 rounded-4" style="background-color: var(--apple-surface-secondary); border: 1px solid var(--apple-border);">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="small fw-semibold" style="color: var(--apple-text-primary);">
+                    <i class="bi bi-shield-lock me-1 text-primary"></i>Demo Credentials
+                </span>
+                <span class="badge badge-apple-neutral">Password: demo12345</span>
+            </div>
+            <div class="d-flex flex-wrap gap-1">
+                <span class="badge badge-apple-purple" title="Role: Owner">owner@demo.com</span>
+                <span class="badge badge-apple-blue" title="Role: Manager">manager@demo.com</span>
+                <span class="badge badge-apple-orange" title="Role: Staff 1">staff1@demo.com</span>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <span class="small" style="color: var(--apple-text-secondary);">Don't have an Eve account?</span>
+            <a href="{% url 'register:register' %}" class="small fw-semibold text-decoration-none ms-1" style="color: var(--apple-blue);">
+                Create one now &rarr;
+            </a>
         </div>
     </div>
 </div>

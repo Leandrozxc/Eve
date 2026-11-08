@@ -1,82 +1,142 @@
+/* ==========================================================================
+   EVE — APPLE DESIGN SYSTEM (Human Interface Guidelines & Apple.com Web)
+   ========================================================================== */
+
 :root {
-    --eve-black: #1d1d1f;
-    --eve-gray-900: #2c2c2e;
-    --eve-gray-600: #6e6e73;
-    --eve-gray-300: #d2d2d7;
-    --eve-gray-100: #f5f5f7;
-    --eve-white: #ffffff;
-    --eve-accent: #243b6b;
-    --eve-accent-hover: #16324f;
-    --eve-teal: #16a6a3;
-    --eve-focus-ring: rgba(36, 59, 107, 0.25);
+    /* Apple Light Mode Palette */
+    --apple-bg: #f5f5f7;
+    --apple-surface: #ffffff;
+    --apple-surface-elevated: #ffffff;
+    --apple-surface-secondary: #fbfbfd;
+    --apple-border: rgba(0, 0, 0, 0.08);
+    --apple-border-strong: rgba(0, 0, 0, 0.16);
+    --apple-text-primary: #1d1d1f;
+    --apple-text-secondary: #86868b;
+    --apple-text-tertiary: #a1a1a6;
+    
+    /* Apple Semantic Accents */
+    --apple-blue: #0071e3;
+    --apple-blue-hover: #0077ed;
+    --apple-blue-subtle: rgba(0, 113, 227, 0.08);
+    --apple-green: #34c759;
+    --apple-green-subtle: rgba(52, 199, 89, 0.1);
+    --apple-orange: #ff9500;
+    --apple-orange-subtle: rgba(255, 149, 0, 0.1);
+    --apple-red: #ff3b30;
+    --apple-red-subtle: rgba(255, 59, 48, 0.1);
+    --apple-purple: #af52de;
+    --apple-purple-subtle: rgba(175, 82, 222, 0.1);
+    
+    /* Chrome & Glass */
+    --apple-nav-bg: rgba(255, 255, 255, 0.82);
+    --apple-nav-border: rgba(0, 0, 0, 0.08);
+    --apple-focus-ring: rgba(0, 113, 227, 0.25);
+    --apple-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.03);
+    --apple-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --apple-shadow-lg: 0 14px 34px rgba(0, 0, 0, 0.08);
+    
+    /* Radii */
+    --apple-radius-sm: 10px;
+    --apple-radius-md: 14px;
+    --apple-radius-lg: 20px;
+    --apple-radius-xl: 24px;
+    --apple-radius-pill: 980px;
 }
 
 [data-bs-theme="dark"] {
-    --eve-black: #f5f5f7;
-    --eve-gray-900: #e5e5ea;
-    --eve-gray-600: #98989d;
-    --eve-gray-300: #38383a;
-    --eve-gray-100: #1c1c1e;
-    --eve-white: #141416;
-    --eve-accent: #3b82f6;
-    --eve-accent-hover: #60a5fa;
-    --eve-teal: #2dd4bf;
-    --eve-focus-ring: rgba(59, 130, 246, 0.35);
+    /* Apple Dark Mode Palette */
+    --apple-bg: #000000;
+    --apple-surface: #161617;
+    --apple-surface-elevated: #1d1d1f;
+    --apple-surface-secondary: #121214;
+    --apple-border: rgba(255, 255, 255, 0.12);
+    --apple-border-strong: rgba(255, 255, 255, 0.22);
+    --apple-text-primary: #f5f5f7;
+    --apple-text-secondary: #86868b;
+    --apple-text-tertiary: #6e6e73;
+    
+    --apple-blue: #2997ff;
+    --apple-blue-hover: #0077ed;
+    --apple-blue-subtle: rgba(41, 151, 255, 0.15);
+    --apple-green: #30d158;
+    --apple-green-subtle: rgba(48, 209, 88, 0.15);
+    --apple-orange: #ff9f0a;
+    --apple-orange-subtle: rgba(255, 159, 10, 0.15);
+    --apple-red: #ff453a;
+    --apple-red-subtle: rgba(255, 69, 58, 0.15);
+    --apple-purple: #bf5af2;
+    --apple-purple-subtle: rgba(191, 90, 242, 0.15);
+    
+    --apple-nav-bg: rgba(22, 22, 23, 0.85);
+    --apple-nav-border: rgba(255, 255, 255, 0.1);
+    --apple-focus-ring: rgba(41, 151, 255, 0.35);
+    --apple-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+    --apple-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --apple-shadow-lg: 0 14px 34px rgba(0, 0, 0, 0.55);
 }
 
+/* Base Document */
 * {
     box-sizing: border-box;
 }
 
-::selection {
-    background-color: rgba(36, 59, 107, 0.2);
-    color: inherit;
-}
-
-[data-bs-theme="dark"] ::selection {
-    background-color: rgba(59, 130, 246, 0.35);
-    color: inherit;
-}
-
-:focus-visible {
-    outline: 2px solid var(--eve-accent);
-    outline-offset: 2px;
+html {
+    scroll-behavior: smooth;
 }
 
 body {
-    background-color: var(--eve-white);
-    color: var(--eve-black);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--apple-bg);
+    color: var(--apple-text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    letter-spacing: -0.01em;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    letter-spacing: -0.012em;
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Navbar */
+::selection {
+    background-color: var(--apple-blue-subtle);
+    color: var(--apple-text-primary);
+}
+
+:focus-visible {
+    outline: 2px solid var(--apple-blue);
+    outline-offset: 3px;
+    border-radius: var(--apple-radius-sm);
+}
+
+/* ==========================================================================
+   GLOBAL NAVIGATION (Apple GlobalNav Style)
+   ========================================================================== */
+
 .eve-navbar {
-    background-color: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--eve-gray-300);
-    padding: 0.75rem 0;
+    background-color: var(--apple-nav-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--apple-nav-border);
+    padding: 0.65rem 0;
+    z-index: 1030;
     transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-[data-bs-theme="dark"] .eve-navbar {
-    background-color: rgba(20, 20, 22, 0.9);
-}
-
 .eve-brand {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
     font-weight: 600;
     font-size: 1.15rem;
-    color: var(--eve-black) !important;
+    color: var(--apple-text-primary) !important;
     text-decoration: none;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+    transition: opacity 0.2s ease;
+}
+
+.eve-brand:hover {
+    opacity: 0.8;
 }
 
 .eve-logo-circle {
@@ -85,323 +145,456 @@ body {
     justify-content: center;
     width: 28px;
     height: 28px;
-    border-radius: 50%;
-    background-color: var(--eve-black);
-    color: var(--eve-white);
+    border-radius: var(--apple-radius-pill);
+    background: linear-gradient(135deg, var(--apple-text-primary), rgba(120, 120, 128, 0.8));
+    color: var(--apple-surface);
     font-weight: 600;
     font-size: 0.85rem;
-}
-
-.eve-logo-large {
-    width: 56px;
-    height: 56px;
-    font-size: 1.5rem;
-    background-color: var(--eve-black);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .eve-nav-link {
-    color: var(--eve-gray-600);
-    font-weight: 500;
-    font-size: 0.92rem;
-    border: none;
-    background: none;
-    padding: 0.5rem 0.85rem;
-    border-radius: 0.5rem;
-    transition: color 0.15s ease, background-color 0.15s ease;
-    min-height: 38px;
-    display: inline-flex;
-    align-items: center;
+    color: var(--apple-text-secondary) !important;
+    font-weight: 400;
+    font-size: 0.84rem;
+    letter-spacing: -0.01em;
+    padding: 0.45rem 0.85rem !important;
+    border-radius: var(--apple-radius-pill);
+    transition: color 0.18s ease, background-color 0.18s ease, opacity 0.18s ease;
 }
 
 .eve-nav-link:hover {
-    color: var(--eve-black);
-    background-color: var(--eve-gray-100);
+    color: var(--apple-text-primary) !important;
+    background-color: rgba(120, 120, 128, 0.08);
 }
 
 .eve-nav-link.active {
-    color: var(--eve-accent) !important;
+    color: var(--apple-text-primary) !important;
     font-weight: 600;
-    background-color: rgba(59, 130, 246, 0.08);
+    background-color: rgba(120, 120, 128, 0.12);
 }
 
-[data-bs-theme="dark"] .eve-nav-link.active {
-    color: var(--eve-accent) !important;
-    background-color: rgba(59, 130, 246, 0.15);
-}
+/* ==========================================================================
+   BUTTONS (Apple Pill Affordances)
+   ========================================================================== */
 
-/* Layout */
-.eve-main {
-    flex: 1;
-    padding: 3rem 0;
-}
-
-.eve-messages {
-    max-width: 600px;
-    margin: 0 auto 2rem auto;
-}
-
-.eve-messages .alert {
-    border-radius: 0.75rem;
-    border: 1px solid var(--eve-gray-300);
-    background-color: var(--eve-gray-100);
-    color: var(--eve-black);
+.eve-btn-primary {
+    background-color: var(--apple-blue);
+    color: #ffffff !important;
+    border: none;
+    font-weight: 500;
     font-size: 0.92rem;
+    padding: 0.55rem 1.35rem;
+    border-radius: var(--apple-radius-pill);
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    transition: background-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.eve-footer {
-    background-color: var(--eve-white);
-    border-top: 1px solid var(--eve-gray-300);
-    padding: 1.75rem 0;
-    color: var(--eve-gray-600);
+.eve-btn-primary:hover {
+    background-color: var(--apple-blue-hover);
+    color: #ffffff !important;
+    transform: scale(1.015);
+    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.28);
+}
+
+.eve-btn-primary:active {
+    transform: scale(0.985);
+}
+
+.eve-btn-outline {
+    background-color: transparent;
+    color: var(--apple-text-primary);
+    border: 1px solid var(--apple-border-strong);
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--apple-radius-pill);
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    transition: all 0.18s ease;
+}
+
+.eve-btn-outline:hover {
+    background-color: var(--apple-surface);
+    color: var(--apple-blue);
+    border-color: var(--apple-blue);
+    box-shadow: var(--apple-shadow-sm);
+    transform: scale(1.01);
+}
+
+.eve-btn-outline:active {
+    transform: scale(0.985);
+}
+
+.eve-btn-subtle {
+    background-color: var(--apple-blue-subtle);
+    color: var(--apple-blue) !important;
+    border: none;
+    font-weight: 500;
+    font-size: 0.88rem;
+    padding: 0.45rem 1rem;
+    border-radius: var(--apple-radius-pill);
+    transition: all 0.15s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.eve-btn-subtle:hover {
+    background-color: var(--apple-blue);
+    color: #ffffff !important;
+    transform: scale(1.02);
+}
+
+/* ==========================================================================
+   CARDS & BENTO BOX GRID (Apple Clean Aesthetics)
+   ========================================================================== */
+
+.card {
+    background-color: var(--apple-surface);
+    border: 1px solid var(--apple-border);
+    border-radius: var(--apple-radius-lg);
+    box-shadow: var(--apple-shadow-sm);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.eve-bento-card {
+    border-radius: var(--apple-radius-xl);
+    border: 1px solid var(--apple-border);
+    background-color: var(--apple-surface);
+    box-shadow: var(--apple-shadow-sm);
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease, border-color 0.2s ease;
+    overflow: hidden;
+}
+
+.eve-bento-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--apple-shadow-lg);
+    border-color: var(--apple-border-strong);
+}
+
+.card-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--apple-border) !important;
+    padding: 1.25rem 1.5rem !important;
+    font-weight: 600;
+}
+
+/* Apple Stat Chips & Metrics */
+.eve-stat-chip {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--apple-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.eve-stat-chip.blue {
+    background-color: var(--apple-blue-subtle);
+    color: var(--apple-blue);
+}
+
+.eve-stat-chip.green {
+    background-color: var(--apple-green-subtle);
+    color: var(--apple-green);
+}
+
+.eve-stat-chip.orange {
+    background-color: var(--apple-orange-subtle);
+    color: var(--apple-orange);
+}
+
+.eve-stat-chip.purple {
+    background-color: var(--apple-purple-subtle);
+    color: var(--apple-purple);
+}
+
+.eve-metric-number {
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--apple-text-primary);
+}
+
+.eve-metric-label {
     font-size: 0.85rem;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    color: var(--apple-text-secondary);
+    font-weight: 500;
+    margin-top: 0.25rem;
 }
 
-/* Auth screens */
+/* ==========================================================================
+   FORMS & CONTROLS (macOS / iOS Inspired)
+   ========================================================================== */
+
+.form-label {
+    color: var(--apple-text-primary);
+    font-weight: 600;
+    font-size: 0.88rem;
+    margin-bottom: 0.45rem;
+    letter-spacing: -0.01em;
+}
+
+.form-control, .form-select {
+    background-color: var(--apple-surface);
+    color: var(--apple-text-primary);
+    border: 1px solid var(--apple-border);
+    border-radius: var(--apple-radius-md);
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    min-height: 46px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: var(--apple-surface);
+    color: var(--apple-text-primary);
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 4px var(--apple-focus-ring);
+    outline: none;
+}
+
+.form-control:disabled, .form-control[readonly] {
+    background-color: rgba(120, 120, 128, 0.08);
+    color: var(--apple-text-secondary);
+    border-color: var(--apple-border);
+}
+
+/* Apple Segmented Control */
+.eve-segmented-control {
+    background-color: rgba(120, 120, 128, 0.12);
+    padding: 3px;
+    border-radius: var(--apple-radius-pill);
+    display: inline-flex;
+    gap: 2px;
+}
+
+.eve-segmented-item {
+    border-radius: var(--apple-radius-pill);
+    padding: 0.35rem 0.95rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--apple-text-secondary);
+    text-decoration: none;
+    transition: all 0.18s ease;
+}
+
+.eve-segmented-item:hover {
+    color: var(--apple-text-primary);
+}
+
+.eve-segmented-item.active {
+    background-color: var(--apple-surface);
+    color: var(--apple-text-primary);
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* ==========================================================================
+   STATUS BADGES (Apple Pill Badges)
+   ========================================================================== */
+
+.badge {
+    border-radius: var(--apple-radius-pill);
+    padding: 0.35rem 0.8rem;
+    font-weight: 500;
+    font-size: 0.78rem;
+    letter-spacing: -0.01em;
+}
+
+.badge-apple-blue {
+    background-color: var(--apple-blue-subtle) !important;
+    color: var(--apple-blue) !important;
+    border: 1px solid rgba(0, 113, 227, 0.15);
+}
+
+.badge-apple-green {
+    background-color: var(--apple-green-subtle) !important;
+    color: var(--apple-green) !important;
+    border: 1px solid rgba(52, 199, 89, 0.2);
+}
+
+.badge-apple-orange {
+    background-color: var(--apple-orange-subtle) !important;
+    color: var(--apple-orange) !important;
+    border: 1px solid rgba(255, 149, 0, 0.2);
+}
+
+.badge-apple-red {
+    background-color: var(--apple-red-subtle) !important;
+    color: var(--apple-red) !important;
+    border: 1px solid rgba(255, 59, 48, 0.2);
+}
+
+.badge-apple-neutral {
+    background-color: rgba(120, 120, 128, 0.12) !important;
+    color: var(--apple-text-secondary) !important;
+    border: 1px solid var(--apple-border);
+}
+
+/* ==========================================================================
+   TABLES (Apple Clean Tabular Presentation)
+   ========================================================================== */
+
+.table {
+    --bs-table-color: var(--apple-text-primary);
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--apple-border);
+    margin-bottom: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.table th {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--apple-text-secondary);
+    border-bottom: 1px solid var(--apple-border);
+    padding: 1rem 1.25rem;
+    background-color: rgba(120, 120, 128, 0.03);
+}
+
+.table td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--apple-border);
+    color: var(--apple-text-primary);
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover td {
+    background-color: rgba(120, 120, 128, 0.04);
+}
+
+/* ==========================================================================
+   AUTHENTICATION CARDS (Apple ID Style)
+   ========================================================================== */
+
 .eve-auth-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 72vh;
+    min-height: 75vh;
+    padding: 2rem 1rem;
 }
 
 .eve-auth-card {
     width: 100%;
     max-width: 440px;
-    border: 1px solid var(--eve-gray-300);
-    border-radius: 1.25rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    background-color: var(--eve-white);
+    background-color: var(--apple-surface);
+    border: 1px solid var(--apple-border);
+    border-radius: var(--apple-radius-xl);
+    box-shadow: var(--apple-shadow-md);
+    padding: 2.5rem 2.25rem;
 }
 
-[data-bs-theme="dark"] .eve-auth-card {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-}
-
-.eve-brand-title {
-    color: var(--eve-black);
-    font-weight: 600;
-    font-size: 1.9rem;
-    letter-spacing: -0.02em;
-}
-
-.eve-tagline {
-    color: var(--eve-gray-600);
-    font-weight: 400;
-    font-size: 0.95rem;
-}
-
-.form-label {
-    color: var(--eve-black);
-    font-weight: 500;
-    font-size: 0.88rem;
-    margin-bottom: 0.4rem;
-}
-
-.form-control, .form-select {
-    border: 1px solid var(--eve-gray-300);
-    border-radius: 0.7rem;
-    padding: 0.65rem 0.9rem;
-    font-size: 0.95rem;
-    background-color: var(--eve-gray-100);
-    color: var(--eve-black);
-    min-height: 42px;
-}
-
-.form-control:focus, .form-select:focus {
-    border-color: var(--eve-accent);
-    box-shadow: 0 0 0 3px var(--eve-focus-ring);
-    background-color: var(--eve-white);
-    color: var(--eve-black);
-}
-
-.eve-switch-link {
-    color: var(--eve-gray-600);
-    font-size: 0.9rem;
-}
-
-.eve-switch-link a {
-    color: var(--eve-accent);
-    font-weight: 500;
-    text-decoration: none;
-}
-
-.eve-switch-link a:hover {
-    text-decoration: underline;
-}
-
-.eve-btn-primary {
-    background-color: var(--eve-accent);
-    color: #ffffff !important;
-    border: none;
-    font-weight: 500;
-    font-size: 0.95rem;
-    padding: 0.65rem 1.3rem;
-    border-radius: 0.7rem;
-    min-height: 40px;
+.eve-auth-logo {
+    width: 64px;
+    height: 64px;
+    font-size: 1.75rem;
+    border-radius: var(--apple-radius-pill);
+    background: linear-gradient(135deg, var(--apple-text-primary), #6e6e73);
+    color: var(--apple-surface);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.15s ease, transform 0.1s ease;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
 }
 
-.eve-btn-primary:hover {
-    background-color: var(--eve-accent-hover);
-    color: #ffffff !important;
-    transform: translateY(-1px);
-}
-
-.eve-btn-outline {
-    border: 1px solid var(--eve-gray-300);
-    color: var(--eve-black);
-    font-weight: 500;
-    font-size: 0.9rem;
-    padding: 0.55rem 1.25rem;
-    border-radius: 0.7rem;
-    min-height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
-    transition: all 0.15s ease;
-}
-
-.eve-btn-outline:hover {
-    background-color: var(--eve-gray-100);
-    color: var(--eve-black);
-    border-color: var(--eve-gray-600);
-}
-
-/* Home screen */
-.eve-home-hero {
-    padding: 2.5rem 0 1rem 0;
-}
-
-.eve-welcome-title {
-    color: var(--eve-black);
-    font-weight: 600;
-    font-size: 2.85rem;
-    letter-spacing: -0.03em;
-}
-
-.eve-welcome-subtitle {
-    color: var(--eve-gray-600);
-    font-size: 1.15rem;
-    font-weight: 400;
-    max-width: 520px;
-    margin: 0.5rem auto 0 auto;
-}
-
-.eve-home-screen-text {
-    color: var(--eve-gray-600);
+.eve-auth-title {
+    font-size: 1.85rem;
     font-weight: 700;
-    letter-spacing: 0.25rem;
-    font-size: 1.3rem;
-    margin-top: 2rem;
-    opacity: 0.85;
+    letter-spacing: -0.035em;
+    color: var(--apple-text-primary);
+    margin-bottom: 0.35rem;
 }
 
-.eve-feature-card {
-    border: 1px solid var(--eve-gray-300);
-    border-radius: 1.1rem;
-    box-shadow: none;
-    background-color: var(--eve-gray-100);
-    transition: transform 0.2s ease, border-color 0.2s ease;
+.eve-auth-subtitle {
+    color: var(--apple-text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
 }
 
-.eve-feature-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--eve-gray-600);
+/* ==========================================================================
+   PROGRESS BARS (Apple Smooth Rounded Trackers)
+   ========================================================================== */
+
+.progress {
+    height: 8px;
+    background-color: rgba(120, 120, 128, 0.12);
+    border-radius: var(--apple-radius-pill);
+    overflow: hidden;
 }
 
-.eve-feature-icon {
-    font-size: 1.8rem;
-    color: var(--eve-accent);
+.progress-bar {
+    background-color: var(--apple-blue);
+    border-radius: var(--apple-radius-pill);
+    transition: width 0.4s ease;
 }
 
-.eve-feature-card .card-title {
-    font-weight: 600;
-    font-size: 1.05rem;
-    color: var(--eve-black);
+/* ==========================================================================
+   FOOTER (Apple Sub-footer Style)
+   ========================================================================== */
+
+.eve-footer {
+    background-color: var(--apple-bg);
+    border-top: 1px solid var(--apple-border);
+    padding: 2rem 0;
+    color: var(--apple-text-secondary);
+    font-size: 0.78rem;
+    letter-spacing: -0.01em;
+    margin-top: auto;
 }
 
-.eve-feature-card .card-text {
-    color: var(--eve-gray-600);
-    font-size: 0.88rem;
+.eve-footer a {
+    color: var(--apple-text-secondary);
+    text-decoration: none;
+    transition: color 0.15s ease;
 }
 
-/* Dark Mode Surface Overrides */
-[data-bs-theme="dark"] .card {
-    background-color: var(--eve-white);
-    border-color: var(--eve-gray-300) !important;
+.eve-footer a:hover {
+    color: var(--apple-text-primary);
 }
 
-[data-bs-theme="dark"] .card-header {
-    background-color: var(--eve-white) !important;
-    border-bottom-color: var(--eve-gray-300) !important;
+/* ==========================================================================
+   ANIMATIONS & HERO TYPOGRAPHY
+   ========================================================================== */
+
+.eve-hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    color: var(--apple-text-primary);
 }
 
-[data-bs-theme="dark"] .bg-white {
-    background-color: var(--eve-white) !important;
+.eve-hero-subtitle {
+    font-size: 1.15rem;
+    color: var(--apple-text-secondary);
+    letter-spacing: -0.01em;
+    font-weight: 400;
 }
 
-[data-bs-theme="dark"] .bg-light {
-    background-color: var(--eve-gray-100) !important;
-    color: var(--eve-black) !important;
-}
-
-[data-bs-theme="dark"] .list-group-item {
-    background-color: var(--eve-white);
-    border-color: var(--eve-gray-300);
-    color: var(--eve-black);
-}
-
-[data-bs-theme="dark"] .table {
-    --bs-table-color: var(--eve-black);
-    --bs-table-bg: var(--eve-white);
-    --bs-table-border-color: var(--eve-gray-300);
-    --bs-table-hover-bg: rgba(255, 255, 255, 0.03);
-}
-
-[data-bs-theme="dark"] .table-light {
-    --bs-table-bg: var(--eve-gray-100);
-    --bs-table-color: var(--eve-black);
-    --bs-table-border-color: var(--eve-gray-300);
-}
-
-[data-bs-theme="dark"] .border {
-    border-color: var(--eve-gray-300) !important;
-}
-
-[data-bs-theme="dark"] .border-top {
-    border-top-color: var(--eve-gray-300) !important;
-}
-
-[data-bs-theme="dark"] .badge.bg-light {
-    background-color: var(--eve-gray-100) !important;
-    color: var(--eve-black) !important;
-    border-color: var(--eve-gray-300) !important;
-}
-
-/* Touch Targets for Table Actions */
-.btn-sm {
-    min-height: 36px;
-    padding-top: 0.35rem;
-    padding-bottom: 0.35rem;
-}
-
-.table td, .table th {
-    vertical-align: middle;
-}
-
-@media (max-width: 576px) {
-    .eve-welcome-title {
-        font-size: 2.1rem;
+@media (max-width: 768px) {
+    .eve-hero-title {
+        font-size: 2.25rem;
     }
-    .eve-home-screen-text {
-        font-size: 1.05rem;
-    }
-    .eve-main {
-        padding: 2rem 0;
+    .eve-auth-card {
+        padding: 2rem 1.5rem;
     }
 }

@@ -1,186 +1,190 @@
 {% extends "base.html" %}
 
-{% block title %}{{ event.title }} — Event & Shift Management{% endblock %}
+{% block title %}{{ event.title }} — Shift Management{% endblock %}
 
 {% block content %}
 <!-- Top Header & Breadcrumb -->
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-    <div>
-        <div class="d-flex align-items-center gap-2 mb-1">
-            <h1 class="h2 mb-0">{{ event.title }}</h1>
-            <span class="badge {% if event.status == 'UPCOMING' %}bg-primary{% elif event.status == 'COMPLETED' %}bg-success{% elif event.status == 'CANCELLED' %}bg-danger{% else %}bg-secondary{% endif %}">
-                {{ event.get_status_display }}
-            </span>
+<div class="py-3 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h1 class="eve-hero-title mb-0" style="font-size: 2.25rem;">{{ event.title }}</h1>
+                <span class="badge {% if event.status == 'UPCOMING' %}badge-apple-green{% elif event.status == 'COMPLETED' %}badge-apple-blue{% elif event.status == 'CANCELLED' %}badge-apple-red{% else %}badge-apple-neutral{% endif %}">
+                    {{ event.get_status_display }}
+                </span>
+            </div>
+            <div class="small" style="color: var(--apple-text-secondary);">
+                <i class="bi bi-building me-1"></i><strong>{{ event.company.name }}</strong>
+                &bull; Organized by {{ event.created_by.user.get_full_name|default:event.created_by.user.username }}
+                &bull; Created {{ event.created_at|date:"M d, Y" }}
+            </div>
         </div>
-        <p class="text-muted mb-0">
-            <i class="bi bi-building me-1"></i><strong>{{ event.company.name }}</strong>
-            &bull; Organized by {{ event.created_by.user.get_full_name|default:event.created_by.user.username }}
-            &bull; Created {{ event.created_at|date:"M d, Y" }}
-        </p>
-    </div>
-    <div class="d-flex align-items-center gap-2">
-        {% if can_manage %}
-            <a href="{% url 'events:event_edit' event_id=event.id %}" class="btn eve-btn-outline btn-sm">
-                <i class="bi bi-pencil me-1"></i> Edit Event
+
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            {% if can_manage %}
+                <a href="{% url 'events:event_edit' event_id=event.id %}" class="btn eve-btn-outline btn-sm">
+                    <i class="bi bi-pencil me-1"></i> Edit
+                </a>
+                <!-- Event Status Changer -->
+                <form method="post" action="{% url 'events:event_update_status' event_id=event.id %}" class="d-flex align-items-center">
+                    {% csrf_token %}
+                    <label for="event_status" class="visually-hidden">Event Status</label>
+                    <select name="status" id="event_status" class="form-select form-select-sm" style="border-radius: var(--apple-radius-pill); min-height: 36px; width: auto;" onchange="this.form.submit()">
+                        {% for code, label in status_choices %}
+                            <option value="{{ code }}" {% if event.status == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <form method="post" action="{% url 'events:event_delete' event_id=event.id %}" onsubmit="return confirm('Delete this event and all associated shifts?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius: var(--apple-radius-pill); min-height: 36px;">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            {% endif %}
+            <a href="{% url 'events:event_list' %}" class="btn eve-btn-outline btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Events
             </a>
-            <!-- Event Status Changer -->
-            <form method="post" action="{% url 'events:event_update_status' event_id=event.id %}" class="d-flex align-items-center gap-1">
-                {% csrf_token %}
-                <label for="event_status" class="small text-muted me-1">Status:</label>
-                <select name="status" id="event_status" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
-                    {% for code, label in status_choices %}
-                        <option value="{{ code }}" {% if event.status == code %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </form>
-            <form method="post" action="{% url 'events:event_delete' event_id=event.id %}" onsubmit="return confirm('Are you sure you want to delete this event? All shifts and assignments will be permanently removed.');">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-outline-danger">
-                    <i class="bi bi-trash me-1"></i> Delete
-                </button>
-            </form>
-        {% endif %}
-        <a href="{% url 'events:event_list' %}" class="btn eve-btn-outline">
-            <i class="bi bi-arrow-left me-1"></i> Back to Events
-        </a>
+        </div>
     </div>
 </div>
 
 <!-- Event Info & Progress Cards -->
 <div class="row g-4 mb-4">
-    <!-- Event Details Card -->
+    <!-- Schedule & Location Card -->
     <div class="col-lg-7">
-        <div class="card h-100 shadow-sm border-0">
+        <div class="card h-100 eve-bento-card">
             <div class="card-body p-4">
-                <h5 class="fw-bold mb-3"><i class="bi bi-info-circle me-2 text-primary"></i>Event Schedule & Location</h5>
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="eve-stat-chip blue" style="width: 36px; height: 36px; font-size: 1.1rem;">
+                        <i class="bi bi-calendar3"></i>
+                    </span>
+                    <h5 class="fw-semibold mb-0" style="color: var(--apple-text-primary);">Schedule & Location</h5>
+                </div>
 
                 <div class="row g-3 mb-3">
                     <div class="col-sm-4">
-                        <div class="text-muted small">Date</div>
-                        <div class="fw-semibold"><i class="bi bi-calendar3 me-1 text-primary"></i>{{ event.event_date|date:"F d, Y" }}</div>
+                        <div class="small fw-medium" style="color: var(--apple-text-secondary);">Date</div>
+                        <div class="fw-bold fs-6" style="color: var(--apple-text-primary);">{{ event.event_date|date:"F d, Y" }}</div>
                     </div>
                     <div class="col-sm-4">
-                        <div class="text-muted small">Time Window</div>
-                        <div class="fw-semibold"><i class="bi bi-clock me-1 text-primary"></i>{{ event.start_time|time:"g:i A" }} – {{ event.end_time|time:"g:i A" }}</div>
+                        <div class="small fw-medium" style="color: var(--apple-text-secondary);">Shift Hours</div>
+                        <div class="fw-bold fs-6" style="color: var(--apple-text-primary);">{{ event.start_time|time:"g:i A" }} – {{ event.end_time|time:"g:i A" }}</div>
                     </div>
                     <div class="col-sm-4">
-                        <div class="text-muted small">Venue / Location</div>
-                        <div class="fw-semibold"><i class="bi bi-geo-alt me-1 text-primary"></i>{{ event.location }}</div>
+                        <div class="small fw-medium" style="color: var(--apple-text-secondary);">Venue</div>
+                        <div class="fw-bold fs-6" style="color: var(--apple-text-primary);">{{ event.location }}</div>
                     </div>
                 </div>
 
                 {% if event.description %}
-                    <div class="pt-3 border-top">
-                        <div class="text-muted small mb-1">Description & Briefing</div>
-                        <p class="mb-0 text-secondary">{{ event.description }}</p>
+                    <div class="p-3 rounded-4 mt-2" style="background-color: var(--apple-surface-secondary); border: 1px solid var(--apple-border);">
+                        <div class="small fw-medium mb-1" style="color: var(--apple-text-secondary);">Overview & Instructions</div>
+                        <p class="mb-0 small" style="color: var(--apple-text-primary); white-space: pre-line;">{{ event.description }}</p>
                     </div>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Progress & Tracking Card -->
+    <!-- Attendance Progress Card -->
     <div class="col-lg-5">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body p-4">
-                <h5 class="fw-bold mb-3"><i class="bi bi-graph-up-arrow me-2 text-success"></i>Staffing & Progress Tracking</h5>
-
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="text-muted small">Progress (Confirmed / Completed):</span>
-                        <span class="fw-bold">{{ progress_pct }}%</span>
+        <div class="card h-100 eve-bento-card">
+            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="eve-stat-chip green" style="width: 36px; height: 36px; font-size: 1.1rem;">
+                                <i class="bi bi-pie-chart"></i>
+                            </span>
+                            <h5 class="fw-semibold mb-0" style="color: var(--apple-text-primary);">Attendance</h5>
+                        </div>
+                        <span class="badge badge-apple-green">{{ progress_pct }}% Ready</span>
                     </div>
-                    <div class="progress" style="height: 10px;">
-                        <div class="progress-bar {% if progress_pct == 100 %}bg-success{% else %}bg-primary{% endif %}" role="progressbar" style="width: {{ progress_pct }}%;" aria-valuenow="{{ progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+
+                    <div class="mt-3 mb-3">
+                        <div class="eve-metric-number mb-1">{{ confirmed_count }} / {{ total_assignments }}</div>
+                        <div class="eve-metric-label">Confirmed or Completed Shifts</div>
+                    </div>
+
+                    <div class="progress mb-3" style="height: 10px;">
+                        <div class="progress-bar" role="progressbar" style="width: {{ progress_pct }}%;" aria-valuenow="{{ progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
 
-                <div class="row g-2 text-center pt-2">
-                    <div class="col-3">
-                        <div class="p-2 border rounded bg-light">
-                            <h4 class="mb-0 fw-bold">{{ total_assignments }}</h4>
-                            <small class="text-muted" style="font-size: 0.75rem;">Total</small>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="p-2 border rounded bg-light">
-                            <h4 class="mb-0 fw-bold text-secondary">{{ assigned_count }}</h4>
-                            <small class="text-muted" style="font-size: 0.75rem;">Assigned</small>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="p-2 border rounded bg-light">
-                            <h4 class="mb-0 fw-bold text-primary">{{ confirmed_count }}</h4>
-                            <small class="text-muted" style="font-size: 0.75rem;">Confirmed</small>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="p-2 border rounded bg-light">
-                            <h4 class="mb-0 fw-bold text-success">{{ completed_count }}</h4>
-                            <small class="text-muted" style="font-size: 0.75rem;">Completed</small>
-                        </div>
-                    </div>
+                <div class="d-flex justify-content-between pt-3" style="border-top: 1px solid var(--apple-border); font-size: 0.8rem;">
+                    <span style="color: var(--apple-text-secondary);"><i class="bi bi-circle-fill me-1 text-warning" style="font-size: 0.5rem;"></i>Assigned: <strong>{{ assigned_count }}</strong></span>
+                    <span style="color: var(--apple-text-secondary);"><i class="bi bi-circle-fill me-1 text-success" style="font-size: 0.5rem;"></i>Confirmed: <strong>{{ confirmed_count }}</strong></span>
+                    <span style="color: var(--apple-text-secondary);"><i class="bi bi-circle-fill me-1 text-primary" style="font-size: 0.5rem;"></i>Completed: <strong>{{ completed_count }}</strong></span>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Logged-in User Shift Alert (if assigned) -->
+<!-- Personal Shift Notice Banner -->
 {% if my_assignment %}
-    <div class="alert alert-info border-0 shadow-sm mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div>
-            <div class="fw-bold mb-1">
-                <i class="bi bi-person-badge me-2"></i>You are assigned to this event:
+    <div class="p-3 mb-4 rounded-4 eve-bento-card" style="background: linear-gradient(135deg, var(--apple-blue-subtle), var(--apple-surface));">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <div class="fw-semibold mb-1" style="color: var(--apple-text-primary);">
+                    <i class="bi bi-person-check me-2 text-primary"></i>Your Assigned Shift:
+                </div>
+                <div class="small" style="color: var(--apple-text-secondary);">
+                    Role: <strong style="color: var(--apple-text-primary);">{{ my_assignment.assigned_role }}</strong>
+                    &bull; Location: <strong style="color: var(--apple-text-primary);">{{ my_assignment.assigned_location }}</strong>
+                    &bull; Time: <strong style="color: var(--apple-text-primary);">{{ my_assignment.start_time|time:"g:i A" }} – {{ my_assignment.end_time|time:"g:i A" }}</strong>
+                    &bull; Status: <span class="badge {% if my_assignment.status == 'CONFIRMED' %}badge-apple-green{% elif my_assignment.status == 'COMPLETED' %}badge-apple-blue{% else %}badge-apple-orange{% endif %}">{{ my_assignment.get_status_display }}</span>
+                </div>
             </div>
-            <div class="small">
-                Role: <strong>{{ my_assignment.assigned_role }}</strong> &bull; Location: <strong>{{ my_assignment.assigned_location }}</strong> &bull; Time: <strong>{{ my_assignment.start_time|time:"g:i A" }} – {{ my_assignment.end_time|time:"g:i A" }}</strong> &bull; Current Status: <span class="badge bg-primary">{{ my_assignment.get_status_display }}</span>
+            <div>
+                {% if my_assignment.status == 'ASSIGNED' %}
+                    <form method="post" action="{% url 'events:assignment_update' assignment_id=my_assignment.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="CONFIRMED">
+                        <button type="submit" class="btn eve-btn-primary btn-sm px-4">
+                            <i class="bi bi-check2"></i> Confirm Attendance
+                        </button>
+                    </form>
+                {% elif my_assignment.status == 'CONFIRMED' %}
+                    <form method="post" action="{% url 'events:assignment_update' assignment_id=my_assignment.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="COMPLETED">
+                        <button type="submit" class="btn eve-btn-primary btn-sm px-4">
+                            <i class="bi bi-patch-check"></i> Mark Shift Completed
+                        </button>
+                    </form>
+                {% endif %}
             </div>
-        </div>
-        <div class="d-flex gap-2">
-            {% if my_assignment.status == 'ASSIGNED' %}
-                <form method="post" action="{% url 'events:assignment_update' assignment_id=my_assignment.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="status" value="CONFIRMED">
-                    <button type="submit" class="btn btn-sm btn-success">
-                        <i class="bi bi-check2-circle me-1"></i> Confirm Attendance
-                    </button>
-                </form>
-            {% elif my_assignment.status == 'CONFIRMED' %}
-                <form method="post" action="{% url 'events:assignment_update' assignment_id=my_assignment.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="status" value="COMPLETED">
-                    <button type="submit" class="btn btn-sm btn-primary">
-                        <i class="bi bi-patch-check me-1"></i> Mark Shift Completed
-                    </button>
-                </form>
-            {% endif %}
         </div>
     </div>
 {% endif %}
 
-<!-- Event Assignments Table -->
-<div class="card shadow-sm border-0 mb-4">
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">
-            <i class="bi bi-people-fill me-2 text-primary"></i>Assigned Team Members & Shift Status ({{ assignments.count }})
-        </h5>
-        <span class="badge bg-light text-dark border">
+<!-- Team Assignments Table -->
+<div class="card mb-4 eve-bento-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <span class="eve-stat-chip purple" style="width: 32px; height: 32px; font-size: 1rem;">
+                <i class="bi bi-people-fill"></i>
+            </span>
+            <span class="fw-semibold">Assigned Team Shifts ({{ assignments.count }})</span>
+        </div>
+        <span class="badge badge-apple-neutral">
             {{ confirmed_count }} of {{ total_assignments }} Confirmed
         </span>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+                <thead>
                     <tr>
                         <th class="ps-4">Member</th>
-                        <th>Assigned Role</th>
+                        <th>Role / Duties</th>
                         <th>Location</th>
                         <th>Shift Hours</th>
                         <th>Status</th>
                         {% if can_manage %}
-                            <th class="text-end pe-4">Actions</th>
+                            <th class="text-end pe-4">Manage</th>
                         {% endif %}
                     </tr>
                 </thead>
@@ -189,20 +193,20 @@
                         <tr>
                             <td class="ps-4">
                                 <div class="d-flex align-items-center">
-                                    <span class="eve-logo-circle me-2" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                                    <span class="eve-logo-circle me-2" style="width: 32px; height: 32px; font-size: 0.82rem;">
                                         {{ a.member.user.first_name|default:a.member.user.username|make_list|first|upper }}
                                     </span>
                                     <div>
-                                        <div class="fw-bold">{{ a.member.user.get_full_name|default:a.member.user.username }}</div>
-                                        <small class="text-muted">{{ a.member.get_role_display }}</small>
+                                        <div class="fw-semibold" style="color: var(--apple-text-primary);">{{ a.member.user.get_full_name|default:a.member.user.username }}</div>
+                                        <div class="small" style="color: var(--apple-text-secondary);">{{ a.member.get_role_display }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td><span class="badge bg-light text-dark border">{{ a.assigned_role }}</span></td>
-                            <td>{{ a.assigned_location|default:event.location }}</td>
-                            <td>{{ a.start_time|time:"g:i A" }} – {{ a.end_time|time:"g:i A" }}</td>
+                            <td><span class="badge badge-apple-neutral">{{ a.assigned_role }}</span></td>
+                            <td><small style="color: var(--apple-text-primary);">{{ a.assigned_location|default:event.location }}</small></td>
+                            <td><small style="color: var(--apple-text-secondary);">{{ a.start_time|time:"g:i A" }} – {{ a.end_time|time:"g:i A" }}</small></td>
                             <td>
-                                <span class="badge {% if a.status == 'CONFIRMED' %}bg-primary{% elif a.status == 'COMPLETED' %}bg-success{% elif a.status == 'CANCELLED' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                <span class="badge {% if a.status == 'CONFIRMED' %}badge-apple-green{% elif a.status == 'COMPLETED' %}badge-apple-blue{% elif a.status == 'CANCELLED' %}badge-apple-red{% else %}badge-apple-orange{% endif %}">
                                     {{ a.get_status_display }}
                                 </span>
                             </td>
@@ -212,7 +216,7 @@
                                         <!-- Update status form -->
                                         <form method="post" action="{% url 'events:assignment_update' assignment_id=a.id %}" class="d-flex align-items-center">
                                             {% csrf_token %}
-                                            <select name="status" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                                            <select name="status" class="form-select form-select-sm py-1 px-2" style="border-radius: var(--apple-radius-pill); font-size: 0.78rem; width: auto;" onchange="this.form.submit()">
                                                 {% for status_code, status_label in assignment_status_choices %}
                                                     <option value="{{ status_code }}" {% if a.status == status_code %}selected{% endif %}>
                                                         {{ status_label }}
@@ -224,7 +228,7 @@
                                         <!-- Delete assignment form -->
                                         <form method="post" action="{% url 'events:assignment_delete' assignment_id=a.id %}" onsubmit="return confirm('Remove assignment for {{ a.member.user.username }}?');">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove assignment" aria-label="Remove assignment for {{ a.member.user.username }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger p-1 px-2" style="border-radius: var(--apple-radius-pill);" title="Remove assignment" aria-label="Remove assignment for {{ a.member.user.username }}">
                                                 <i class="bi bi-trash" aria-hidden="true"></i>
                                             </button>
                                         </form>
@@ -234,12 +238,9 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-5">
-                                <i class="bi bi-person-x" style="font-size: 2rem;"></i>
-                                <p class="mt-2 mb-0">No company members assigned to this event yet.</p>
-                                {% if can_manage %}
-                                    <small class="text-muted">Use the form below to assign team members to shifts.</small>
-                                {% endif %}
+                            <td colspan="6" class="text-center py-5" style="color: var(--apple-text-secondary);">
+                                <i class="bi bi-person-x fs-1 d-block mb-2"></i>
+                                <p class="mb-0">No company members assigned to this event yet.</p>
                             </td>
                         </tr>
                     {% endfor %}
@@ -251,11 +252,12 @@
 
 <!-- Assign Member Form (Owners & Managers Only) -->
 {% if can_manage %}
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-white py-3">
-            <h5 class="mb-0">
-                <i class="bi bi-person-plus-fill me-2 text-primary"></i>Assign Company Member to this Event
-            </h5>
+    <div class="card eve-bento-card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+            <span class="eve-stat-chip blue" style="width: 32px; height: 32px; font-size: 1rem;">
+                <i class="bi bi-person-plus-fill"></i>
+            </span>
+            <span class="fw-semibold">Assign Team Member to Shift</span>
         </div>
         <div class="card-body p-4">
             {% if available_members %}
@@ -264,48 +266,47 @@
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="member_id" class="form-label fw-semibold">Select Company Member *</label>
+                            <label for="member_id" class="form-label">Company Member *</label>
                             <select name="member_id" id="member_id" class="form-select" required>
-                                <option value="" disabled selected>-- Choose available member --</option>
+                                <option value="" disabled selected>Choose available team member...</option>
                                 {% for m in available_members %}
                                     <option value="{{ m.id }}">
-                                        {{ m.user.get_full_name|default:m.user.username }} ({{ m.get_role_display }}) - {{ m.user.email }}
+                                        {{ m.user.get_full_name|default:m.user.username }} ({{ m.get_role_display }}) — {{ m.user.email }}
                                     </option>
                                 {% endfor %}
                             </select>
                         </div>
 
                         <div class="col-md-6">
-                            <label for="assigned_role" class="form-label fw-semibold">Assigned Role / Job Title *</label>
-                            <input type="text" class="form-control" id="assigned_role" name="assigned_role" placeholder="e.g., Usher, Stage Technician, Cashier, Security" required list="role_suggestions">
+                            <label for="assigned_role" class="form-label">Role / Shift Duties *</label>
+                            <input type="text" class="form-control" id="assigned_role" name="assigned_role" placeholder="e.g., Stage Supervisor, Usher, Cashier" required list="role_suggestions">
                             <datalist id="role_suggestions">
                                 <option value="Shift Supervisor">
                                 <option value="Stage Technician">
                                 <option value="Usher">
                                 <option value="Cashier">
-                                <option value="Registration Desk">
-                                <option value="Security Coordinator">
-                                <option value="Logistics Support">
+                                <option value="Registration Coordinator">
+                                <option value="Security Officer">
                             </datalist>
                         </div>
 
                         <div class="col-md-4">
-                            <label for="assigned_location" class="form-label fw-semibold">Specific Location</label>
-                            <input type="text" class="form-control" id="assigned_location" name="assigned_location" value="{{ event.location }}" placeholder="e.g., Main Entrance, Stage Left">
+                            <label for="assigned_location" class="form-label">Shift Location</label>
+                            <input type="text" class="form-control" id="assigned_location" name="assigned_location" value="{{ event.location }}" placeholder="e.g. Main Hall, Gate 2">
                         </div>
 
                         <div class="col-md-3">
-                            <label for="start_time" class="form-label fw-semibold">Start Time</label>
+                            <label for="start_time" class="form-label">Start Time</label>
                             <input type="time" class="form-control" id="start_time" name="start_time" value="{{ event.start_time|time:'H:i' }}">
                         </div>
 
                         <div class="col-md-3">
-                            <label for="end_time" class="form-label fw-semibold">End Time</label>
+                            <label for="end_time" class="form-label">End Time</label>
                             <input type="time" class="form-control" id="end_time" name="end_time" value="{{ event.end_time|time:'H:i' }}">
                         </div>
 
                         <div class="col-md-2">
-                            <label for="assignment_initial_status" class="form-label fw-semibold">Initial Status</label>
+                            <label for="assignment_initial_status" class="form-label">Status</label>
                             <select name="status" id="assignment_initial_status" class="form-select">
                                 <option value="ASSIGNED" selected>Assigned</option>
                                 <option value="CONFIRMED">Confirmed</option>
@@ -315,15 +316,16 @@
 
                     <div class="d-flex justify-content-end mt-4">
                         <button type="submit" class="btn eve-btn-primary">
-                            <i class="bi bi-check2-circle me-1"></i> Assign Member to Shift
+                            <i class="bi bi-check2"></i> Add Shift Assignment
                         </button>
                     </div>
                 </form>
             {% else %}
-                <div class="text-center py-3 text-muted">
-                    <p class="mb-0">All current company members have already been assigned to this event, or no members are registered.</p>
-                    <a href="{% url 'events:company_members' company_id=event.company.id %}" class="btn eve-btn-outline btn-sm mt-2">
-                        <i class="bi bi-people me-1"></i> View Company Members
+                <div class="text-center py-4" style="color: var(--apple-text-secondary);">
+                    <i class="bi bi-check-all fs-1 text-success d-block mb-1"></i>
+                    <p class="mb-2">All active organization members have been assigned to shifts for this event.</p>
+                    <a href="{% url 'events:company_members' company_id=event.company.id %}" class="btn eve-btn-outline btn-sm">
+                        <i class="bi bi-people me-1"></i> View Organization Roster
                     </a>
                 </div>
             {% endif %}
@@ -331,4 +333,3 @@
     </div>
 {% endif %}
 {% endblock %}
-

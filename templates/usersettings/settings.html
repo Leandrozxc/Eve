@@ -1,48 +1,71 @@
 {% extends 'base.html' %}
 
-{% block title %}Settings{% endblock %}
+{% block title %}Preferences{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
+<div class="row justify-content-center py-3">
     <div class="col-lg-7">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h1 class="h2 mb-1">Preferences & Settings</h1>
-                <p class="text-muted mb-0">Configure your application preferences and notification controls.</p>
+                <div class="text-uppercase fw-semibold small mb-1" style="color: var(--apple-text-secondary); letter-spacing: 0.05em; font-size: 0.75rem;">
+                    System Preferences
+                </div>
+                <h1 class="eve-hero-title mb-1" style="font-size: 2.25rem;">Preferences</h1>
+                <p class="eve-hero-subtitle mb-0">Customize your interface appearance and notification delivery.</p>
             </div>
-            <a href="{% url 'home:home' %}" class="btn eve-btn-outline">
-                <i class="bi bi-arrow-left me-1"></i> Back to Home
+            <a href="{% url 'home:home' %}" class="btn eve-btn-outline btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Overview
             </a>
         </div>
 
-        <div class="card shadow-sm border-0">
+        <div class="card eve-bento-card">
             <div class="card-body p-4 p-md-5">
                 <form method="post" action="{% url 'usersettings:settings' %}">
                     {% csrf_token %}
 
-                    <div class="card bg-light border-0 p-3 mb-3">
+                    <!-- Appearance Section -->
+                    <div class="text-uppercase fw-semibold small mb-3" style="color: var(--apple-text-secondary); letter-spacing: 0.05em; font-size: 0.75rem;">
+                        Appearance
+                    </div>
+
+                    <div class="p-3 rounded-4 mb-4" style="background-color: var(--apple-surface-secondary); border: 1px solid var(--apple-border);">
                         <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0">
                             <div>
-                                <label class="form-check-label fw-semibold" for="dark_mode">Dark Mode</label>
-                                <p class="text-muted small mb-0">Switch between standard light interface and high-contrast dark theme.</p>
+                                <label class="form-check-label fw-semibold" for="dark_mode" style="color: var(--apple-text-primary);">
+                                    <i class="bi bi-moon-stars me-2 text-primary"></i>Dark Mode
+                                </label>
+                                <p class="small mb-0" style="color: var(--apple-text-secondary);">
+                                    Switch between Apple light canvas and deep obsidian dark mode.
+                                </p>
                             </div>
-                            <input class="form-check-input ms-3" type="checkbox" role="switch" id="dark_mode" name="dark_mode" {% if settings.dark_mode %}checked{% endif %}>
+                            <input class="form-check-input ms-3" type="checkbox" role="switch" id="dark_mode" name="dark_mode" style="width: 2.8em; height: 1.5em; cursor: pointer;" {% if settings.dark_mode %}checked{% endif %}>
                         </div>
                     </div>
 
-                    <div class="card bg-light border-0 p-3 mb-4">
+                    <!-- Notifications Section -->
+                    <div class="text-uppercase fw-semibold small mb-3" style="color: var(--apple-text-secondary); letter-spacing: 0.05em; font-size: 0.75rem;">
+                        Notifications
+                    </div>
+
+                    <div class="p-3 rounded-4 mb-4" style="background-color: var(--apple-surface-secondary); border: 1px solid var(--apple-border);">
                         <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0">
                             <div>
-                                <label class="form-check-label fw-semibold" for="email_notifications">Email Notifications</label>
-                                <p class="text-muted small mb-0">Receive automated email alerts for new shifts, schedule updates, and task assignments.</p>
+                                <label class="form-check-label fw-semibold" for="email_notifications" style="color: var(--apple-text-primary);">
+                                    <i class="bi bi-bell me-2 text-primary"></i>Email Notifications
+                                </label>
+                                <p class="small mb-0" style="color: var(--apple-text-secondary);">
+                                    Receive alerts for upcoming event shift assignments and status changes.
+                                </p>
                             </div>
-                            <input class="form-check-input ms-3" type="checkbox" role="switch" id="email_notifications" name="email_notifications" {% if settings.email_notifications %}checked{% endif %}>
+                            <input class="form-check-input ms-3" type="checkbox" role="switch" id="email_notifications" name="email_notifications" style="width: 2.8em; height: 1.5em; cursor: pointer;" {% if settings.email_notifications %}checked{% endif %}>
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a href="{% url 'home:home' %}" class="btn eve-btn-outline">Back to Home</a>
-                        <button type="submit" class="btn eve-btn-primary">Save Settings</button>
+                    <div class="d-flex justify-content-end gap-2 pt-3" style="border-top: 1px solid var(--apple-border);">
+                        <a href="{% url 'home:home' %}" class="btn eve-btn-outline">Cancel</a>
+                        <button type="submit" class="btn eve-btn-primary">
+                            Save Preferences
+                        </button>
                     </div>
                 </form>
             </div>

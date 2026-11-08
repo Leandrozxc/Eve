@@ -1,47 +1,54 @@
 {% extends "base.html" %}
 
-{% block title %}Shift & Event Scheduling{% endblock %}
+{% block title %}Events & Shift Scheduling{% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-    <div>
-        <h1 class="h2 mb-1">Shift & Event Scheduling</h1>
-        <p class="text-muted mb-0">Organize company events, assign staff, and track progress.</p>
-    </div>
-    <div class="d-flex gap-2">
-        <a href="{% url 'events:event_create' %}" class="btn eve-btn-primary">
-            <i class="bi bi-plus-lg me-1"></i> Create Event
-        </a>
+<!-- Apple Header -->
+<div class="py-3 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+        <div>
+            <div class="text-uppercase fw-semibold small mb-1" style="color: var(--apple-text-secondary); letter-spacing: 0.05em; font-size: 0.75rem;">
+                Schedule Coordination
+            </div>
+            <h1 class="eve-hero-title mb-1">Events & Shifts</h1>
+            <p class="eve-hero-subtitle mb-0">Organize company events, assign team members, and track real-time attendance.</p>
+        </div>
+        <div>
+            <a href="{% url 'events:event_create' %}" class="btn eve-btn-primary">
+                <i class="bi bi-plus-lg"></i>
+                <span>Schedule New Event</span>
+            </a>
+        </div>
     </div>
 </div>
 
-<!-- Filters Bar -->
-<div class="card border-0 shadow-sm p-3 mb-4 bg-light">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <!-- Status Filter Tabs -->
-        <div class="btn-group" role="group">
-            <a href="{% url 'events:event_list' %}{% if company_filter %}?company_id={{ company_filter }}{% endif %}" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-                All Statuses
+<!-- Apple Filter Bar (Segmented Controls) -->
+<div class="card p-3 mb-4 eve-bento-card">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+        <!-- Segmented Status Tabs -->
+        <div class="eve-segmented-control flex-wrap">
+            <a href="{% url 'events:event_list' %}{% if company_filter %}?company_id={{ company_filter }}{% endif %}" class="eve-segmented-item {% if not status_filter %}active{% endif %}">
+                All Events
             </a>
             {% for code, label in status_choices %}
-                <a href="{% url 'events:event_list' %}?status={{ code }}{% if company_filter %}&company_id={{ company_filter }}{% endif %}" class="btn btn-sm {% if status_filter == code %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                <a href="{% url 'events:event_list' %}?status={{ code }}{% if company_filter %}&company_id={{ company_filter }}{% endif %}" class="eve-segmented-item {% if status_filter == code %}active{% endif %}">
                     {{ label }}
                 </a>
             {% endfor %}
         </div>
 
-        <!-- Company Filter Dropdown -->
+        <!-- Company Picker -->
         {% if my_memberships %}
             <form method="get" class="d-flex align-items-center gap-2">
                 {% if status_filter %}
                     <input type="hidden" name="status" value="{{ status_filter }}">
                 {% endif %}
-                <label for="company_id" class="small text-muted text-nowrap">Filter Company:</label>
-                <select name="company_id" id="company_id" class="form-select form-select-sm" onchange="this.form.submit()">
-                    <option value="">All Companies</option>
+                <label for="company_id" class="small fw-medium text-nowrap" style="color: var(--apple-text-secondary);">Filter by:</label>
+                <select name="company_id" id="company_id" class="form-select form-select-sm py-1 px-3" style="border-radius: var(--apple-radius-pill); min-height: 36px; width: auto;" onchange="this.form.submit()">
+                    <option value="">All Organizations</option>
                     {% for mem in my_memberships %}
                         <option value="{{ mem.company.id }}" {% if company_filter == mem.company.id|stringformat:"s" %}selected{% endif %}>
-                            {{ mem.company.name }} ({{ mem.get_role_display }})
+                            {{ mem.company.name }}
                         </option>
                     {% endfor %}
                 </select>
@@ -50,60 +57,68 @@
     </div>
 </div>
 
-<!-- Event List -->
+<!-- Bento Event Cards Grid -->
 {% if events_data %}
-    <div class="row g-4">
+    <div class="row g-4 mb-4">
         {% for item in events_data %}
             {% with ev=item.event %}
                 <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 shadow-sm border-0 eve-feature-card">
+                    <div class="card h-100 eve-bento-card">
                         <div class="card-body p-4 d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="badge {% if ev.status == 'UPCOMING' %}bg-primary{% elif ev.status == 'COMPLETED' %}bg-success{% elif ev.status == 'CANCELLED' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                <span class="badge {% if ev.status == 'UPCOMING' %}badge-apple-green{% elif ev.status == 'COMPLETED' %}badge-apple-blue{% elif ev.status == 'CANCELLED' %}badge-apple-red{% else %}badge-apple-neutral{% endif %}">
                                     {{ ev.get_status_display }}
                                 </span>
-                                <small class="text-muted"><i class="bi bi-building me-1"></i>{{ ev.company.name }}</small>
+                                <span class="small fw-medium" style="color: var(--apple-text-secondary);">
+                                    <i class="bi bi-building me-1"></i>{{ ev.company.name }}
+                                </span>
                             </div>
 
-                            <h5 class="card-title mt-2 mb-2">
-                                <a href="{% url 'events:event_detail' event_id=ev.id %}" class="text-dark text-decoration-none">
+                            <h5 class="fw-bold mt-2 mb-2">
+                                <a href="{% url 'events:event_detail' event_id=ev.id %}" class="text-decoration-none" style="color: var(--apple-text-primary);">
                                     {{ ev.title }}
                                 </a>
                             </h5>
 
                             {% if ev.description %}
-                                <p class="card-text text-muted small mb-3">{{ ev.description|truncatewords:18 }}</p>
+                                <p class="small text-truncate mb-3" style="color: var(--apple-text-secondary);" title="{{ ev.description }}">
+                                    {{ ev.description }}
+                                </p>
+                            {% else %}
+                                <div class="mb-3"></div>
                             {% endif %}
 
-                            <!-- Progress Bar -->
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center small mb-1">
-                                    <span class="text-muted">Staffing Progress:</span>
-                                    <span class="fw-semibold">{{ item.confirmed_count }}/{{ item.total_assignments }} confirmed</span>
+                            <div class="p-3 rounded-3 mb-3" style="background-color: var(--apple-surface-secondary); border: 1px solid var(--apple-border); font-size: 0.85rem;">
+                                <div class="mb-1" style="color: var(--apple-text-primary);">
+                                    <i class="bi bi-calendar3 me-2" style="color: var(--apple-blue);"></i>{{ ev.event_date|date:"F d, Y" }}
                                 </div>
-                                <div class="progress" style="height: 6px;">
-                                    <div class="progress-bar {% if item.progress_pct == 100 %}bg-success{% else %}bg-primary{% endif %}" role="progressbar" style="width: {{ item.progress_pct }}%;" aria-valuenow="{{ item.progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="mb-1" style="color: var(--apple-text-secondary);">
+                                    <i class="bi bi-clock me-2" style="color: var(--apple-blue);"></i>{{ ev.start_time|time:"g:i A" }} – {{ ev.end_time|time:"g:i A" }}
+                                </div>
+                                <div style="color: var(--apple-text-secondary);">
+                                    <i class="bi bi-geo-alt me-2" style="color: var(--apple-blue);"></i>{{ ev.location }}
                                 </div>
                             </div>
 
-                            <div class="mt-auto pt-3 border-top text-muted small">
-                                <div class="d-flex align-items-center mb-1">
-                                    <i class="bi bi-calendar3 me-2 text-primary"></i>
-                                    <span>{{ ev.event_date|date:"F d, Y" }}</span>
+                            <!-- Progress Track -->
+                            <div class="mt-auto pt-2">
+                                <div class="d-flex justify-content-between align-items-center small mb-1">
+                                    <span style="color: var(--apple-text-secondary);">Shift Progress</span>
+                                    <span class="fw-semibold" style="color: var(--apple-text-primary);">
+                                        {{ item.confirmed_count }}/{{ item.total_assignments }} Confirmed
+                                    </span>
                                 </div>
-                                <div class="d-flex align-items-center mb-1">
-                                    <i class="bi bi-clock me-2 text-primary"></i>
-                                    <span>{{ ev.start_time|time:"g:i A" }} – {{ ev.end_time|time:"g:i A" }}</span>
-                                </div>
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-geo-alt me-2 text-primary"></i>
-                                    <span>{{ ev.location }}</span>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ item.progress_pct }}%;" aria-valuenow="{{ item.progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
 
-                                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                    <span class="text-secondary small">Created by {{ ev.created_by.user.first_name|default:ev.created_by.user.username }}</span>
-                                    <a href="{% url 'events:event_detail' event_id=ev.id %}" class="btn btn-sm eve-btn-primary">
-                                        Manage Shifts <i class="bi bi-arrow-right ms-1"></i>
+                                <div class="d-flex justify-content-between align-items-center pt-2" style="border-top: 1px solid var(--apple-border);">
+                                    <span class="small" style="color: var(--apple-text-secondary);">
+                                        {{ item.total_assignments }} member{{ item.total_assignments|pluralize }} assigned
+                                    </span>
+                                    <a href="{% url 'events:event_detail' event_id=ev.id %}" class="eve-btn-subtle text-decoration-none">
+                                        <span>Manage</span>
+                                        <i class="bi bi-chevron-right small"></i>
                                     </a>
                                 </div>
                             </div>
@@ -114,13 +129,24 @@
         {% endfor %}
     </div>
 {% else %}
-    <div class="card border-0 shadow-sm text-center py-5">
-        <div class="card-body">
-            <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
-            <h4 class="mt-3">No shifts or events found</h4>
-            <p class="text-muted">There are no events matching your criteria.</p>
-            <a href="{% url 'events:event_create' %}" class="btn eve-btn-primary mt-2">
-                <i class="bi bi-plus-lg me-1"></i> Create First Event
+    <div class="card p-5 text-center eve-bento-card mb-4">
+        <div class="eve-stat-chip blue mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.75rem;">
+            <i class="bi bi-calendar-x"></i>
+        </div>
+        <h4 class="fw-bold mb-1" style="color: var(--apple-text-primary);">No events found</h4>
+        <p class="small mb-4" style="color: var(--apple-text-secondary); max-width: 420px; margin: 0 auto;">
+            {% if status_filter or company_filter %}
+                No events match the selected filters. Try changing or clearing your filter criteria.
+            {% else %}
+                Your organizations do not have any scheduled events yet. Get started by creating your first event.
+            {% endif %}
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            {% if status_filter or company_filter %}
+                <a href="{% url 'events:event_list' %}" class="btn eve-btn-outline">Clear Filters</a>
+            {% endif %}
+            <a href="{% url 'events:event_create' %}" class="btn eve-btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> Create Event
             </a>
         </div>
     </div>
