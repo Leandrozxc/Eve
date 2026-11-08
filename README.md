@@ -4,52 +4,56 @@ Eve is a team coordination and shift-scheduling web platform developed for **IM2
 
 ---
 
-## Features
-
-- **Authentication & Onboarding**:
-  - Secure registration creating Django `User`, `Profile`, `UserSettings`, and company ownership records in an atomic transaction.
-  - Credential authentication with user session management and flash alerts.
-  - Graceful logout.
-- **Relational Domain Models & SQL Demonstrations**:
-  - Domain structure covering **Companies**, **Company Members** (Owner, Manager, Staff), **Events**, and **Event Assignments**.
-  - Interactive SQL demonstration (`/events/joins/`) showcasing the behavioral difference between **`INNER JOIN`** and **`LEFT JOIN`**.
-  - Management commands for seeding demo relational data and inspecting query outputs in the terminal.
-- **User Profile & Preferences**:
-  - Profile management for personal information, bio, and associated company memberships.
-  - User settings for interface preferences (e.g. Dark Mode) and notification toggles.
-- **Modern Minimalist UI**:
-  - Responsive design powered by Bootstrap 5.3, Bootstrap Icons, and custom CSS.
-
----
-
-## Architecture & Directory Structure
-
-Eve employs a modular vertical-slice application layout:
+## Application Workflow
 
 ```text
-eve_project/
-├── apps/
-│   ├── events/          # Company, Member, Event, & Assignment models + SQL JOIN demo
-│   │   └── management/commands/
-│   │       ├── join_demo.py       # Terminal SQL JOIN demo command
-│   │       └── seed_join_demo.py  # Relational test data seeder
-│   ├── home/            # Dashboard landing page
-│   ├── login/           # Authentication and logout views
-│   ├── register/        # Registration flow and initial setup
-│   ├── userprofile/     # Profile model and editing interface
-│   └── usersettings/    # Preference toggles
-├── eve_project/         # Django project settings and root routing
-├── static/              # CSS stylesheet and assets
-├── templates/           # Django HTML templates
-├── manage.py
-└── requirements.txt     # Python dependencies
+Register / log in
+       ↓
+Open the home dashboard
+       ↓
+Create or join a company
+       ↓
+Get a company role: Owner, Manager, or Staff
+       ↓
+Create an event under the company
+       ↓
+Assign company members to the event
+       ↓
+Set each assignment’s role, location, time, and status
+       ↓
+Track event and assignment progress
 ```
 
 ---
 
-## Database Design & SQL Joins
+## Implemented Features
 
-### Relational Schema
+1. **Authentication & Onboarding**:
+   - Secure registration creating Django `User`, `Profile`, `UserSettings`, and company ownership records atomically.
+   - Login with email or username, password verification, flash alerts, and logout.
+2. **Home Dashboard**:
+   - High-level metrics: user's companies, upcoming events count, personal assigned shifts, and shift confirmation percentage.
+   - Quick preview of user's personal upcoming shift assignments with direct status confirmation.
+   - Company and role directory preview.
+3. **Company & Role Management (`/events/companies/`)**:
+   - **Create a Company**: Creator automatically becomes `OWNER`.
+   - **Join a Company**: Browse available companies and join as `STAFF`.
+   - **Role Administration**: Owners and Managers can promote or demote members across roles (`OWNER`, `MANAGER`, `STAFF`) and remove members with safeguards for the sole owner.
+4. **Event Scheduling (`/events/`)**:
+   - Create events linked to specific companies with title, description, date, start time, end time, location, and status (`DRAFT`, `UPCOMING`, `COMPLETED`, `CANCELLED`).
+   - Filter events by company and lifecycle status.
+5. **Shift Assignment & Coordination (`/events/<event_id>/`)**:
+   - Owners and Managers can assign unassigned company members to shifts.
+   - Specify `assigned_role` (e.g. Usher, Technician, Security, Cashier), `assigned_location`, `start_time`, `end_time`, and status.
+   - Staff members can view their personal assignment and click **"Confirm Attendance"** or **"Mark Shift Completed"**.
+6. **Progress Tracking**:
+   - Live visual progress bars and metrics on both the Event detail page and Home Dashboard calculating confirmation and completion rates.
+7. **SQL JOIN Demonstration (`/events/joins/`)**:
+   - Live interactive database view and CLI command demonstrating `INNER JOIN` vs `LEFT JOIN` on `events_event` and `events_eventassignment`.
+
+---
+
+## Relational Database Schema
 
 ```text
 +------------------+         1 : N         +----------------------+
@@ -64,32 +68,50 @@ eve_project/
 +------------------+                       +----------------------+
 ```
 
-### SQL JOIN Operations
+---
 
-- **INNER JOIN**: Returns only events that have at least one assigned company member. Events without assignments (e.g. *Charity Gala*) are excluded.
-- **LEFT JOIN**: Returns all events regardless of assignment status. Events with no assignments display `NULL` for assignment attributes.
+## Architecture & Directory Structure
+
+```text
+eve_project/
+├── apps/
+│   ├── events/          # Companies, Roles, Events, Assignments & SQL JOIN Demo
+│   │   ├── management/commands/
+│   │   │   ├── join_demo.py       # Terminal SQL JOIN demo command
+│   │   │   └── seed_join_demo.py  # Relational test data seeder
+│   │   ├── models.py
+│   │   ├── urls.py
+│   │   ├── views.py
+│   │   └── tests.py
+│   ├── home/            # Dashboard landing page & workflow metrics
+│   ├── login/           # Authentication and logout views
+│   ├── register/        # Registration flow and initial setup
+│   ├── userprofile/     # Profile model and editing interface
+│   └── usersettings/    # Preference toggles (Dark Mode, Email Notifications)
+├── eve_project/         # Django project settings and root routing
+├── static/              # CSS stylesheet and UI branding
+├── templates/           # Django HTML templates
+├── manage.py
+└── requirements.txt     # Python dependencies
+```
 
 ---
 
 ## Getting Started
 
 ### 1. Prerequisites
-- Python 3.11 or higher
+- Python 3.10+
 - Git
 
-### 2. Clone Repository & Setup Virtual Environment
+### 2. Setup Virtual Environment
 
 ```bash
-git clone https://github.com/Leandrozxc/eve_project.git
-cd eve_project
-
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
 # Windows (PowerShell):
+python -m venv venv
 .\venv\Scripts\Activate.ps1
+
 # Linux / macOS:
+python3 -m venv venv
 source venv/bin/activate
 ```
 
@@ -99,53 +121,32 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Configure Environment Variables
-
-Create or inspect `.env` in the project root:
-
-```ini
-# Local SQLite database (default)
-DATABASE_URL=sqlite:///db.sqlite3
-
-# Or PostgreSQL (e.g., Supabase / Neon / Local Postgres):
-# DATABASE_URL=postgresql://user:password@host:5432/dbname
-```
-
-### 5. Run Database Migrations
+### 4. Run Migrations & Seed Relational Data
 
 ```bash
 python manage.py migrate
-```
-
-### 6. Seed Demo Data for SQL Joins
-
-```bash
 python manage.py seed_join_demo
 ```
 
-### 7. Run Terminal SQL Demo
+### 5. Run Terminal SQL Demo
 
 ```bash
 python manage.py join_demo
 ```
 
-### 8. Start the Development Server
+### 6. Run the Test Suite
+
+```bash
+python manage.py test
+```
+
+### 7. Start the Development Server
 
 ```bash
 python manage.py runserver
 ```
 
 Open your browser and navigate to `http://127.0.0.1:8000/`.
-
----
-
-## Running Automated Tests
-
-Run the test suite across all apps:
-
-```bash
-python manage.py test
-```
 
 ---
 

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Members — {{ company.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <h1 class="h2 mb-0">{{ company.name }}</h1>
+            <span class="badge {% if current_membership.role == 'OWNER' %}bg-primary{% elif current_membership.role == 'MANAGER' %}bg-info text-dark{% else %}bg-secondary{% endif %}">
+                Your Role: {{ current_membership.get_role_display }}
+            </span>
+        </div>
+        <p class="text-muted mb-0">Team directory, role management, and permissions.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'events:event_list' %}?company_id={{ company.id }}" class="btn eve-btn-outline">
+            <i class="bi bi-calendar-event me-1"></i> Company Events
+        </a>
+        <a href="{% url 'events:company_list' %}" class="btn eve-btn-outline">
+            <i class="bi bi-arrow-left me-1"></i> All Companies
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="bi bi-people me-2 text-primary"></i>Company Members ({{ members.count }})
+        </h5>
+        {% if can_manage %}
+            <span class="badge bg-light text-dark border">
+                <i class="bi bi-shield-check text-success me-1"></i>You can manage roles
+            </span>
+        {% endif %}
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Member</th>
+                        <th>Email</th>
+                        <th>Assigned Role</th>
+                        <th>Joined Date</th>
+                        {% if can_manage %}
+                            <th class="text-end pe-4">Manage Role</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mem in members %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <span class="eve-logo-circle me-3" style="width: 36px; height: 36px; font-size: 0.9rem;">
+                                        {{ mem.user.first_name|default:mem.user.username|make_list|first|upper }}
+                                    </span>
+                                    <div>
+                                        <div class="fw-bold">{{ mem.user.get_full_name|default:mem.user.username }}</div>
+                                        {% if mem.user == request.user %}
+                                            <span class="badge bg-light text-primary border small">You</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-muted">{{ mem.user.email }}</td>
+                            <td>
+                                <span class="badge {% if mem.role == 'OWNER' %}bg-primary{% elif mem.role == 'MANAGER' %}bg-info text-dark{% else %}bg-secondary{% endif %}">
+                                    {{ mem.get_role_display }}
+                                </span>
+                            </td>
+                            <td class="text-muted small">{{ mem.joined_at|date:"M d, Y" }}</td>
+                            {% if can_manage %}
+                                <td class="text-end pe-4">
+                                    <div class="d-inline-flex align-items-center gap-2">
+                                        <!-- Role change form -->
+                                        <form method="post" action="{% url 'events:company_members' company_id=company.id %}" class="d-flex align-items-center gap-1">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="change_role">
+                                            <input type="hidden" name="member_id" value="{{ mem.id }}">
+                                            <select name="new_role" class="form-select form-select-sm" style="width: auto;">
+                                                {% for role_code, role_label in role_choices %}
+                                                    <option value="{{ role_code }}" {% if mem.role == role_code %}selected{% endif %}>
+                                                        {{ role_label }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn btn-sm eve-btn-outline" title="Update role">Save</button>
+                                        </form>
+
+                                        <!-- Remove member form -->
+                                        {% if mem.user != request.user %}
+                                            <form method="post" action="{% url 'events:company_members' company_id=company.id %}" onsubmit="return confirm('Are you sure you want to remove {{ mem.user.username }} from the company?');">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="remove_member">
+                                                <input type="hidden" name="member_id" value="{{ mem.id }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove member">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">No members found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

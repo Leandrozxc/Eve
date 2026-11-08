@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Companies & Roles{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <h1 class="h2 mb-1">Company Organizations & Roles</h1>
+        <p class="text-muted mb-0">Join an organization, manage team members, and administer roles (Owner, Manager, Staff).</p>
+    </div>
+    <div>
+        <a href="{% url 'events:company_create' %}" class="btn eve-btn-primary">
+            <i class="bi bi-building-add me-1"></i> Create Company
+        </a>
+    </div>
+</div>
+
+<!-- My Companies Section -->
+<div class="mb-5">
+    <h4 class="mb-3"><i class="bi bi-briefcase me-2 text-primary"></i>My Companies</h4>
+
+    {% if my_memberships %}
+        <div class="row g-4">
+            {% for mem in my_memberships %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0 eve-feature-card">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0 fw-bold">{{ mem.company.name }}</h5>
+                                <span class="badge {% if mem.role == 'OWNER' %}bg-primary{% elif mem.role == 'MANAGER' %}bg-info text-dark{% else %}bg-secondary{% endif %}">
+                                    {{ mem.get_role_display }}
+                                </span>
+                            </div>
+
+                            <div class="text-muted small mt-2 mb-3">
+                                {% if mem.company.address %}
+                                    <div class="mb-1"><i class="bi bi-geo-alt me-1"></i>{{ mem.company.address }}</div>
+                                {% endif %}
+                                {% if mem.company.contact_number %}
+                                    <div class="mb-1"><i class="bi bi-telephone me-1"></i>{{ mem.company.contact_number }}</div>
+                                {% endif %}
+                                <div><i class="bi bi-calendar-check me-1"></i>Joined {{ mem.joined_at|date:"M d, Y" }}</div>
+                            </div>
+
+                            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="small text-muted">
+                                    <i class="bi bi-people me-1"></i>{{ mem.company.members.count }} member{{ mem.company.members.count|pluralize }}
+                                </span>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'events:event_list' %}?company_id={{ mem.company.id }}" class="btn btn-sm eve-btn-outline" title="View Events">
+                                        <i class="bi bi-calendar-event"></i> Events
+                                    </a>
+                                    <a href="{% url 'events:company_members' company_id=mem.company.id %}" class="btn btn-sm btn-primary" title="Manage Members">
+                                        <i class="bi bi-person-gear"></i> Members
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm text-center py-4 mb-4">
+            <div class="card-body">
+                <i class="bi bi-building-slash text-muted" style="font-size: 2.5rem;"></i>
+                <h5 class="mt-3">You do not belong to any companies yet</h5>
+                <p class="text-muted small">Create a company to become an Owner, or join one of the available companies below.</p>
+                <a href="{% url 'events:company_create' %}" class="btn eve-btn-primary btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Create Company
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Other Companies to Join -->
+<div>
+    <h4 class="mb-3"><i class="bi bi-globe me-2 text-secondary"></i>Available Companies to Join</h4>
+
+    {% if other_companies %}
+        <div class="row g-4">
+            {% for comp in other_companies %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h5 class="card-title fw-bold mb-2">{{ comp.name }}</h5>
+                            <p class="card-text text-muted small mb-3">
+                                {% if comp.address %}{{ comp.address }}{% else %}No address provided.{% endif %}
+                            </p>
+
+                            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="small text-muted">
+                                    <i class="bi bi-people me-1"></i>{{ comp.members.count }} member{{ comp.members.count|pluralize }}
+                                </span>
+                                <a href="{% url 'events:company_join' company_id=comp.id %}" class="btn btn-sm eve-btn-outline">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i> Join as Staff
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm text-center py-4">
+            <div class="card-body text-muted small">
+                No other companies available right now. You can create a new one!
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

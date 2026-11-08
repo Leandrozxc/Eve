@@ -10,5 +10,6 @@ urlpatterns = [
     path('settings/', include('apps.usersettings.urls')),
     path('home/', include('apps.home.urls')),
     path('', RedirectView.as_view(pattern_name='login:login', permanent=False)),
-    path('events/', include('apps.events.urls')),   
+    path('events/', include('apps.events.urls')),
+    path('companies/', RedirectView.as_view(pattern_name='events:company_list', permanent=False)),
 ]
