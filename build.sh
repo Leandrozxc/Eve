@@ -13,3 +13,4 @@ python manage.py migrate
 
 # Seed baseline relational data for workflow and SQL JOIN demo
 python manage.py seed_join_demo
+
