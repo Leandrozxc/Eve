@@ -109,7 +109,9 @@
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center small text-secondary">
                                     <span><i class="bi bi-calendar3 me-1"></i>{{ a.event.event_date|date:"M d, Y" }} &bull; {{ a.start_time|time:"g:i A" }} – {{ a.end_time|time:"g:i A" }}</span>
-                                    <a href="{% url 'events:event_detail' event_id=a.event.id %}" class="btn btn-sm btn-outline-primary py-0">View Details</a>
+                                    <a href="{% url 'events:event_detail' event_id=a.event.id %}" class="btn btn-sm eve-btn-outline px-3">
+                                        View Details
+                                    </a>
                                 </div>
                             </div>
                         {% endfor %}

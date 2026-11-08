@@ -26,8 +26,8 @@
             <!-- Event Status Changer -->
             <form method="post" action="{% url 'events:event_update_status' event_id=event.id %}" class="d-flex align-items-center gap-1">
                 {% csrf_token %}
-                <label for="status" class="small text-muted me-1">Status:</label>
-                <select name="status" id="status" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                <label for="event_status" class="small text-muted me-1">Status:</label>
+                <select name="status" id="event_status" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
                     {% for code, label in status_choices %}
                         <option value="{{ code }}" {% if event.status == code %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
@@ -224,8 +224,8 @@
                                         <!-- Delete assignment form -->
                                         <form method="post" action="{% url 'events:assignment_delete' assignment_id=a.id %}" onsubmit="return confirm('Remove assignment for {{ a.member.user.username }}?');">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove assignment">
-                                                <i class="bi bi-trash"></i>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove assignment" aria-label="Remove assignment for {{ a.member.user.username }}">
+                                                <i class="bi bi-trash" aria-hidden="true"></i>
                                             </button>
                                         </form>
                                     </div>
@@ -305,8 +305,8 @@
                         </div>
 
                         <div class="col-md-2">
-                            <label for="status" class="form-label fw-semibold">Initial Status</label>
-                            <select name="status" id="status" class="form-select">
+                            <label for="assignment_initial_status" class="form-label fw-semibold">Initial Status</label>
+                            <select name="status" id="assignment_initial_status" class="form-select">
                                 <option value="ASSIGNED" selected>Assigned</option>
                                 <option value="CONFIRMED">Confirmed</option>
                             </select>
