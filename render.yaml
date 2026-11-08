@@ -3,8 +3,8 @@ services:
     name: eve-scheduling
     runtime: python
     plan: free
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn eve_project.wsgi:application"
+    buildCommand: "bash ./build.sh"
+    startCommand: "python manage.py migrate && python manage.py seed_join_demo && gunicorn eve_project.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
