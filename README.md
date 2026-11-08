@@ -1,5 +1,7 @@
 # Eve — Smart Scheduling & Team Coordination Platform
 
+[![Django CI & Validation](https://github.com/Leandrozxc/Eve/actions/workflows/django.yml/badge.svg)](https://github.com/Leandrozxc/Eve/actions/workflows/django.yml)
+
 Eve is a team coordination and shift-scheduling web platform developed for **IM2 (Information Management 2)**. It showcases relational database design, Django vertical-slice architecture, and practical SQL operations (such as `INNER JOIN` and `LEFT JOIN` queries).
 
 ---
@@ -128,6 +130,14 @@ python manage.py migrate
 python manage.py seed_join_demo
 ```
 
+#### Pre-seeded Demo Accounts (Password: `demo12345`)
+| Role | Email | Username | Description |
+| :--- | :--- | :--- | :--- |
+| **Owner** | `owner@demo.com` | `demo_owner` | Full administration rights over company and events |
+| **Manager** | `manager@demo.com` | `demo_manager` | Can schedule events, assign staff, and update statuses |
+| **Staff 1** | `staff1@demo.com` | `demo_staff_one` | Assigned to Concert Night and Trade Expo; can confirm attendance |
+| **Staff 2** | `staff2@demo.com` | `demo_staff_two` | Assigned as Cashier to Concert Night |
+
 ### 5. Run Terminal SQL Demo
 
 ```bash
@@ -147,6 +157,24 @@ python manage.py runserver
 ```
 
 Open your browser and navigate to `http://127.0.0.1:8000/`.
+
+---
+
+## Deployment (via GitHub)
+
+This repository includes turnkey configuration for production hosting:
+- **`Procfile`**: Runs production WSGI server via `gunicorn`.
+- **`build.sh`**: Installs dependencies, collects static assets via `whitenoise`, runs migrations, and seeds initial data.
+- **`render.yaml`**: One-click blueprint for [Render](https://render.com).
+- **`.github/workflows/django.yml`**: Continuous Integration (CI) running system checks, migrations, seeds, SQL JOIN commands, and the test suite on every push.
+
+### Deploying to Render in 3 Steps:
+1. Go to [Render.com](https://render.com) and sign in with GitHub.
+2. Click **New +** > **Web Service** and select this repository (`Leandrozxc/Eve`).
+3. Set:
+   - **Build Command**: `./build.sh`
+   - **Start Command**: `gunicorn eve_project.wsgi:application`
+   - Render automatically detects the configuration and deploys your live web application!
 
 ---
 

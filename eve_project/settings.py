@@ -15,7 +15,19 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = ["*"] if DEBUG else ["127.0.0.1", "localhost"]
+allowed_hosts_env = os.environ.get("ALLOWED_HOSTS", "*")
+ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(",") if h.strip()]
+if "RENDER" in os.environ:
+    ALLOWED_HOSTS.extend([".onrender.com", "localhost", "127.0.0.1"])
+
+csrf_origins_env = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
+CSRF_TRUSTED_ORIGINS = [
+    h.strip() if h.strip().startswith("http") else f"https://{h.strip()}"
+    for h in csrf_origins_env.split(",")
+    if h.strip()
+]
+if "RENDER" in os.environ:
+    CSRF_TRUSTED_ORIGINS.append("https://*.onrender.com")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -34,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -106,6 +119,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
