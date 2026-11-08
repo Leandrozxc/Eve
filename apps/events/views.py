@@ -1,52 +1,11 @@
 from datetime import date
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db import connection, transaction
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from .models import Company, CompanyMember, Event, EventAssignment
-
-# Raw SQL Joins for IM2 Demonstration
-INNER_SQL = """
-SELECT e.id AS event_id,
-       a.id AS assignment_id,
-       a.assigned_role,
-       a.assigned_location,
-       a.status
-FROM events_event AS e
-INNER JOIN events_eventassignment AS a
-        ON e.id = a.event_id
-ORDER BY e.id, a.id
-"""
-
-LEFT_SQL = """
-SELECT e.id AS event_id,
-       a.id AS assignment_id,
-       a.assigned_role,
-       a.assigned_location,
-       a.status
-FROM events_event AS e
-LEFT JOIN events_eventassignment AS a
-       ON e.id = a.event_id
-ORDER BY e.id, a.id
-"""
-
-
-def _run(sql):
-    with connection.cursor() as cursor:
-        cursor.execute(sql)
-        return cursor.fetchall()
-
-
-def join_demo(request):
-    context = {
-        "inner_sql": INNER_SQL.strip(),
-        "inner_rows": _run(INNER_SQL),
-        "left_sql": LEFT_SQL.strip(),
-        "left_rows": _run(LEFT_SQL),
-    }
-    return render(request, "events/join_demo.html", context)
 
 
 # ==============================================================================
@@ -275,7 +234,69 @@ def event_create(request):
         messages.success(request, f'Event "{event.title}" created successfully! Now assign team members below.')
         return redirect("events:event_detail", event_id=event.id)
 
-    return render(request, "events/event_form.html", {"memberships": eligible_memberships})
+    return render(request, "events/event_form.html", {"memberships": eligible_memberships, "is_edit": False})
+
+
+@login_required
+def event_edit(request, event_id):
+    """Edit an existing event's details (restricted to Owners and Managers)."""
+    event = get_object_or_404(Event.objects.select_related("company"), id=event_id)
+    user_membership = CompanyMember.objects.filter(
+        company=event.company, user=request.user
+    ).first()
+
+    if not user_membership or user_membership.role not in ("OWNER", "MANAGER"):
+        messages.error(request, "Only Owners and Managers can edit this event.")
+        return redirect("events:event_detail", event_id=event.id)
+
+    if request.method == "POST":
+        title = request.POST.get("title", "").strip()
+        description = request.POST.get("description", "").strip()
+        event_date = request.POST.get("event_date")
+        start_time = request.POST.get("start_time")
+        end_time = request.POST.get("end_time")
+        location = request.POST.get("location", "").strip()
+        status = request.POST.get("status", event.status)
+
+        if not title or not event_date or not start_time or not end_time or not location:
+            messages.error(request, "Please fill in all required fields.")
+            return render(request, "events/event_form.html", {"event": event, "is_edit": True})
+
+        event.title = title
+        event.description = description
+        event.event_date = event_date
+        event.start_time = start_time
+        event.end_time = end_time
+        event.location = location
+        if status in dict(Event.STATUS_CHOICES):
+            event.status = status
+        event.save()
+
+        messages.success(request, f'Event "{event.title}" updated successfully!')
+        return redirect("events:event_detail", event_id=event.id)
+
+    return render(request, "events/event_form.html", {"event": event, "is_edit": True})
+
+
+@login_required
+def event_delete(request, event_id):
+    """Delete an event (restricted to Owners and Managers)."""
+    event = get_object_or_404(Event.objects.select_related("company"), id=event_id)
+    user_membership = CompanyMember.objects.filter(
+        company=event.company, user=request.user
+    ).first()
+
+    if not user_membership or user_membership.role not in ("OWNER", "MANAGER"):
+        messages.error(request, "Only Owners and Managers can delete this event.")
+        return redirect("events:event_detail", event_id=event.id)
+
+    if request.method == "POST":
+        title = event.title
+        event.delete()
+        messages.success(request, f'Event "{title}" and all its shift assignments have been deleted.')
+        return redirect("events:event_list")
+
+    return redirect("events:event_detail", event_id=event.id)
 
 
 @login_required

@@ -128,36 +128,53 @@ class EventWorkflowTest(TestCase):
         self.assertEqual(assignment.status, "CONFIRMED")
 
 
-class EventsJoinDemoViewTest(TestCase):
+class EventEditDeleteViewTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(username="demouser", password="password123")
+        self.owner_user = User.objects.create_user(username="owneruser", password="password123")
+        self.staff_user = User.objects.create_user(username="staffuser", password="password123")
         self.company = Company.objects.create(name="Demo Company")
-        self.member = CompanyMember.objects.create(company=self.company, user=self.user, role="STAFF")
+        self.owner_member = CompanyMember.objects.create(company=self.company, user=self.owner_user, role="OWNER")
+        self.staff_member = CompanyMember.objects.create(company=self.company, user=self.staff_user, role="STAFF")
         self.event = Event.objects.create(
             company=self.company,
-            created_by=self.member,
-            title="Demo Concert",
+            created_by=self.owner_member,
+            title="Initial Title",
             event_date=date.today(),
             start_time=time(9, 0),
             end_time=time(17, 0),
             location="Arena",
             status="UPCOMING",
         )
-        self.assignment = EventAssignment.objects.create(
-            event=self.event,
-            member=self.member,
-            assigned_role="Usher",
-            assigned_location="Door 1",
-            start_time=time(9, 0),
-            end_time=time(17, 0),
-            status="CONFIRMED",
-        )
 
-    def test_join_demo_view_renders_successfully(self):
-        response = self.client.get(reverse("events:join_demo"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "events/join_demo.html")
-        self.assertContains(response, "SQL JOIN Demonstration")
-        self.assertContains(response, "INNER JOIN")
-        self.assertContains(response, "LEFT JOIN")
+    def test_owner_can_edit_event(self):
+        self.client.login(username="owneruser", password="password123")
+        response = self.client.post(
+            reverse("events:event_edit", kwargs={"event_id": self.event.id}),
+            {
+                "title": "Updated Title",
+                "description": "Updated Description",
+                "event_date": str(date.today()),
+                "start_time": "10:00",
+                "end_time": "18:00",
+                "location": "New Arena",
+                "status": "COMPLETED",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.event.refresh_from_db()
+        self.assertEqual(self.event.title, "Updated Title")
+        self.assertEqual(self.event.status, "COMPLETED")
+
+    def test_staff_cannot_delete_event(self):
+        self.client.login(username="staffuser", password="password123")
+        response = self.client.post(reverse("events:event_delete", kwargs={"event_id": self.event.id}))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Event.objects.filter(id=self.event.id).exists())
+
+    def test_owner_can_delete_event(self):
+        self.client.login(username="owneruser", password="password123")
+        response = self.client.post(reverse("events:event_delete", kwargs={"event_id": self.event.id}))
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Event.objects.filter(id=self.event.id).exists())
+

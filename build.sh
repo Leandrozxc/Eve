@@ -11,6 +11,6 @@ python manage.py collectstatic --no-input
 # Run database migrations
 python manage.py migrate
 
-# Seed baseline relational data for workflow and SQL JOIN demo
-python manage.py seed_join_demo
+# Seed baseline relational data for workflow demo
+python manage.py seed_demo_data
 

@@ -2,7 +2,7 @@
 
 [![Django CI & Validation](https://github.com/Leandrozxc/Eve/actions/workflows/django.yml/badge.svg)](https://github.com/Leandrozxc/Eve/actions/workflows/django.yml)
 
-Eve is a team coordination and shift-scheduling web platform developed for **IM2 (Information Management 2)**. It showcases relational database design, Django vertical-slice architecture, and practical SQL operations (such as `INNER JOIN` and `LEFT JOIN` queries).
+Eve is a team coordination and shift-scheduling web platform developed for **IM2 (Information Management 2)**. It showcases relational database design, Django vertical-slice architecture, and practical shift management workflows.
 
 ---
 
@@ -50,8 +50,7 @@ Track event and assignment progress
    - Staff members can view their personal assignment and click **"Confirm Attendance"** or **"Mark Shift Completed"**.
 6. **Progress Tracking**:
    - Live visual progress bars and metrics on both the Event detail page and Home Dashboard calculating confirmation and completion rates.
-7. **SQL JOIN Demonstration (`/events/joins/`)**:
-   - Live interactive database view and CLI command demonstrating `INNER JOIN` vs `LEFT JOIN` on `events_event` and `events_eventassignment`.
+
 
 ---
 
@@ -77,10 +76,9 @@ Track event and assignment progress
 ```text
 eve_project/
 ├── apps/
-│   ├── events/          # Companies, Roles, Events, Assignments & SQL JOIN Demo
+│   ├── events/          # Companies, Roles, Events & Assignments
 │   │   ├── management/commands/
-│   │   │   ├── join_demo.py       # Terminal SQL JOIN demo command
-│   │   │   └── seed_join_demo.py  # Relational test data seeder
+│   │   │   └── seed_demo_data.py  # Relational test data seeder
 │   │   ├── models.py
 │   │   ├── urls.py
 │   │   ├── views.py
@@ -127,7 +125,7 @@ pip install -r requirements.txt
 
 ```bash
 python manage.py migrate
-python manage.py seed_join_demo
+python manage.py seed_demo_data
 ```
 
 #### Pre-seeded Demo Accounts (Password: `demo12345`)
@@ -138,19 +136,13 @@ python manage.py seed_join_demo
 | **Staff 1** | `staff1@demo.com` | `demo_staff_one` | Assigned to Concert Night and Trade Expo; can confirm attendance |
 | **Staff 2** | `staff2@demo.com` | `demo_staff_two` | Assigned as Cashier to Concert Night |
 
-### 5. Run Terminal SQL Demo
-
-```bash
-python manage.py join_demo
-```
-
-### 6. Run the Test Suite
+### 5. Run the Test Suite
 
 ```bash
 python manage.py test
 ```
 
-### 7. Start the Development Server
+### 6. Start the Development Server
 
 ```bash
 python manage.py runserver
@@ -166,7 +158,7 @@ This repository includes turnkey configuration for production hosting:
 - **`Procfile`**: Runs production WSGI server via `gunicorn`.
 - **`build.sh`**: Installs dependencies, collects static assets via `whitenoise`, runs migrations, and seeds initial data.
 - **`render.yaml`**: One-click blueprint for [Render](https://render.com).
-- **`.github/workflows/django.yml`**: Continuous Integration (CI) running system checks, migrations, seeds, SQL JOIN commands, and the test suite on every push.
+- **`.github/workflows/django.yml`**: Continuous Integration (CI) running system checks, migrations, seeds, and the test suite on every push.
 
 ### Deploying to Render in 3 Steps:
 1. Go to [Render.com](https://render.com) and sign in with GitHub.

@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: "bash ./build.sh"
-    startCommand: "python manage.py migrate && python manage.py seed_join_demo && gunicorn eve_project.wsgi:application"
+    startCommand: "python manage.py migrate && python manage.py seed_demo_data && gunicorn eve_project.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9

@@ -26,9 +26,9 @@ try:
         call_command('migrate', interactive=False)
         print('[Startup] Seeding initial accounts and demo data...')
         try:
-            call_command('seed_join_demo')
+            call_command('seed_demo_data')
         except Exception as seed_err:
-            print(f'[Startup Warning] seed_join_demo failed: {seed_err}')
+            print(f'[Startup Warning] seed_demo_data failed: {seed_err}')
         print('[Startup] Database initialization complete.')
 except Exception as exc:
     print(f'[Startup Warning] Auto-migrate check failed: {exc}')

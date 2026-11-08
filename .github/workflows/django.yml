@@ -43,13 +43,7 @@ jobs:
       env:
         DATABASE_URL: sqlite:///db.sqlite3
       run: |
-        python manage.py seed_join_demo
-
-    - name: Run SQL JOIN Demonstration Command
-      env:
-        DATABASE_URL: sqlite:///db.sqlite3
-      run: |
-        python manage.py join_demo
+        python manage.py seed_demo_data
 
     - name: Run Automated Test Suite
       env:
