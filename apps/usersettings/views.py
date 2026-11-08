@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-
 from .models import UserSettings
 
 
@@ -10,7 +9,6 @@ def settings_view(request):
     settings, _ = UserSettings.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
-        # Checkbox inputs only appear in POST if checked
         dark_mode = request.POST.get('dark_mode') == 'on'
         email_notifications = request.POST.get('email_notifications') == 'on'
 

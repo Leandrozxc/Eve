@@ -3,44 +3,49 @@
 {% block title %}Settings{% endblock %}
 
 {% block content %}
-<div class="eve-auth-wrapper py-4">
-    <div class="card eve-auth-card shadow-sm mx-auto" style="max-width: 650px;">
-        <div class="card-body p-4 p-md-5">
-
-            <div class="mb-4 pb-3 border-bottom">
-                <h3 class="mb-1">Account Settings</h3>
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2 mb-1">Preferences & Settings</h1>
                 <p class="text-muted mb-0">Configure your application preferences and notification controls.</p>
             </div>
+            <a href="{% url 'home:home' %}" class="btn eve-btn-outline">
+                <i class="bi bi-arrow-left me-1"></i> Back to Home
+            </a>
+        </div>
 
-            <form method="post" action="{% url 'usersettings:settings' %}">
-                {% csrf_token %}
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4 p-md-5">
+                <form method="post" action="{% url 'usersettings:settings' %}">
+                    {% csrf_token %}
 
-                <div class="card bg-light border-0 p-3 mb-3">
-                    <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0">
-                        <div>
-                            <label class="form-check-label fw-semibold" for="dark_mode">Dark Mode</label>
-                            <p class="text-muted small mb-0">Switch between standard light interface and high-contrast dark theme.</p>
+                    <div class="card bg-light border-0 p-3 mb-3">
+                        <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0">
+                            <div>
+                                <label class="form-check-label fw-semibold" for="dark_mode">Dark Mode</label>
+                                <p class="text-muted small mb-0">Switch between standard light interface and high-contrast dark theme.</p>
+                            </div>
+                            <input class="form-check-input ms-3" type="checkbox" role="switch" id="dark_mode" name="dark_mode" {% if settings.dark_mode %}checked{% endif %}>
                         </div>
-                        <input class="form-check-input ms-3" type="checkbox" role="switch" id="dark_mode" name="dark_mode" {% if settings.dark_mode %}checked{% endif %}>
                     </div>
-                </div>
 
-                <div class="card bg-light border-0 p-3 mb-4">
-                    <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0">
-                        <div>
-                            <label class="form-check-label fw-semibold" for="email_notifications">Email Notifications</label>
-                            <p class="text-muted small mb-0">Receive automated email alerts for new shifts, schedule updates, and task assignments.</p>
+                    <div class="card bg-light border-0 p-3 mb-4">
+                        <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0">
+                            <div>
+                                <label class="form-check-label fw-semibold" for="email_notifications">Email Notifications</label>
+                                <p class="text-muted small mb-0">Receive automated email alerts for new shifts, schedule updates, and task assignments.</p>
+                            </div>
+                            <input class="form-check-input ms-3" type="checkbox" role="switch" id="email_notifications" name="email_notifications" {% if settings.email_notifications %}checked{% endif %}>
                         </div>
-                        <input class="form-check-input ms-3" type="checkbox" role="switch" id="email_notifications" name="email_notifications" {% if settings.email_notifications %}checked{% endif %}>
                     </div>
-                </div>
 
-                <div class="d-flex justify-content-end gap-2 mt-4">
-                    <a href="{% url 'home:home' %}" class="btn eve-btn-outline">Back to Home</a>
-                    <button type="submit" class="btn eve-btn-primary">Save Settings</button>
-                </div>
-            </form>
-
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{% url 'home:home' %}" class="btn eve-btn-outline">Back to Home</a>
+                        <button type="submit" class="btn eve-btn-primary">Save Settings</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

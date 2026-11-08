@@ -21,9 +21,12 @@
             <div class="d-flex align-items-center gap-2">
                 {% if user.is_authenticated %}
                     <a class="btn eve-nav-link" href="{% url 'home:home' %}">Home</a>
+                    <a class="btn eve-nav-link" href="{% url 'events:join_demo' %}">Events Demo</a>
                     <a class="btn eve-nav-link" href="{% url 'userprofile:profile' %}">Profile</a>
                     <a class="btn eve-nav-link" href="{% url 'usersettings:settings' %}">Settings</a>
-                    <a class="btn eve-nav-link" href="{% url 'accounts:logout' %}">Logout</a>
+                    <a class="btn eve-nav-link" href="{% url 'login:logout' %}">Logout</a>
+                {% elif request.resolver_match.namespace == 'register' %}
+                    <a class="btn eve-nav-link" href="{% url 'login:login' %}">Login</a>
                 {% else %}
                     <a class="btn eve-nav-link" href="{% url 'login:login' %}">Login</a>
                     <a class="btn eve-nav-link" href="{% url 'register:register' %}">Register</a>

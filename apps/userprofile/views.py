@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-
 from .models import Profile
 
 
@@ -17,7 +16,6 @@ def profile_view(request):
         profile.bio = bio
         profile.save()
 
-        # Keep User first and last name aligned with full name
         name_parts = full_name.split(maxsplit=1)
         request.user.first_name = name_parts[0] if name_parts else ''
         request.user.last_name = name_parts[1] if len(name_parts) > 1 else ''
@@ -26,4 +24,10 @@ def profile_view(request):
         messages.success(request, 'Your profile has been updated successfully!')
         return redirect('userprofile:profile')
 
-    return render(request, 'profile/profile.html', {'profile': profile})
+    memberships = request.user.company_memberships.select_related('company').all()
+
+    context = {
+        'profile': profile,
+        'memberships': memberships,
+    }
+    return render(request, 'profile/profile.html', context)

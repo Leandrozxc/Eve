@@ -1,3 +1,21 @@
-from django.test import TestCase
+from django.test import TestCase, Client
+from django.urls import reverse
+from django.contrib.auth import get_user_model
 
-# Create your tests here.
+User = get_user_model()
+
+
+class ProfileViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username="testuser@example.com", password="password123")
+
+    def test_unauthenticated_redirects_to_login(self):
+        response = self.client.get(reverse('userprofile:profile'))
+        self.assertRedirects(response, reverse('login:login'))
+
+    def test_authenticated_profile_page_renders(self):
+        self.client.login(username="testuser@example.com", password="password123")
+        response = self.client.get(reverse('userprofile:profile'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'profile/profile.html')

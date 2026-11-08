@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError, transaction
 from django.shortcuts import redirect, render
 
+from apps.events.models import Company, CompanyMember
 from apps.userprofile.models import Profile
 from apps.usersettings.models import UserSettings
 
@@ -14,11 +15,11 @@ def register_view(request):
     if request.method == 'POST':
         full_name = request.POST.get('full_name', '').strip()
         email = request.POST.get('email', '').strip().lower()
-        company = request.POST.get('company', '').strip()
+        company_name = request.POST.get('company', '').strip()
         password = request.POST.get('password', '')
         confirm_password = request.POST.get('confirm_password', '')
 
-        if not full_name or not email or not password:
+        if not full_name or not email or not company_name or not password:
             return render(
                 request,
                 'register/register.html',
@@ -26,7 +27,7 @@ def register_view(request):
                     'error': 'Please complete all required fields.',
                     'full_name': full_name,
                     'email': email,
-                    'company': company,
+                    'company': company_name,
                 },
             )
 
@@ -38,7 +39,7 @@ def register_view(request):
                     'error': 'Passwords do not match.',
                     'full_name': full_name,
                     'email': email,
-                    'company': company,
+                    'company': company_name,
                 },
             )
 
@@ -49,7 +50,7 @@ def register_view(request):
                 {
                     'error': 'An account with this email already exists.',
                     'full_name': full_name,
-                    'company': company,
+                    'company': company_name,
                 },
             )
 
@@ -69,6 +70,9 @@ def register_view(request):
                 Profile.objects.create(user=user, full_name=full_name)
                 UserSettings.objects.create(user=user)
 
+                company, _ = Company.objects.get_or_create(name=company_name)
+                CompanyMember.objects.create(company=company, user=user, role="OWNER")
+
         except IntegrityError:
             return render(
                 request,
@@ -76,7 +80,7 @@ def register_view(request):
                 {
                     'error': 'Could not create account. Please try again.',
                     'full_name': full_name,
-                    'company': company,
+                    'company': company_name,
                 },
             )
 

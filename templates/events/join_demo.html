@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}SQL JOIN Demonstration{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1">SQL JOIN Demonstration</h1>
+        <p class="text-muted mb-0">IM2 Database Relations: <code>events_event</code> and <code>events_eventassignment</code></p>
+    </div>
+    <a href="{% url 'home:home' %}" class="btn eve-btn-outline">
+        <i class="bi bi-arrow-left me-1"></i> Back to Home
+    </a>
+</div>
+
+<div class="row g-4">
+    <!-- INNER JOIN -->
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-primary">
+                        <i class="bi bi-intersect me-2"></i>1. INNER JOIN (Events with Assignments)
+                    </h5>
+                    <span class="badge bg-primary">{{ inner_rows|length }} rows returned</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="card-text text-muted">
+                    Only events that have a matching assignment appear. Events without assignments (such as <em>Charity Gala</em>) are excluded from the result.
+                </p>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-secondary small text-uppercase">SQL Query:</label>
+                    <pre class="bg-light p-3 rounded border"><code>{{ inner_sql }}</code></pre>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Event ID</th>
+                                <th>Assignment ID</th>
+                                <th>Assigned Role</th>
+                                <th>Assigned Location</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in inner_rows %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td><span class="badge bg-secondary">Event #{{ row.0 }}</span></td>
+                                    <td><span class="badge bg-info text-dark">Assignment #{{ row.1 }}</span></td>
+                                    <td class="fw-medium">{{ row.2 }}</td>
+                                    <td>{{ row.3 }}</td>
+                                    <td>
+                                        <span class="badge {% if row.4 == 'CONFIRMED' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                            {{ row.4 }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-3">No matching records found. Run seed command to populate.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEFT JOIN -->
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-success">
+                        <i class="bi bi-layout-sidebar me-2"></i>2. LEFT JOIN (All Events, Assigned or Unassigned)
+                    </h5>
+                    <span class="badge bg-success">{{ left_rows|length }} rows returned</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="card-text text-muted">
+                    Every event appears. Events that do not have an assignment (such as <em>Charity Gala</em>) display <code>NULL</code> for the assignment columns.
+                </p>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-secondary small text-uppercase">SQL Query:</label>
+                    <pre class="bg-light p-3 rounded border"><code>{{ left_sql }}</code></pre>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Event ID</th>
+                                <th>Assignment ID</th>
+                                <th>Assigned Role</th>
+                                <th>Assigned Location</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in left_rows %}
+                                <tr {% if row.1 is None %}class="table-warning"{% endif %}>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td><span class="badge bg-secondary">Event #{{ row.0 }}</span></td>
+                                    <td>
+                                        {% if row.1 is not None %}
+                                            <span class="badge bg-info text-dark">Assignment #{{ row.1 }}</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">NULL</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="fw-medium">
+                                        {% if row.2 is not None %}
+                                            {{ row.2 }}
+                                        {% else %}
+                                            <span class="text-muted fst-italic">NULL</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if row.3 is not None %}
+                                            {{ row.3 }}
+                                        {% else %}
+                                            <span class="text-muted fst-italic">NULL</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if row.4 is not None %}
+                                            <span class="badge {% if row.4 == 'CONFIRMED' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                                {{ row.4 }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">NULL</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-3">No matching records found. Run seed command to populate.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
