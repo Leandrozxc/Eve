@@ -28,7 +28,7 @@ class LoginViewsTest(TestCase):
             'password': 'wrongpassword',
         })
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Invalid email address or password.')
+        self.assertContains(response, 'Invalid email/username or password.')
 
     def test_logout_redirects_to_login(self):
         response = self.client.get(reverse('login:logout'))

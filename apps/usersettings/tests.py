@@ -12,7 +12,7 @@ class SettingsViewTest(TestCase):
 
     def test_unauthenticated_redirects_to_login(self):
         response = self.client.get(reverse('usersettings:settings'))
-        self.assertRedirects(response, reverse('login:login'))
+        self.assertRedirects(response, f"{reverse('login:login')}?next={reverse('usersettings:settings')}")
 
     def test_authenticated_settings_page_renders(self):
         self.client.login(username="testuser@example.com", password="password123")
