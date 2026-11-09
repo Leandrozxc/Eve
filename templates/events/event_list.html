@@ -40,7 +40,7 @@
                 <input type="hidden" name="status" value="{{ status_filter }}">
                 {% endif %}
                 <label for="company_id" class="apple-caption fw-semibold text-nowrap">Workspace:</label>
-                <select name="company_id" id="company_id" class="form-select eve-select py-1 px-3" style="min-height: 38px; font-size: 13px; width: auto;" onchange="this.form.submit()">
+                <select name="company_id" id="company_id" class="form-select eve-select eve-select-sm" onchange="this.form.submit()">
                     <option value="">All Organizations</option>
                     {% for mem in my_memberships %}
                     <option value="{{ mem.company.id }}" {% if company_filter == mem.company.id|stringformat:"s" %}selected{% endif %}>

@@ -39,7 +39,7 @@
                 <form method="post" action="{% url 'events:event_update_status' event_id=event.id %}" class="m-0">
                     {% csrf_token %}
                     <label for="event_status" class="visually-hidden">Event Status</label>
-                    <select name="status" id="event_status" class="form-select eve-select py-1 px-3" style="min-height: 36px; font-size: 13px; width: auto;" onchange="this.form.submit()">
+                    <select name="status" id="event_status" class="form-select eve-select eve-select-sm" onchange="this.form.submit()">
                         {% for code, label in status_choices %}
                         <option value="{{ code }}" {% if event.status == code %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
@@ -177,7 +177,7 @@
                         <tr>
                             <td class="ps-4">
                                 <div class="d-flex align-items-center gap-3">
-                                    <span class="eve-avatar-xs" style="width: 32px; height: 32px; font-size: 12px;">
+                                    <span class="eve-avatar-sm">
                                         {{ a.member.user.first_name|default:a.member.user.username|make_list|first|upper }}
                                     </span>
                                     <div>
@@ -206,7 +206,7 @@
                                     <form method="post" action="{% url 'events:assignment_update' assignment_id=a.id %}" class="m-0">
                                         {% csrf_token %}
                                         <label for="status_{{ a.id }}" class="visually-hidden">Status for {{ a.member.user.username }}</label>
-                                        <select name="status" id="status_{{ a.id }}" class="form-select eve-select py-1 px-3" style="font-size: 13px; min-height: 36px; width: auto;" onchange="this.form.submit()">
+                                        <select name="status" id="status_{{ a.id }}" class="form-select eve-select eve-select-sm" onchange="this.form.submit()">
                                             {% for status_code, status_label in assignment_status_choices %}
                                             <option value="{{ status_code }}" {% if a.status == status_code %}selected{% endif %}>
                                                 {{ status_label }}

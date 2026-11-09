@@ -557,6 +557,58 @@ h1, h2, h3, h4, h5, h6 {
     flex-shrink: 0;
 }
 
+.eve-avatar-sm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background-color: var(--apple-text);
+    color: var(--apple-surface);
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.eve-avatar-md {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background-color: var(--apple-text);
+    color: var(--apple-surface);
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.eve-avatar-lg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background-color: var(--apple-text);
+    color: var(--apple-surface);
+    font-size: 18px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.eve-select-sm {
+    font-size: 13px;
+    min-height: 36px;
+    width: auto;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    padding-left: 0.75rem;
+    padding-right: 2rem;
+}
+
 /* Contextual Sub-Bar (Minimalist Breadcrumb & Action Bar) */
 .apple-localnav {
     background-color: transparent;
