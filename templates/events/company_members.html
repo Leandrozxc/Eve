@@ -2,127 +2,145 @@
 
 {% block title %}Team Roster — {{ company.name }}{% endblock %}
 
-{% block content %}
-<!-- Apple Header -->
-<div class="py-3 mb-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <h1 class="eve-hero-title mb-0" style="font-size: 2.25rem;">{{ company.name }}</h1>
-                <span class="badge {% if current_membership.role == 'OWNER' %}badge-apple-purple{% elif current_membership.role == 'MANAGER' %}badge-apple-blue{% else %}badge-apple-neutral{% endif %}">
-                    Your Role: {{ current_membership.get_role_display }}
-                </span>
-            </div>
-            <div class="small" style="color: var(--apple-text-secondary);">
-                Team directory, permissions, and role management.
-            </div>
+{% block local_nav %}
+<div class="apple-localnav">
+    <div class="apple-localnav-inner">
+        <div class="d-flex align-items-center gap-2 text-truncate">
+            <a href="{% url 'events:company_list' %}" class="apple-caption text-decoration-none d-none d-sm-inline" style="color: var(--eve-text-muted);">Organizations</a>
+            <span class="apple-caption d-none d-sm-inline" aria-hidden="true">/</span>
+            <span class="apple-localnav-title text-truncate">{{ company.name }}</span>
         </div>
 
-        <div class="d-flex gap-2">
-            <a href="{% url 'events:event_list' %}?company_id={{ company.id }}" class="btn eve-btn-outline btn-sm">
-                <i class="bi bi-calendar-event me-1"></i> Events
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'events:event_list' %}?company_id={{ company.id }}" class="btn-apple-secondary btn-apple-sm">
+                Organization Events
             </a>
-            <a href="{% url 'events:company_list' %}" class="btn eve-btn-outline btn-sm">
-                <i class="bi bi-arrow-left me-1"></i> All Organizations
+            {% if can_manage %}
+            <a href="{% url 'events:event_create' %}" class="btn-apple-primary btn-apple-sm">
+                Schedule Event
             </a>
+            {% endif %}
         </div>
     </div>
 </div>
+{% endblock %}
 
-<!-- Team Members Card -->
-<div class="card eve-bento-card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-2">
-            <span class="eve-stat-chip purple" style="width: 32px; height: 32px; font-size: 1rem;">
-                <i class="bi bi-people-fill"></i>
-            </span>
-            <span class="fw-semibold">Organization Roster ({{ members.count }})</span>
+{% block full_bleed %}
+<!-- 1. Organization Header (White Surface) -->
+<section class="apple-section-white">
+    <div class="apple-container-wide">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+            <div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <span class="eve-role-badge {% if current_membership.role == 'OWNER' %}eve-role-owner{% elif current_membership.role == 'MANAGER' %}eve-role-manager{% endif %}">
+                        Your Role: {{ current_membership.get_role_display }}
+                    </span>
+                    {% if can_manage %}
+                    <span class="eve-status-pill eve-status-confirmed">
+                        <span class="eve-status-dot"></span> Role Administration Active
+                    </span>
+                    {% endif %}
+                </div>
+                <h1 class="apple-headline-section">{{ company.name }}</h1>
+                <p class="apple-subhead mb-0">
+                    {% if company.address %}{{ company.address }} &middot; {% endif %}
+                    {% if company.contact_number %}{{ company.contact_number }} &middot; {% endif %}
+                    {{ members.count }} active team member{{ members.count|pluralize }}
+                </p>
+            </div>
         </div>
-        {% if can_manage %}
-            <span class="badge badge-apple-green">
-                <i class="bi bi-shield-check me-1"></i>Role Management Enabled
-            </span>
-        {% endif %}
     </div>
+</section>
 
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th class="ps-4">Member</th>
-                        <th>Email Address</th>
-                        <th>Assigned Role</th>
-                        <th>Joined Date</th>
-                        {% if can_manage %}
-                            <th class="text-end pe-4">Administration</th>
-                        {% endif %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for m in members %}
+<!-- 2. Organization Roster Specification Table on Apple Canvas -->
+<section class="apple-section-canvas">
+    <div class="apple-container-wide">
+        <div class="apple-tile p-0 overflow-hidden">
+            <div class="p-4 d-flex flex-wrap justify-content-between align-items-center gap-2" style="border-bottom: 1px solid var(--eve-border);">
+                <div>
+                    <h2 class="apple-headline-tile mb-0" style="font-size: 22px;">Directory &amp; permissions</h2>
+                    <p class="apple-caption mb-0">Owners and Managers can promote members or update access levels in real time.</p>
+                </div>
+                <span class="apple-caption tabular-nums">{{ members.count }} total</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="eve-table">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Team Member</th>
+                            <th>Email Address</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                            {% if can_manage %}
+                            <th class="text-end pe-4">Permissions</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in members %}
                         <tr>
                             <td class="ps-4">
-                                <div class="d-flex align-items-center">
-                                    <span class="eve-logo-circle me-3" style="width: 36px; height: 36px; font-size: 0.9rem;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="eve-avatar-xs" style="width: 34px; height: 34px; font-size: 13px;">
                                         {{ m.user.first_name|default:m.user.username|make_list|first|upper }}
                                     </span>
                                     <div>
-                                        <div class="fw-semibold" style="color: var(--apple-text-primary);">
+                                        <div class="fw-semibold" style="color: var(--eve-text);">
                                             {{ m.user.get_full_name|default:m.user.username }}
                                             {% if m.user == request.user %}
-                                                <span class="badge badge-apple-neutral ms-1">You</span>
+                                            <span class="eve-role-badge ms-1" style="font-size: 10px; padding: 2px 8px;">You</span>
                                             {% endif %}
                                         </div>
-                                        <div class="small" style="color: var(--apple-text-secondary);">@{{ m.user.username }}</div>
+                                        <div class="apple-caption">@{{ m.user.username }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <span class="small" style="color: var(--apple-text-primary);">{{ m.user.email }}</span>
+                                <span class="apple-caption" style="color: var(--eve-text);">{{ m.user.email }}</span>
                             </td>
                             <td>
-                                <span class="badge {% if m.role == 'OWNER' %}badge-apple-purple{% elif m.role == 'MANAGER' %}badge-apple-blue{% else %}badge-apple-neutral{% endif %}">
+                                <span class="eve-role-badge {% if m.role == 'OWNER' %}eve-role-owner{% elif m.role == 'MANAGER' %}eve-role-manager{% endif %}">
                                     {{ m.get_role_display }}
                                 </span>
                             </td>
-                            <td>
-                                <span class="small" style="color: var(--apple-text-secondary);">{{ m.joined_at|date:"M d, Y" }}</span>
+                            <td class="tabular-nums">
+                                <span class="apple-caption">{{ m.joined_at|date:"M d, Y" }}</span>
                             </td>
                             {% if can_manage %}
-                                <td class="text-end pe-4">
-                                    <div class="d-inline-flex align-items-center gap-2">
-                                        <!-- Role change form -->
-                                        <form method="post" action="{% url 'events:company_members' company_id=company.id %}" class="d-flex align-items-center">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="action" value="change_role">
-                                            <input type="hidden" name="member_id" value="{{ m.id }}">
-                                            <select name="new_role" class="form-select form-select-sm py-1 px-2" style="border-radius: var(--apple-radius-pill); font-size: 0.8rem; width: auto;" onchange="this.form.submit()">
-                                                {% for role_code, role_name in role_choices %}
-                                                    <option value="{{ role_code }}" {% if m.role == role_code %}selected{% endif %}>
-                                                        {{ role_name }}
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                        </form>
+                            <td class="text-end pe-4">
+                                <div class="d-inline-flex align-items-center gap-2">
+                                    <form method="post" action="{% url 'events:company_members' company_id=company.id %}" class="m-0">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="change_role">
+                                        <input type="hidden" name="member_id" value="{{ m.id }}">
+                                        <label for="role_{{ m.id }}" class="visually-hidden">Role for {{ m.user.username }}</label>
+                                        <select name="new_role" id="role_{{ m.id }}" class="form-select py-1 px-2" style="border-radius: 980px; font-size: 12px; min-height: 30px; width: auto;" onchange="this.form.submit()">
+                                            {% for role_code, role_name in role_choices %}
+                                            <option value="{{ role_code }}" {% if m.role == role_code %}selected{% endif %}>
+                                                {{ role_name }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </form>
 
-                                        <!-- Remove member form -->
-                                        <form method="post" action="{% url 'events:company_members' company_id=company.id %}" onsubmit="return confirm('Remove {{ m.user.username }} from {{ company.name }}?');">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="action" value="remove_member">
-                                            <input type="hidden" name="member_id" value="{{ m.id }}">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger p-1 px-2" style="border-radius: var(--apple-radius-pill);" title="Remove member" aria-label="Remove {{ m.user.username }} from organization">
-                                                <i class="bi bi-person-x" aria-hidden="true"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
+                                    <form method="post" action="{% url 'events:company_members' company_id=company.id %}" class="m-0" onsubmit="return confirm('Remove {{ m.user.username }} from {{ company.name }}?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="remove_member">
+                                        <input type="hidden" name="member_id" value="{{ m.id }}">
+                                        <button type="submit" class="btn-apple-ghost btn-apple-sm text-danger px-2 py-1" title="Remove member" aria-label="Remove {{ m.user.username }} from organization">
+                                            <i class="bi bi-person-x" aria-hidden="true"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                             {% endif %}
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

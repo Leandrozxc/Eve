@@ -1,69 +1,108 @@
 {% extends 'base.html' %}
 
-{% block title %}Create Your Account{% endblock %}
+{% block title %}Create Your Eve Account{% endblock %}
 
-{% block content %}
-<div class="eve-auth-wrapper">
-    <div class="card eve-auth-card" style="max-width: 480px;">
-        <div class="text-center">
-            <div class="eve-auth-logo">
+{% block full_bleed %}
+<section class="eve-auth-stage">
+    <div class="eve-auth-box" style="max-width: 520px;">
+        <div class="text-center mb-4 pb-1">
+            <div class="eve-auth-logo mx-auto" aria-hidden="true">
                 <i class="bi bi-person-plus-fill"></i>
             </div>
-            <h1 class="eve-auth-title">Create your Eve Account</h1>
-            <p class="eve-auth-subtitle">One account for all your organizations and team shift schedules.</p>
+            <h1 class="apple-headline-tile mb-2" style="font-size: 32px;">Create your Eve Account</h1>
+            <p class="apple-body">One account sets up your profile and launches your organization workspace.</p>
         </div>
 
         {% if error %}
-            <div class="alert alert-danger border-0 mb-4 d-flex align-items-center gap-2" style="border-radius: var(--apple-radius-md);" role="alert">
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                <div class="small">{{ error }}</div>
-            </div>
+        <div class="eve-alert eve-alert-danger mb-4" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            <span>{{ error }}</span>
+        </div>
         {% endif %}
 
-        <form method="post" action="{% url 'register:register' %}">
+        <form method="POST" action="{% url 'register:register' %}" novalidate>
             {% csrf_token %}
-
             <div class="mb-3">
-                <label for="full_name" class="form-label">Full Name</label>
-                <input type="text" class="form-control" id="full_name" name="full_name" value="{{ full_name|default:'' }}" placeholder="e.g. Alex Mercer" required autofocus>
+                <label for="full_name" class="eve-form-label">Full Name</label>
+                <input
+                    type="text"
+                    class="form-control eve-input"
+                    id="full_name"
+                    name="full_name"
+                    value="{{ full_name|default:'' }}"
+                    placeholder="Alex Morgan"
+                    autocomplete="name"
+                    required
+                    autofocus
+                >
             </div>
 
             <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" class="form-control" id="email" name="email" value="{{ email|default:'' }}" placeholder="alex@company.com" required>
+                <label for="email" class="eve-form-label">Work Email Address</label>
+                <input
+                    type="email"
+                    class="form-control eve-input"
+                    id="email"
+                    name="email"
+                    value="{{ email|default:'' }}"
+                    placeholder="alex@organization.com"
+                    autocomplete="email"
+                    required
+                >
             </div>
 
             <div class="mb-3">
-                <label for="company" class="form-label">Primary Organization / Company</label>
-                <input type="text" class="form-control" id="company" name="company" value="{{ company|default:'' }}" placeholder="e.g. Acme Event Management" required>
-                <div class="form-text" style="color: var(--apple-text-secondary); font-size: 0.78rem;">
-                    You will automatically be assigned as Owner of this organization.
+                <label for="company" class="eve-form-label">Organization Name</label>
+                <input
+                    type="text"
+                    class="form-control eve-input"
+                    id="company"
+                    name="company"
+                    value="{{ company|default:'' }}"
+                    placeholder="Apex Event Productions"
+                    autocomplete="organization"
+                    required
+                >
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6">
+                    <label for="password" class="eve-form-label">Password</label>
+                    <input
+                        type="password"
+                        class="form-control eve-input"
+                        id="password"
+                        name="password"
+                        placeholder="Create password"
+                        autocomplete="new-password"
+                        required
+                    >
+                </div>
+                <div class="col-sm-6">
+                    <label for="confirm_password" class="eve-form-label">Confirm Password</label>
+                    <input
+                        type="password"
+                        class="form-control eve-input"
+                        id="confirm_password"
+                        name="confirm_password"
+                        placeholder="Repeat password"
+                        autocomplete="new-password"
+                        required
+                    >
                 </div>
             </div>
 
-            <div class="row g-2 mb-4">
-                <div class="col-md-6">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Create password" required>
-                </div>
-                <div class="col-md-6">
-                    <label for="confirm_password" class="form-label">Confirm Password</label>
-                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-enter password" required>
-                </div>
-            </div>
-
-            <button type="submit" class="btn eve-btn-primary w-100 py-2">
-                Create Account
-                <i class="bi bi-arrow-right ms-1"></i>
+            <button type="submit" class="btn-apple-primary btn-apple-lg w-100">
+                Continue
             </button>
         </form>
 
-        <div class="text-center mt-4 pt-3" style="border-top: 1px solid var(--apple-border);">
-            <span class="small" style="color: var(--apple-text-secondary);">Already have an account?</span>
-            <a href="{% url 'login:login' %}" class="small fw-semibold text-decoration-none ms-1" style="color: var(--apple-blue);">
-                Sign in &rarr;
+        <div class="text-center mt-4 pt-3" style="border-top: 1px solid var(--eve-border);">
+            <span class="apple-caption">Already have an Eve Account?</span>
+            <a href="{% url 'login:login' %}" class="apple-link-cta apple-link-cta-sm ms-1">
+                Sign in <span class="chevron" aria-hidden="true">&rsaquo;</span>
             </a>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

@@ -1,101 +1,102 @@
 {% extends "base.html" %}
 
-{% block title %}{% if is_edit %}Edit Event: {{ event.title }}{% else %}Schedule Event{% endif %}{% endblock %}
+{% block title %}{% if is_edit %}Edit {{ event.title }}{% else %}Schedule Event{% endif %}{% endblock %}
 
-{% block content %}
-<div class="row justify-content-center py-3">
-    <div class="col-lg-8">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <div class="text-uppercase fw-semibold small mb-1" style="color: var(--apple-text-secondary); letter-spacing: 0.05em; font-size: 0.75rem;">
-                    {% if is_edit %}Event Revision{% else %}New Event{% endif %}
-                </div>
-                <h1 class="eve-hero-title mb-1" style="font-size: 2.25rem;">
-                    {% if is_edit %}Edit {{ event.title }}{% else %}Schedule an Event{% endif %}
-                </h1>
-                <p class="eve-hero-subtitle mb-0">
-                    {% if is_edit %}
-                        Update schedule parameters, venue, or instructions for <strong>{{ event.company.name }}</strong>.
-                    {% else %}
-                        Prepare an event schedule and configure shift assignments for your team.
-                    {% endif %}
-                </p>
-            </div>
-            <a href="{% if is_edit %}{% url 'events:event_detail' event_id=event.id %}{% else %}{% url 'events:event_list' %}{% endif %}" class="btn eve-btn-outline btn-sm">
-                <i class="bi bi-arrow-left me-1"></i> Cancel
-            </a>
-        </div>
-
-        <div class="card eve-bento-card">
-            <div class="card-body p-4 p-md-5">
-                <form method="post" action="{% if is_edit %}{% url 'events:event_edit' event_id=event.id %}{% else %}{% url 'events:event_create' %}{% endif %}">
-                    {% csrf_token %}
-
-                    {% if not is_edit %}
-                        <div class="mb-4">
-                            <label for="company_id" class="form-label">Organization *</label>
-                            <select class="form-select" id="company_id" name="company_id" required>
-                                {% for mem in memberships %}
-                                    <option value="{{ mem.company.id }}">
-                                        {{ mem.company.name }} (Role: {{ mem.get_role_display }})
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    {% endif %}
-
-                    <div class="mb-4">
-                        <label for="title" class="form-label">Event Title *</label>
-                        <input type="text" class="form-control" id="title" name="title" value="{{ event.title|default:'' }}" placeholder="e.g. Annual Gala, Weekend Night Shift" required>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="description" class="form-label">Description & Staff Instructions</label>
-                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Briefing notes, shift expectations, or equipment requirements...">{{ event.description|default:'' }}</textarea>
-                    </div>
-
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <label for="event_date" class="form-label">Event Date *</label>
-                            <input type="date" class="form-control" id="event_date" name="event_date" value="{{ event.event_date|date:'Y-m-d'|default:'' }}" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="start_time" class="form-label">Start Time *</label>
-                            <input type="time" class="form-control" id="start_time" name="start_time" value="{{ event.start_time|time:'H:i'|default:'' }}" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="end_time" class="form-label">End Time *</label>
-                            <input type="time" class="form-control" id="end_time" name="end_time" value="{{ event.end_time|time:'H:i'|default:'' }}" required>
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-8">
-                            <label for="location" class="form-label">Location / Venue *</label>
-                            <input type="text" class="form-control" id="location" name="location" value="{{ event.location|default:'' }}" placeholder="e.g. City Arena Hall B, Main Campus" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="status" class="form-label">Event Status</label>
-                            <select class="form-select" id="status" name="status">
-                                <option value="UPCOMING" {% if event.status == 'UPCOMING' or not event %}selected{% endif %}>Upcoming</option>
-                                <option value="DRAFT" {% if event.status == 'DRAFT' %}selected{% endif %}>Draft</option>
-                                <option value="COMPLETED" {% if event.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
-                                <option value="CANCELLED" {% if event.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end gap-2 pt-3" style="border-top: 1px solid var(--apple-border);">
-                        <a href="{% if is_edit %}{% url 'events:event_detail' event_id=event.id %}{% else %}{% url 'events:event_list' %}{% endif %}" class="btn eve-btn-outline">
-                            Cancel
-                        </a>
-                        <button type="submit" class="btn eve-btn-primary">
-                            {% if is_edit %}Save Changes{% else %}Create Event & Assign Shifts{% endif %}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+{% block local_nav %}
+<div class="apple-localnav">
+    <div class="apple-localnav-inner">
+        <span class="apple-localnav-title">{% if is_edit %}Edit Event{% else %}Schedule Event{% endif %}</span>
+        <a href="{% if is_edit %}{% url 'events:event_detail' event_id=event.id %}{% else %}{% url 'events:event_list' %}{% endif %}" class="btn-apple-ghost btn-apple-sm">
+            Cancel
+        </a>
     </div>
 </div>
+{% endblock %}
+
+{% block full_bleed %}
+<section class="apple-section-canvas">
+    <div class="apple-container" style="max-width: 720px;">
+        <div class="text-center mb-4 pb-2">
+            <h1 class="apple-headline-section mb-2">
+                {% if is_edit %}Update event details.{% else %}Schedule a new event.{% endif %}
+            </h1>
+            <p class="apple-body">
+                {% if is_edit %}
+                    Modify timing, venue, or briefing instructions for <strong>{{ event.company.name }}</strong>.
+                {% else %}
+                    Define the date, shift window, and location so your team can confirm attendance.
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="apple-tile">
+            <form method="post" action="{% if is_edit %}{% url 'events:event_edit' event_id=event.id %}{% else %}{% url 'events:event_create' %}{% endif %}">
+                {% csrf_token %}
+
+                {% if not is_edit %}
+                <div class="mb-4">
+                    <label for="company_id" class="eve-form-label">Organization</label>
+                    <select class="form-select eve-select" id="company_id" name="company_id" required>
+                        {% for mem in memberships %}
+                        <option value="{{ mem.company.id }}">
+                            {{ mem.company.name }} ({{ mem.get_role_display }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                <div class="mb-4">
+                    <label for="title" class="eve-form-label">Event Title</label>
+                    <input type="text" class="form-control eve-input" id="title" name="title" value="{{ event.title|default:'' }}" placeholder="e.g. Annual Product Keynote, Weekend Arena Shift" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="eve-form-label">Briefing &amp; Staff Instructions</label>
+                    <textarea class="form-control eve-textarea" id="description" name="description" rows="3" placeholder="Arrival gates, dress code, or shift coordination notes...">{{ event.description|default:'' }}</textarea>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label for="event_date" class="eve-form-label">Event Date</label>
+                        <input type="date" class="form-control eve-input" id="event_date" name="event_date" value="{{ event.event_date|date:'Y-m-d'|default:'' }}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="start_time" class="eve-form-label">Start Time</label>
+                        <input type="time" class="form-control eve-input" id="start_time" name="start_time" value="{{ event.start_time|time:'H:i'|default:'' }}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="end_time" class="eve-form-label">End Time</label>
+                        <input type="time" class="form-control eve-input" id="end_time" name="end_time" value="{{ event.end_time|time:'H:i'|default:'' }}" required>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-8">
+                        <label for="location" class="eve-form-label">Primary Venue / Location</label>
+                        <input type="text" class="form-control eve-input" id="location" name="location" value="{{ event.location|default:'' }}" placeholder="e.g. Grand Ballroom B, Main Campus" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="status" class="eve-form-label">Operational Status</label>
+                        <select class="form-select eve-select" id="status" name="status">
+                            <option value="UPCOMING" {% if event.status == 'UPCOMING' or not event %}selected{% endif %}>Upcoming</option>
+                            <option value="DRAFT" {% if event.status == 'DRAFT' %}selected{% endif %}>Draft</option>
+                            <option value="COMPLETED" {% if event.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                            <option value="CANCELLED" {% if event.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end align-items-center gap-3 pt-4" style="border-top: 1px solid var(--eve-border);">
+                    <a href="{% if is_edit %}{% url 'events:event_detail' event_id=event.id %}{% else %}{% url 'events:event_list' %}{% endif %}" class="btn-apple-secondary">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn-apple-primary">
+                        {% if is_edit %}Save Changes{% else %}Create Event{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
 {% endblock %}

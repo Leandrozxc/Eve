@@ -1,190 +1,431 @@
 /* ==========================================================================
-   EVE — APPLE DESIGN SYSTEM (Human Interface Guidelines & Apple.com Web)
+   EVE — APPLE.COM DESIGN SYSTEM & HUMAN INTERFACE GUIDELINES
+   Minimalist, spacious, typographic, and engineered for clarity.
    ========================================================================== */
 
 :root {
-    /* Apple Light Mode Palette */
+    /* Apple Surface & Canvas Palette (Light Mode) */
     --apple-bg: #f5f5f7;
+    --apple-bg-alt: #ffffff;
     --apple-surface: #ffffff;
     --apple-surface-elevated: #ffffff;
-    --apple-surface-secondary: #fbfbfd;
-    --apple-border: rgba(0, 0, 0, 0.08);
-    --apple-border-strong: rgba(0, 0, 0, 0.16);
-    --apple-text-primary: #1d1d1f;
-    --apple-text-secondary: #86868b;
-    --apple-text-tertiary: #a1a1a6;
-    
-    /* Apple Semantic Accents */
+    --apple-surface-subtle: #f5f5f7;
+    --apple-surface-dark: #1d1d1f;
+    --apple-surface-dark-text: #f5f5f7;
+
+    /* Apple Typography Colors */
+    --apple-text: #1d1d1f;
+    --apple-text-secondary: #6e6e73;
+    --apple-text-tertiary: #86868b;
+
+    /* Hairlines & Dividers */
+    --apple-divider: rgba(0, 0, 0, 0.08);
+    --apple-border: #d2d2d7;
+    --apple-border-subtle: rgba(0, 0, 0, 0.06);
+
+    /* Apple Brand & Semantic Accents (WCAG AA compliant) */
     --apple-blue: #0071e3;
     --apple-blue-hover: #0077ed;
-    --apple-blue-subtle: rgba(0, 113, 227, 0.08);
-    --apple-green: #34c759;
-    --apple-green-subtle: rgba(52, 199, 89, 0.1);
-    --apple-orange: #ff9500;
-    --apple-orange-subtle: rgba(255, 149, 0, 0.1);
-    --apple-red: #ff3b30;
-    --apple-red-subtle: rgba(255, 59, 48, 0.1);
-    --apple-purple: #af52de;
-    --apple-purple-subtle: rgba(175, 82, 222, 0.1);
-    
-    /* Chrome & Glass */
-    --apple-nav-bg: rgba(255, 255, 255, 0.82);
-    --apple-nav-border: rgba(0, 0, 0, 0.08);
-    --apple-focus-ring: rgba(0, 113, 227, 0.25);
-    --apple-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.03);
-    --apple-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.05);
-    --apple-shadow-lg: 0 14px 34px rgba(0, 0, 0, 0.08);
-    
+    --apple-blue-active: #0068d1;
+    --apple-blue-link: #0066cc;
+    --apple-blue-tint: rgba(0, 113, 227, 0.08);
+
+    --apple-green: #1d8348;
+    --apple-green-bright: #28cd41;
+    --apple-green-tint: rgba(40, 205, 65, 0.12);
+
+    --apple-orange: #b45309;
+    --apple-orange-tint: rgba(255, 149, 0, 0.14);
+
+    --apple-red: #d70015;
+    --apple-red-tint: rgba(255, 59, 48, 0.12);
+
+    --apple-purple: #6e3bc7;
+    --apple-purple-tint: rgba(175, 82, 222, 0.12);
+
+    /* Global Chrome */
+    --apple-nav-bg: rgba(251, 251, 253, 0.8);
+    --apple-localnav-bg: rgba(255, 255, 255, 0.72);
+    --apple-focus-ring: rgba(0, 113, 227, 0.28);
+
+    /* Shadows */
+    --apple-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.04);
+    --apple-shadow-hover: 0 12px 36px rgba(0, 0, 0, 0.08);
+    --apple-shadow-float: 0 20px 50px rgba(0, 0, 0, 0.12);
+
     /* Radii */
-    --apple-radius-sm: 10px;
-    --apple-radius-md: 14px;
-    --apple-radius-lg: 20px;
-    --apple-radius-xl: 24px;
+    --apple-radius-xs: 8px;
+    --apple-radius-sm: 12px;
+    --apple-radius-md: 18px;
+    --apple-radius-lg: 24px;
+    --apple-radius-xl: 28px;
     --apple-radius-pill: 980px;
+
+    /* Spacing Rhythm */
+    --apple-ease: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 [data-bs-theme="dark"] {
-    /* Apple Dark Mode Palette */
+    /* Apple Surface & Canvas Palette (Dark Mode) */
     --apple-bg: #000000;
+    --apple-bg-alt: #111113;
     --apple-surface: #161617;
     --apple-surface-elevated: #1d1d1f;
-    --apple-surface-secondary: #121214;
-    --apple-border: rgba(255, 255, 255, 0.12);
-    --apple-border-strong: rgba(255, 255, 255, 0.22);
-    --apple-text-primary: #f5f5f7;
-    --apple-text-secondary: #86868b;
-    --apple-text-tertiary: #6e6e73;
-    
-    --apple-blue: #2997ff;
+    --apple-surface-subtle: #242426;
+    --apple-surface-dark: #1d1d1f;
+    --apple-surface-dark-text: #f5f5f7;
+
+    /* Apple Typography Colors (Dark Mode) */
+    --apple-text: #f5f5f7;
+    --apple-text-secondary: #a1a1a6;
+    --apple-text-tertiary: #86868b;
+
+    /* Hairlines & Dividers */
+    --apple-divider: rgba(255, 255, 255, 0.12);
+    --apple-border: #424245;
+    --apple-border-subtle: rgba(255, 255, 255, 0.08);
+
+    /* Apple Accents (Dark Mode) */
+    --apple-blue: #0071e3;
     --apple-blue-hover: #0077ed;
-    --apple-blue-subtle: rgba(41, 151, 255, 0.15);
+    --apple-blue-active: #0068d1;
+    --apple-blue-link: #2997ff;
+    --apple-blue-tint: rgba(41, 151, 255, 0.16);
+
     --apple-green: #30d158;
-    --apple-green-subtle: rgba(48, 209, 88, 0.15);
+    --apple-green-bright: #30d158;
+    --apple-green-tint: rgba(48, 209, 88, 0.16);
+
     --apple-orange: #ff9f0a;
-    --apple-orange-subtle: rgba(255, 159, 10, 0.15);
+    --apple-orange-tint: rgba(255, 159, 10, 0.16);
+
     --apple-red: #ff453a;
-    --apple-red-subtle: rgba(255, 69, 58, 0.15);
+    --apple-red-tint: rgba(255, 69, 58, 0.16);
+
     --apple-purple: #bf5af2;
-    --apple-purple-subtle: rgba(191, 90, 242, 0.15);
-    
-    --apple-nav-bg: rgba(22, 22, 23, 0.85);
-    --apple-nav-border: rgba(255, 255, 255, 0.1);
+    --apple-purple-tint: rgba(191, 90, 242, 0.16);
+
+    /* Global Chrome */
+    --apple-nav-bg: rgba(22, 22, 23, 0.8);
+    --apple-localnav-bg: rgba(22, 22, 23, 0.75);
     --apple-focus-ring: rgba(41, 151, 255, 0.35);
-    --apple-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
-    --apple-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
-    --apple-shadow-lg: 0 14px 34px rgba(0, 0, 0, 0.55);
+
+    /* Shadows */
+    --apple-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.35);
+    --apple-shadow-hover: 0 14px 40px rgba(0, 0, 0, 0.55);
+    --apple-shadow-float: 0 24px 60px rgba(0, 0, 0, 0.7);
 }
 
-/* Base Document */
-* {
+/* ==========================================================================
+   1. RESET & TYPOGRAPHY FOUNDATION
+   ========================================================================== */
+
+*, *::before, *::after {
     box-sizing: border-box;
 }
 
 html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
+    margin: 0;
     background-color: var(--apple-bg);
-    color: var(--apple-text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    color: var(--apple-text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.47059;
+    font-weight: 400;
+    letter-spacing: -0.022em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    letter-spacing: -0.012em;
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition: background-color 0.25s var(--apple-ease), color 0.25s var(--apple-ease);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--apple-text);
+    margin-top: 0;
+    font-weight: 600;
+    letter-spacing: -0.028em;
 }
 
 ::selection {
-    background-color: var(--apple-blue-subtle);
-    color: var(--apple-text-primary);
+    background-color: var(--apple-blue-tint);
+    color: var(--apple-blue-link);
 }
 
 :focus-visible {
-    outline: 2px solid var(--apple-blue);
-    outline-offset: 3px;
-    border-radius: var(--apple-radius-sm);
+    outline: 2px solid var(--apple-blue-link);
+    outline-offset: 2px;
+}
+
+/* Apple Display & Editorial Type Scale */
+.apple-headline-hero {
+    font-size: clamp(2.5rem, 5vw, 3.75rem);
+    line-height: 1.06;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    color: var(--apple-text);
+    text-wrap: balance;
+}
+
+.apple-headline-section {
+    font-size: clamp(1.85rem, 3.5vw, 2.75rem);
+    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--apple-text);
+    text-wrap: balance;
+}
+
+.apple-headline-tile {
+    font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+    line-height: 1.16;
+    font-weight: 600;
+    letter-spacing: -0.024em;
+    color: var(--apple-text);
+}
+
+.apple-lead {
+    font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+    line-height: 1.381;
+    font-weight: 400;
+    letter-spacing: 0.004em;
+    color: var(--apple-text-secondary);
+    text-wrap: pretty;
+}
+
+.apple-body-secondary {
+    font-size: 0.94rem;
+    line-height: 1.45;
+    color: var(--apple-text-secondary);
+}
+
+.apple-caption {
+    font-size: 0.78rem;
+    line-height: 1.35;
+    letter-spacing: -0.008em;
+    color: var(--apple-text-tertiary);
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
 }
 
 /* ==========================================================================
-   GLOBAL NAVIGATION (Apple GlobalNav Style)
+   2. CONTAINERS & SECTION ARCHITECTURE
+   ========================================================================== */
+
+.apple-container {
+    width: 100%;
+    max-width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 22px;
+    padding-right: 22px;
+}
+
+.apple-container-wide {
+    width: 100%;
+    max-width: 1120px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 22px;
+    padding-right: 22px;
+}
+
+.apple-Container-narrow {
+    width: 100%;
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 22px;
+    padding-right: 22px;
+}
+
+.apple-section-white {
+    background-color: var(--apple-bg-alt);
+    border-bottom: 1px solid var(--apple-divider);
+}
+
+.apple-section-canvas {
+    background-color: var(--apple-bg);
+}
+
+/* ==========================================================================
+   3. APPLE GLOBAL NAVIGATION (44px Desktop Bar)
    ========================================================================== */
 
 .eve-navbar {
     background-color: var(--apple-nav-bg);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid var(--apple-nav-border);
-    padding: 0.65rem 0;
-    z-index: 1030;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--apple-divider);
+    min-height: 44px;
+    padding: 0;
+    z-index: 1040;
+    transition: background-color 0.25s var(--apple-ease);
+}
+
+.eve-navbar .apple-nav-inner {
+    width: 100%;
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 0 22px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .eve-brand {
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.45rem;
     font-weight: 600;
-    font-size: 1.15rem;
-    color: var(--apple-text-primary) !important;
+    font-size: 0.95rem;
+    color: var(--apple-text) !important;
     text-decoration: none;
-    letter-spacing: -0.025em;
-    transition: opacity 0.2s ease;
+    letter-spacing: -0.02em;
+    opacity: 0.92;
+    transition: opacity 0.2s var(--apple-ease);
+    padding: 0.25rem 0;
 }
 
 .eve-brand:hover {
-    opacity: 0.8;
+    opacity: 1;
 }
 
 .eve-logo-circle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: var(--apple-radius-pill);
-    background: linear-gradient(135deg, var(--apple-text-primary), rgba(120, 120, 128, 0.8));
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: var(--apple-text);
     color: var(--apple-surface);
-    font-weight: 600;
-    font-size: 0.85rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0;
+}
+
+.eve-nav-list {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .eve-nav-link {
-    color: var(--apple-text-secondary) !important;
+    color: var(--apple-text) !important;
+    opacity: 0.72;
     font-weight: 400;
-    font-size: 0.84rem;
+    font-size: 12px;
     letter-spacing: -0.01em;
-    padding: 0.45rem 0.85rem !important;
-    border-radius: var(--apple-radius-pill);
-    transition: color 0.18s ease, background-color 0.18s ease, opacity 0.18s ease;
+    text-decoration: none;
+    padding: 0.35rem 0 !important;
+    transition: opacity 0.2s var(--apple-ease), color 0.2s var(--apple-ease);
+    position: relative;
+    white-space: nowrap;
 }
 
 .eve-nav-link:hover {
-    color: var(--apple-text-primary) !important;
-    background-color: rgba(120, 120, 128, 0.08);
+    opacity: 1;
 }
 
 .eve-nav-link.active {
-    color: var(--apple-text-primary) !important;
+    opacity: 1;
+    font-weight: 500;
+}
+
+.eve-nav-link.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -6px;
+    height: 1.5px;
+    background-color: var(--apple-text);
+    border-radius: 2px;
+}
+
+.eve-nav-action {
+    font-size: 12px;
+    color: var(--apple-text-secondary) !important;
+    text-decoration: none;
+    transition: color 0.2s var(--apple-ease);
+    white-space: nowrap;
+}
+
+.eve-nav-action:hover {
+    color: var(--apple-text) !important;
+}
+
+/* Local Sub-Navigation Bar (Apple Chapter / Product Bar) */
+.apple-localnav {
+    background-color: var(--apple-localnav-bg);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--apple-divider);
+    position: sticky;
+    top: 44px;
+    z-index: 1020;
+    transition: background-color 0.25s var(--apple-ease);
+}
+
+.apple-localnav-inner {
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 0 22px;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.apple-localnav-title {
+    font-size: 1.2rem;
     font-weight: 600;
-    background-color: rgba(120, 120, 128, 0.12);
+    letter-spacing: -0.022em;
+    color: var(--apple-text);
+    margin: 0;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+/* System Flash Ribbon */
+.apple-ribbon {
+    background-color: var(--apple-surface);
+    border-bottom: 1px solid var(--apple-divider);
+    padding: 0.65rem 0;
+    font-size: 0.85rem;
 }
 
 /* ==========================================================================
-   BUTTONS (Apple Pill Affordances)
+   4. APPLE BUTTONS & CALLS TO ACTION
    ========================================================================== */
 
 .eve-btn-primary {
     background-color: var(--apple-blue);
     color: #ffffff !important;
-    border: none;
-    font-weight: 500;
-    font-size: 0.92rem;
-    padding: 0.55rem 1.35rem;
+    border: 1px solid transparent;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    padding: 0.6rem 1.35rem;
     border-radius: var(--apple-radius-pill);
     min-height: 40px;
     display: inline-flex;
@@ -192,28 +433,42 @@ body {
     justify-content: center;
     gap: 0.4rem;
     text-decoration: none;
-    transition: background-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: background-color 0.2s var(--apple-ease), transform 0.15s var(--apple-ease);
 }
 
 .eve-btn-primary:hover {
     background-color: var(--apple-blue-hover);
     color: #ffffff !important;
-    transform: scale(1.015);
-    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.28);
 }
 
 .eve-btn-primary:active {
+    background-color: var(--apple-blue-active);
     transform: scale(0.985);
+}
+
+.eve-btn-primary.btn-lg-apple {
+    font-size: 17px;
+    padding: 0.75rem 1.65rem;
+    min-height: 46px;
+}
+
+.eve-btn-primary.btn-sm-apple {
+    font-size: 12px;
+    padding: 0.35rem 0.9rem;
+    min-height: 30px;
+    font-weight: 500;
 }
 
 .eve-btn-outline {
     background-color: transparent;
-    color: var(--apple-text-primary);
-    border: 1px solid var(--apple-border-strong);
-    font-weight: 500;
-    font-size: 0.9rem;
-    padding: 0.5rem 1.25rem;
+    color: var(--apple-blue-link) !important;
+    border: 1px solid var(--apple-blue-link);
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    padding: 0.6rem 1.35rem;
     border-radius: var(--apple-radius-pill);
     min-height: 40px;
     display: inline-flex;
@@ -221,322 +476,434 @@ body {
     justify-content: center;
     gap: 0.4rem;
     text-decoration: none;
-    transition: all 0.18s ease;
+    cursor: pointer;
+    transition: background-color 0.2s var(--apple-ease), color 0.2s var(--apple-ease), transform 0.15s var(--apple-ease);
 }
 
 .eve-btn-outline:hover {
-    background-color: var(--apple-surface);
-    color: var(--apple-blue);
+    background-color: var(--apple-blue);
     border-color: var(--apple-blue);
-    box-shadow: var(--apple-shadow-sm);
-    transform: scale(1.01);
+    color: #ffffff !important;
 }
 
 .eve-btn-outline:active {
     transform: scale(0.985);
 }
 
-.eve-btn-subtle {
-    background-color: var(--apple-blue-subtle);
-    color: var(--apple-blue) !important;
-    border: none;
+.eve-btn-outline.btn-sm-apple {
+    font-size: 12px;
+    padding: 0.35rem 0.9rem;
+    min-height: 30px;
     font-weight: 500;
-    font-size: 0.88rem;
-    padding: 0.45rem 1rem;
+}
+
+.eve-btn-neutral {
+    background-color: var(--apple-surface-subtle);
+    color: var(--apple-text) !important;
+    border: 1px solid var(--apple-divider);
+    font-weight: 400;
+    font-size: 14px;
+    padding: 0.5rem 1.15rem;
     border-radius: var(--apple-radius-pill);
-    transition: all 0.15s ease;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
     text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s var(--apple-ease), border-color 0.2s var(--apple-ease);
+}
+
+.eve-btn-neutral:hover {
+    background-color: var(--apple-border-subtle);
+    border-color: var(--apple-border);
+    color: var(--apple-text) !important;
+}
+
+/* Apple Chevron Link CTA ("Explore organizations ›") */
+.apple-link-cta {
+    color: var(--apple-blue-link) !important;
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: gap 0.2s var(--apple-ease);
+}
+
+.apple-link-cta:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    gap: 0.4rem;
+}
+
+.apple-link-cta-sm {
+    color: var(--apple-blue-link) !important;
+    font-size: 14px;
+    font-weight: 400;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    transition: gap 0.2s var(--apple-ease);
+}
+
+.apple-link-cta-sm:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    gap: 0.35rem;
+}
+
+/* ==========================================================================
+   5. BENTO TILES & EDITORIAL SURFACES (Zero Nested Boxes)
+   ========================================================================== */
+
+.apple-bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+}
+
+.bento-span-12 { grid-column: span 12; }
+.bento-span-8  { grid-column: span 8; }
+.bento-span-7  { grid-column: span 7; }
+.bento-span-6  { grid-column: span 6; }
+.bento-span-5  { grid-column: span 5; }
+.bento-span-4  { grid-column: span 4; }
+
+@media (max-width: 991.98px) {
+    .bento-span-8, .bento-span-7, .bento-span-6, .bento-span-5, .bento-span-4 {
+        grid-column: span 12;
+    }
+}
+
+.apple-tile, .eve-bento-card, .card {
+    background-color: var(--apple-surface);
+    border: 1px solid var(--apple-border-subtle);
+    border-radius: var(--apple-radius-lg);
+    box-shadow: var(--apple-shadow-card);
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s var(--apple-ease), box-shadow 0.3s var(--apple-ease);
+}
+
+.card {
+    padding: 0;
+}
+
+.apple-tile-interactive:hover, .eve-bento-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--apple-shadow-hover);
+}
+
+/* Apple Pro Dark Tile (Dark even in light mode, like MacBook Pro feature tiles) */
+.apple-tile-pro {
+    background: radial-gradient(circle at top right, #2c2c2e 0%, #161617 70%);
+    color: #f5f5f7;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--apple-radius-lg);
+    padding: 36px;
+    box-shadow: var(--apple-shadow-card);
+    position: relative;
+    overflow: hidden;
+}
+
+.apple-tile-pro h2, .apple-tile-pro h3, .apple-tile-pro h4, .apple-tile-pro h5 {
+    color: #f5f5f7;
+}
+
+.apple-tile-pro p {
+    color: #a1a1a6;
+}
+
+/* Large Apple Metric Display */
+.apple-stat-figure {
+    font-size: clamp(2.75rem, 4.5vw, 4rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--apple-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.apple-stat-caption {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--apple-text-secondary);
+    margin-top: 0.4rem;
+}
+
+/* Hairline Specification Strip */
+.apple-spec-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--apple-divider);
+}
+
+.apple-spec-item-label {
+    font-size: 0.78rem;
+    color: var(--apple-text-tertiary);
+    margin-bottom: 0.2rem;
+}
+
+.apple-spec-item-value {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--apple-text);
+    letter-spacing: -0.015em;
+}
+
+/* Clean Editorial Row List (Zero Box Clutter) */
+.apple-row-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.apple-row-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.35rem 0;
+    border-bottom: 1px solid var(--apple-divider);
+    transition: background-color 0.15s var(--apple-ease);
+}
+
+.apple-row-item:first-child {
+    border-top: 1px solid var(--apple-divider);
+}
+
+.apple-date-badge {
+    min-width: 58px;
+    height: 58px;
+    border-radius: 14px;
+    background-color: var(--apple-surface-subtle);
+    border: 1px solid var(--apple-divider);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+    flex-shrink: 0;
+}
+
+.apple-date-badge-month {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--apple-red);
+}
+
+.apple-date-badge-day {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--apple-text);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   6. STATUS PILLS & SEGMENTED CONTROLS
+   ========================================================================== */
+
+.badge {
+    border-radius: var(--apple-radius-pill);
+    padding: 0.32rem 0.78rem;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: -0.008em;
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
 }
 
-.eve-btn-subtle:hover {
-    background-color: var(--apple-blue);
-    color: #ffffff !important;
-    transform: scale(1.02);
+.badge-apple-blue {
+    background-color: var(--apple-blue-tint) !important;
+    color: var(--apple-blue-link) !important;
 }
 
-/* ==========================================================================
-   CARDS & BENTO BOX GRID (Apple Clean Aesthetics)
-   ========================================================================== */
-
-.card {
-    background-color: var(--apple-surface);
-    border: 1px solid var(--apple-border);
-    border-radius: var(--apple-radius-lg);
-    box-shadow: var(--apple-shadow-sm);
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+.badge-apple-green {
+    background-color: var(--apple-green-tint) !important;
+    color: var(--apple-green) !important;
 }
 
-.eve-bento-card {
-    border-radius: var(--apple-radius-xl);
-    border: 1px solid var(--apple-border);
-    background-color: var(--apple-surface);
-    box-shadow: var(--apple-shadow-sm);
-    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease, border-color 0.2s ease;
-    overflow: hidden;
+.badge-apple-orange {
+    background-color: var(--apple-orange-tint) !important;
+    color: var(--apple-orange) !important;
 }
 
-.eve-bento-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--apple-shadow-lg);
-    border-color: var(--apple-border-strong);
+.badge-apple-red {
+    background-color: var(--apple-red-tint) !important;
+    color: var(--apple-red) !important;
 }
 
-.card-header {
-    background-color: transparent !important;
-    border-bottom: 1px solid var(--apple-border) !important;
-    padding: 1.25rem 1.5rem !important;
-    font-weight: 600;
+.badge-apple-purple {
+    background-color: var(--apple-purple-tint) !important;
+    color: var(--apple-purple) !important;
 }
 
-/* Apple Stat Chips & Metrics */
-.eve-stat-chip {
-    width: 44px;
-    height: 44px;
-    border-radius: var(--apple-radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
+.badge-apple-neutral {
+    background-color: var(--apple-surface-subtle) !important;
+    color: var(--apple-text-secondary) !important;
+    border: 1px solid var(--apple-divider);
 }
 
-.eve-stat-chip.blue {
-    background-color: var(--apple-blue-subtle);
-    color: var(--apple-blue);
+/* Segmented Filter Control */
+.eve-segmented-control {
+    background-color: rgba(118, 118, 128, 0.12);
+    padding: 3px;
+    border-radius: var(--apple-radius-pill);
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 2px;
 }
 
-.eve-stat-chip.green {
-    background-color: var(--apple-green-subtle);
-    color: var(--apple-green);
-}
-
-.eve-stat-chip.orange {
-    background-color: var(--apple-orange-subtle);
-    color: var(--apple-orange);
-}
-
-.eve-stat-chip.purple {
-    background-color: var(--apple-purple-subtle);
-    color: var(--apple-purple);
-}
-
-.eve-metric-number {
-    font-size: 2.25rem;
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1;
-    color: var(--apple-text-primary);
-}
-
-.eve-metric-label {
-    font-size: 0.85rem;
-    color: var(--apple-text-secondary);
+.eve-segmented-item {
+    border-radius: var(--apple-radius-pill);
+    padding: 0.38rem 1.05rem;
+    font-size: 13px;
     font-weight: 500;
-    margin-top: 0.25rem;
+    color: var(--apple-text-secondary);
+    text-decoration: none;
+    transition: all 0.2s var(--apple-ease);
+}
+
+.eve-segmented-item:hover {
+    color: var(--apple-text);
+}
+
+.eve-segmented-item.active {
+    background-color: var(--apple-surface);
+    color: var(--apple-text);
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 /* ==========================================================================
-   FORMS & CONTROLS (macOS / iOS Inspired)
+   7. FORMS & APPLE ID INPUTS
    ========================================================================== */
 
 .form-label {
-    color: var(--apple-text-primary);
-    font-weight: 600;
-    font-size: 0.88rem;
+    color: var(--apple-text);
+    font-weight: 500;
+    font-size: 0.85rem;
     margin-bottom: 0.45rem;
     letter-spacing: -0.01em;
 }
 
 .form-control, .form-select {
     background-color: var(--apple-surface);
-    color: var(--apple-text-primary);
+    color: var(--apple-text);
     border: 1px solid var(--apple-border);
-    border-radius: var(--apple-radius-md);
-    padding: 0.75rem 1rem;
-    font-size: 0.95rem;
-    min-height: 46px;
-    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+    border-radius: var(--apple-radius-sm);
+    padding: 0.8rem 1rem;
+    font-size: 16px;
+    min-height: 50px;
+    transition: border-color 0.2s var(--apple-ease), box-shadow 0.2s var(--apple-ease);
+}
+
+.form-control::placeholder {
+    color: var(--apple-text-tertiary);
 }
 
 .form-control:focus, .form-select:focus {
     background-color: var(--apple-surface);
-    color: var(--apple-text-primary);
+    color: var(--apple-text);
     border-color: var(--apple-blue);
     box-shadow: 0 0 0 4px var(--apple-focus-ring);
     outline: none;
 }
 
 .form-control:disabled, .form-control[readonly] {
-    background-color: rgba(120, 120, 128, 0.08);
-    color: var(--apple-text-secondary);
-    border-color: var(--apple-border);
+    background-color: var(--apple-surface-subtle);
+    color: var(--apple-text-tertiary);
+    border-color: var(--apple-divider);
 }
 
-/* Apple Segmented Control */
-.eve-segmented-control {
-    background-color: rgba(120, 120, 128, 0.12);
-    padding: 3px;
-    border-radius: var(--apple-radius-pill);
-    display: inline-flex;
-    gap: 2px;
+/* Apple Auth Stage */
+.eve-auth-stage {
+    min-height: calc(100vh - 140px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3.5rem 1.25rem;
 }
 
-.eve-segmented-item {
-    border-radius: var(--apple-radius-pill);
-    padding: 0.35rem 0.95rem;
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: var(--apple-text-secondary);
-    text-decoration: none;
-    transition: all 0.18s ease;
+.eve-auth-box {
+    width: 100%;
+    max-width: 440px;
 }
 
-.eve-segmented-item:hover {
-    color: var(--apple-text-primary);
-}
-
-.eve-segmented-item.active {
+.eve-demo-pill {
     background-color: var(--apple-surface);
-    color: var(--apple-text-primary);
-    font-weight: 600;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-}
-
-/* ==========================================================================
-   STATUS BADGES (Apple Pill Badges)
-   ========================================================================== */
-
-.badge {
-    border-radius: var(--apple-radius-pill);
-    padding: 0.35rem 0.8rem;
-    font-weight: 500;
-    font-size: 0.78rem;
-    letter-spacing: -0.01em;
-}
-
-.badge-apple-blue {
-    background-color: var(--apple-blue-subtle) !important;
-    color: var(--apple-blue) !important;
-    border: 1px solid rgba(0, 113, 227, 0.15);
-}
-
-.badge-apple-green {
-    background-color: var(--apple-green-subtle) !important;
-    color: var(--apple-green) !important;
-    border: 1px solid rgba(52, 199, 89, 0.2);
-}
-
-.badge-apple-orange {
-    background-color: var(--apple-orange-subtle) !important;
-    color: var(--apple-orange) !important;
-    border: 1px solid rgba(255, 149, 0, 0.2);
-}
-
-.badge-apple-red {
-    background-color: var(--apple-red-subtle) !important;
-    color: var(--apple-red) !important;
-    border: 1px solid rgba(255, 59, 48, 0.2);
-}
-
-.badge-apple-neutral {
-    background-color: rgba(120, 120, 128, 0.12) !important;
-    color: var(--apple-text-secondary) !important;
     border: 1px solid var(--apple-border);
+    border-radius: var(--apple-radius-pill);
+    padding: 0.35rem 0.85rem;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--apple-text);
+    cursor: pointer;
+    transition: all 0.15s var(--apple-ease);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.eve-demo-pill:hover {
+    border-color: var(--apple-blue);
+    color: var(--apple-blue-link);
+    background-color: var(--apple-blue-tint);
 }
 
 /* ==========================================================================
-   TABLES (Apple Clean Tabular Presentation)
+   8. TABLES & PROGRESS TRACKERS
    ========================================================================== */
 
 .table {
-    --bs-table-color: var(--apple-text-primary);
+    --bs-table-color: var(--apple-text);
     --bs-table-bg: transparent;
-    --bs-table-border-color: var(--apple-border);
+    --bs-table-border-color: var(--apple-divider);
     margin-bottom: 0;
     font-variant-numeric: tabular-nums;
 }
 
 .table th {
-    font-size: 0.78rem;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--apple-text-secondary);
-    border-bottom: 1px solid var(--apple-border);
-    padding: 1rem 1.25rem;
-    background-color: rgba(120, 120, 128, 0.03);
+    letter-spacing: 0.05em;
+    color: var(--apple-text-tertiary);
+    border-bottom: 1px solid var(--apple-divider);
+    padding: 0.9rem 1.5rem;
+    background-color: transparent;
 }
 
 .table td {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--apple-border);
-    color: var(--apple-text-primary);
+    padding: 1.15rem 1.5rem;
+    border-bottom: 1px solid var(--apple-divider);
+    color: var(--apple-text);
     vertical-align: middle;
 }
 
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
 .table-hover tbody tr:hover td {
-    background-color: rgba(120, 120, 128, 0.04);
+    background-color: var(--apple-surface-subtle);
 }
-
-/* ==========================================================================
-   AUTHENTICATION CARDS (Apple ID Style)
-   ========================================================================== */
-
-.eve-auth-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 75vh;
-    padding: 2rem 1rem;
-}
-
-.eve-auth-card {
-    width: 100%;
-    max-width: 440px;
-    background-color: var(--apple-surface);
-    border: 1px solid var(--apple-border);
-    border-radius: var(--apple-radius-xl);
-    box-shadow: var(--apple-shadow-md);
-    padding: 2.5rem 2.25rem;
-}
-
-.eve-auth-logo {
-    width: 64px;
-    height: 64px;
-    font-size: 1.75rem;
-    border-radius: var(--apple-radius-pill);
-    background: linear-gradient(135deg, var(--apple-text-primary), #6e6e73);
-    color: var(--apple-surface);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 1.25rem;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-}
-
-.eve-auth-title {
-    font-size: 1.85rem;
-    font-weight: 700;
-    letter-spacing: -0.035em;
-    color: var(--apple-text-primary);
-    margin-bottom: 0.35rem;
-}
-
-.eve-auth-subtitle {
-    color: var(--apple-text-secondary);
-    font-size: 0.95rem;
-    margin-bottom: 2rem;
-}
-
-/* ==========================================================================
-   PROGRESS BARS (Apple Smooth Rounded Trackers)
-   ========================================================================== */
 
 .progress {
-    height: 8px;
-    background-color: rgba(120, 120, 128, 0.12);
+    height: 6px;
+    background-color: rgba(120, 120, 128, 0.16);
     border-radius: var(--apple-radius-pill);
     overflow: hidden;
 }
@@ -544,57 +911,94 @@ body {
 .progress-bar {
     background-color: var(--apple-blue);
     border-radius: var(--apple-radius-pill);
-    transition: width 0.4s ease;
+    transition: width 0.5s var(--apple-ease);
 }
 
 /* ==========================================================================
-   FOOTER (Apple Sub-footer Style)
+   9. APPLE MULTI-COLUMN DIRECTORY FOOTER
    ========================================================================== */
 
 .eve-footer {
     background-color: var(--apple-bg);
-    border-top: 1px solid var(--apple-border);
-    padding: 2rem 0;
-    color: var(--apple-text-secondary);
-    font-size: 0.78rem;
+    border-top: 1px solid var(--apple-divider);
+    padding: 2.5rem 0 2rem;
+    color: var(--apple-text-tertiary);
+    font-size: 12px;
+    line-height: 1.4;
     letter-spacing: -0.01em;
     margin-top: auto;
+}
+
+.eve-footer-note {
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--apple-divider);
+    color: var(--apple-text-tertiary);
+}
+
+.eve-footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--apple-divider);
+}
+
+.eve-footer-col-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--apple-text);
+    margin-bottom: 0.6rem;
+}
+
+.eve-footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
 }
 
 .eve-footer a {
     color: var(--apple-text-secondary);
     text-decoration: none;
-    transition: color 0.15s ease;
+    transition: color 0.15s var(--apple-ease);
 }
 
 .eve-footer a:hover {
-    color: var(--apple-text-primary);
+    color: var(--apple-text);
+    text-decoration: underline;
 }
 
-/* ==========================================================================
-   ANIMATIONS & HERO TYPOGRAPHY
-   ========================================================================== */
-
-.eve-hero-title {
-    font-size: 3rem;
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.1;
-    color: var(--apple-text-primary);
-}
-
-.eve-hero-subtitle {
-    font-size: 1.15rem;
-    color: var(--apple-text-secondary);
-    letter-spacing: -0.01em;
-    font-weight: 400;
-}
-
-@media (max-width: 768px) {
-    .eve-hero-title {
-        font-size: 2.25rem;
+@media (max-width: 767.98px) {
+    .eve-footer-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
-    .eve-auth-card {
-        padding: 2rem 1.5rem;
+    .apple-tile, .eve-bento-card {
+        padding: 24px;
+    }
+    .apple-row-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.85rem;
+    }
+    .eve-nav-list {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1rem 0;
+    }
+    .eve-nav-link.active::after {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
