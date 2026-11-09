@@ -473,17 +473,74 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 13px;
     font-weight: 600;
     color: var(--apple-text);
-    padding: 4px 12px 4px 6px;
+    padding: 4px 10px 4px 6px;
     min-height: 36px;
     border-radius: var(--apple-radius-sm);
     background-color: var(--apple-surface-subtle);
     border: 1px solid var(--apple-divider);
+    cursor: pointer;
     transition: background-color 0.2s var(--apple-ease), border-color 0.2s var(--apple-ease);
 }
 
-.eve-user-chip:hover {
+.eve-user-chip:hover,
+.eve-user-chip[aria-expanded="true"] {
     border-color: var(--apple-border);
+    background-color: var(--apple-surface);
     color: var(--apple-text);
+}
+
+.eve-user-chip::after {
+    display: none;
+}
+
+.eve-dropdown-menu {
+    background-color: var(--apple-surface);
+    border: 1px solid var(--apple-border);
+    border-radius: var(--apple-radius-md);
+    box-shadow: var(--apple-shadow-float);
+    padding: 6px;
+    min-width: 230px;
+    margin-top: 8px !important;
+}
+
+.eve-dropdown-header {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--apple-divider);
+    margin-bottom: 4px;
+}
+
+.eve-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 8px 12px;
+    border-radius: var(--apple-radius-xs);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--apple-text);
+    text-decoration: none;
+    transition: background-color 0.15s var(--apple-ease), color 0.15s var(--apple-ease);
+}
+
+.eve-dropdown-item:hover,
+.eve-dropdown-item:focus {
+    background-color: var(--apple-surface-subtle);
+    color: var(--apple-text);
+}
+
+.eve-dropdown-item.active {
+    background-color: var(--apple-blue-tint);
+    color: var(--apple-blue-link);
+}
+
+.eve-dropdown-item-danger {
+    color: var(--apple-red);
+}
+
+.eve-dropdown-item-danger:hover,
+.eve-dropdown-item-danger:focus {
+    background-color: var(--apple-red-tint);
+    color: var(--apple-red);
 }
 
 .eve-avatar-xs {

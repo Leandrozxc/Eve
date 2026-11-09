@@ -30,12 +30,13 @@
                     <span>Eve</span>
                 </a>
 
+                {% if user.is_authenticated %}
                 <button class="navbar-toggler border-0 shadow-none p-1" type="button" data-bs-toggle="collapse" data-bs-target="#eveGlobalNav" aria-controls="eveGlobalNav" aria-expanded="false" aria-label="Menu">
                     <i class="bi bi-list fs-5"></i>
                 </button>
 
                 <div class="collapse navbar-collapse flex-grow-0" id="eveGlobalNav">
-                    {% if user.is_authenticated %}
+                    <!-- Core Workspace Navigation Only (No Account/Preferences Clutter) -->
                     <ul class="eve-nav-list mx-lg-auto my-2 my-lg-0">
                         <li>
                             <a class="nav-link {% if request.resolver_match.app_name == 'home' %}active{% endif %}" href="{% url 'home:home' %}">Overview</a>
@@ -46,38 +47,48 @@
                         <li>
                             <a class="nav-link {% if 'event' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'events:event_list' %}">Events &amp; Shifts</a>
                         </li>
-                        <li>
-                            <a class="nav-link {% if request.resolver_match.app_name == 'userprofile' %}active{% endif %}" href="{% url 'userprofile:profile' %}">Account</a>
+                        <!-- Mobile-only Account & Preferences section -->
+                        <li class="d-lg-none pt-2 mt-1 apple-divider-top">
+                            <a class="nav-link {% if request.resolver_match.app_name == 'userprofile' %}active{% endif %}" href="{% url 'userprofile:profile' %}">Account Profile</a>
                         </li>
-                        <li>
+                        <li class="d-lg-none">
                             <a class="nav-link {% if request.resolver_match.app_name == 'usersettings' %}active{% endif %}" href="{% url 'usersettings:settings' %}">Preferences</a>
                         </li>
-                        <li class="d-lg-none pt-2 mt-1 apple-divider-top">
+                        <li class="d-lg-none pt-1 mt-1 apple-divider-top">
                             <a class="nav-link text-danger" href="{% url 'login:logout' %}">Sign Out ({{ user.first_name|default:user.username }})</a>
                         </li>
                     </ul>
-                    {% else %}
-                    <ul class="eve-nav-list ms-auto my-2 my-lg-0" style="background: transparent; border: none; padding: 0;">
-                        <li>
-                            <a class="nav-link {% if request.resolver_match.app_name == 'login' %}active{% endif %}" href="{% url 'login:login' %}">Sign In</a>
-                        </li>
-                        <li>
-                            <a class="btn-apple-primary btn-apple-sm text-decoration-none ms-lg-2" href="{% url 'register:register' %}">Create Account</a>
-                        </li>
-                    </ul>
-                    {% endif %}
                 </div>
 
-                {% if user.is_authenticated %}
-                <div class="d-none d-lg-flex align-items-center gap-2">
-                    <a href="{% url 'userprofile:profile' %}" class="eve-user-chip text-decoration-none" title="Account Profile">
+                <!-- Consolidated User Account Popover Menu (Desktop) -->
+                <div class="d-none d-lg-flex align-items-center dropdown">
+                    <button class="eve-user-chip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu">
                         <span class="eve-avatar-xs">{{ user.first_name|default:user.username|make_list|first|upper }}</span>
                         <span>{{ user.first_name|default:user.username }}</span>
-                    </a>
-                    <a href="{% url 'login:logout' %}" class="btn-apple-ghost btn-apple-sm text-decoration-none">
-                        Sign Out
-                    </a>
+                        <i class="bi bi-chevron-down" style="font-size: 11px; color: var(--apple-text-tertiary);" aria-hidden="true"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end eve-dropdown-menu">
+                        <div class="eve-dropdown-header">
+                            <div class="fw-bold" style="font-size: 13px; color: var(--apple-text);">{{ user.get_full_name|default:user.username }}</div>
+                            <div class="apple-caption text-truncate">{{ user.email|default:user.username }}</div>
+                        </div>
+                        <a class="eve-dropdown-item {% if request.resolver_match.app_name == 'userprofile' %}active{% endif %}" href="{% url 'userprofile:profile' %}">
+                            <i class="bi bi-person" aria-hidden="true"></i>
+                            <span>Account Profile</span>
+                        </a>
+                        <a class="eve-dropdown-item {% if request.resolver_match.app_name == 'usersettings' %}active{% endif %}" href="{% url 'usersettings:settings' %}">
+                            <i class="bi bi-sliders" aria-hidden="true"></i>
+                            <span>Preferences</span>
+                        </a>
+                        <div class="my-1 apple-divider-top"></div>
+                        <a class="eve-dropdown-item eve-dropdown-item-danger" href="{% url 'login:logout' %}">
+                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                            <span>Sign Out</span>
+                        </a>
+                    </div>
                 </div>
+                {% else %}
+                <span class="apple-caption d-none d-sm-inline">Workforce &amp; Shift Coordination</span>
                 {% endif %}
             </div>
         </nav>
