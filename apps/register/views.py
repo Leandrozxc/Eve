@@ -68,7 +68,7 @@ def register_view(request):
                     last_name=last_name,
                 )
                 Profile.objects.create(user=user, full_name=full_name)
-                UserSettings.objects.create(user=user)
+                UserSettings.objects.get_or_create(user=user)
 
                 company, _ = Company.objects.get_or_create(name=company_name)
                 CompanyMember.objects.create(company=company, user=user, role="OWNER")

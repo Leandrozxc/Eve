@@ -16,6 +16,19 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Eve Chronometer Minimalist Design System -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script>
+        (function() {
+            {% if not user.is_authenticated %}
+            try {
+                const savedTheme = localStorage.getItem('eve_theme');
+                if (savedTheme === 'dark' || savedTheme === 'light') {
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                    document.documentElement.setAttribute('data-bs-theme', savedTheme);
+                }
+            } catch(e) {}
+            {% endif %}
+        })();
+    </script>
     {% block extra_css %}{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -54,41 +67,64 @@
                         <li class="d-lg-none">
                             <a class="nav-link {% if request.resolver_match.app_name == 'usersettings' %}active{% endif %}" href="{% url 'usersettings:settings' %}">Preferences</a>
                         </li>
+                        <li class="d-lg-none">
+                            <button type="button" class="nav-link w-100 border-0 bg-transparent text-start d-flex align-items-center justify-content-between eve-theme-toggle-trigger" aria-label="Toggle theme">
+                                <span>Theme</span>
+                                <span class="d-inline-flex align-items-center gap-1 apple-caption text-uppercase">
+                                    <i class="bi eve-theme-icon-indicator" aria-hidden="true"></i>
+                                    <span class="eve-theme-label-indicator"></span>
+                                </span>
+                            </button>
+                        </li>
                         <li class="d-lg-none pt-1 mt-1 apple-divider-top">
                             <a class="nav-link text-danger" href="{% url 'login:logout' %}">Sign Out ({{ user.first_name|default:user.username }})</a>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Consolidated User Account Popover Menu (Desktop) -->
-                <div class="d-none d-lg-flex align-items-center dropdown">
-                    <button class="eve-user-chip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu">
-                        <span class="eve-avatar-xs">{{ user.first_name|default:user.username|make_list|first|upper }}</span>
-                        <span>{{ user.first_name|default:user.username }}</span>
-                        <i class="bi bi-chevron-down" style="font-size: 11px; color: var(--apple-text-tertiary);" aria-hidden="true"></i>
+                <!-- Desktop Controls: Theme Switcher & Consolidated User Account Popover Menu -->
+                <div class="d-none d-lg-flex align-items-center gap-2">
+                    <button type="button" class="theme-toggle-btn eve-theme-toggle-trigger" aria-label="Toggle theme mode" title="Toggle theme (Carbon Dark / Warm Alabaster)">
+                        <i class="bi eve-theme-icon-indicator" aria-hidden="true"></i>
                     </button>
-                    <div class="dropdown-menu dropdown-menu-end eve-dropdown-menu">
-                        <div class="eve-dropdown-header">
-                            <div class="fw-bold" style="font-size: 13px; color: var(--apple-text);">{{ user.get_full_name|default:user.username }}</div>
-                            <div class="apple-caption text-truncate">{{ user.email|default:user.username }}</div>
+                    <div class="dropdown">
+                        <button class="eve-user-chip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu">
+                            <span class="eve-avatar-xs">{{ user.first_name|default:user.username|make_list|first|upper }}</span>
+                            <span>{{ user.first_name|default:user.username }}</span>
+                            <i class="bi bi-chevron-down" style="font-size: 11px; color: var(--apple-text-tertiary);" aria-hidden="true"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end eve-dropdown-menu">
+                            <div class="eve-dropdown-header">
+                                <div class="fw-bold" style="font-size: 13px; color: var(--apple-text);">{{ user.get_full_name|default:user.username }}</div>
+                                <div class="apple-caption text-truncate">{{ user.email|default:user.username }}</div>
+                            </div>
+                            <a class="eve-dropdown-item {% if request.resolver_match.app_name == 'userprofile' %}active{% endif %}" href="{% url 'userprofile:profile' %}">
+                                <i class="bi bi-person" aria-hidden="true"></i>
+                                <span>Account Profile</span>
+                            </a>
+                            <a class="eve-dropdown-item {% if request.resolver_match.app_name == 'usersettings' %}active{% endif %}" href="{% url 'usersettings:settings' %}">
+                                <i class="bi bi-sliders" aria-hidden="true"></i>
+                                <span>Preferences</span>
+                            </a>
+                            <button type="button" class="eve-dropdown-item w-100 border-0 bg-transparent text-start eve-theme-toggle-trigger">
+                                <i class="bi eve-theme-icon-indicator" aria-hidden="true"></i>
+                                <span>Switch to <span class="eve-theme-target-label">Dark</span></span>
+                            </button>
+                            <div class="my-1 apple-divider-top"></div>
+                            <a class="eve-dropdown-item eve-dropdown-item-danger" href="{% url 'login:logout' %}">
+                                <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                                <span>Sign Out</span>
+                            </a>
                         </div>
-                        <a class="eve-dropdown-item {% if request.resolver_match.app_name == 'userprofile' %}active{% endif %}" href="{% url 'userprofile:profile' %}">
-                            <i class="bi bi-person" aria-hidden="true"></i>
-                            <span>Account Profile</span>
-                        </a>
-                        <a class="eve-dropdown-item {% if request.resolver_match.app_name == 'usersettings' %}active{% endif %}" href="{% url 'usersettings:settings' %}">
-                            <i class="bi bi-sliders" aria-hidden="true"></i>
-                            <span>Preferences</span>
-                        </a>
-                        <div class="my-1 apple-divider-top"></div>
-                        <a class="eve-dropdown-item eve-dropdown-item-danger" href="{% url 'login:logout' %}">
-                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-                            <span>Sign Out</span>
-                        </a>
                     </div>
                 </div>
                 {% else %}
-                <span class="apple-caption d-none d-sm-inline">Workforce &amp; Shift Coordination</span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="apple-caption d-none d-sm-inline">Workforce &amp; Shift Coordination</span>
+                    <button type="button" class="theme-toggle-btn eve-theme-toggle-trigger" aria-label="Toggle theme mode" title="Toggle theme (Carbon Dark / Warm Alabaster)">
+                        <i class="bi eve-theme-icon-indicator" aria-hidden="true"></i>
+                    </button>
+                </div>
                 {% endif %}
             </div>
         </nav>
@@ -145,8 +181,121 @@
         </div>
     </footer>
 
+    <!-- Hidden CSRF token container for AJAX theme toggling -->
+    <div style="display: none;" id="eveCsrfContainer">
+        {% csrf_token %}
+    </div>
+
     <!-- Bootstrap 5.3 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Eve Chronometer Real-time Theme & Motion Controller -->
+    <script>
+    (function() {
+        const TOGGLE_URL = "{% if user.is_authenticated %}{% url 'usersettings:toggle_theme' %}{% else %}{% endif %}";
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function getCsrfToken() {
+            const input = document.querySelector('input[name="csrfmiddlewaretoken"]');
+            if (input && input.value) return input.value;
+            return getCookie('csrftoken') || '';
+        }
+
+        function updateThemeIndicators(isDark) {
+            document.querySelectorAll('.eve-theme-icon-indicator').forEach(function(icon) {
+                if (isDark) {
+                    icon.classList.remove('bi-moon-stars');
+                    icon.classList.add('bi-sun');
+                } else {
+                    icon.classList.remove('bi-sun');
+                    icon.classList.add('bi-moon-stars');
+                }
+            });
+
+            document.querySelectorAll('.eve-theme-label-indicator').forEach(function(el) {
+                el.textContent = isDark ? 'Dark' : 'Light';
+            });
+
+            document.querySelectorAll('.eve-theme-target-label').forEach(function(el) {
+                el.textContent = isDark ? 'Light' : 'Dark';
+            });
+
+            // Update switch if present on Settings page
+            const settingsSwitch = document.getElementById('dark_mode');
+            if (settingsSwitch && settingsSwitch.checked !== isDark) {
+                settingsSwitch.checked = isDark;
+            }
+        }
+
+        function applyTheme(theme, persistServer) {
+            const isDark = theme === 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            try {
+                localStorage.setItem('eve_theme', theme);
+            } catch(e) {}
+
+            updateThemeIndicators(isDark);
+
+            if (persistServer && TOGGLE_URL) {
+                const token = getCsrfToken();
+                fetch(TOGGLE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ theme: theme })
+                }).catch(function(err) {
+                    console.warn('Eve theme sync warning:', err);
+                });
+            }
+        }
+
+        function toggleCurrentTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            applyTheme(next, true);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const initialTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            updateThemeIndicators(initialTheme === 'dark');
+
+            // Wire all theme toggle triggers
+            document.querySelectorAll('.eve-theme-toggle-trigger').forEach(function(trigger) {
+                trigger.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleCurrentTheme();
+                });
+            });
+
+            // Connect settings page switch if present
+            const settingsSwitch = document.getElementById('dark_mode');
+            if (settingsSwitch) {
+                settingsSwitch.addEventListener('change', function() {
+                    const desiredTheme = this.checked ? 'dark' : 'light';
+                    applyTheme(desiredTheme, true);
+                });
+            }
+        });
+    })();
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

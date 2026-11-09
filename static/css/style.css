@@ -175,7 +175,54 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    transition: background-color 0.25s var(--apple-ease), color 0.25s var(--apple-ease);
+    transition: background-color 0.28s cubic-bezier(0.16, 1, 0.3, 1), color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Authored Focal Keyframes (Impeccable Motion Thesis) */
+@keyframes eveFadeRise {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes evePulseSoft {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.65;
+        transform: scale(0.92);
+    }
+}
+
+@keyframes eveShimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.apple-tile,
+.eve-bento-card,
+.eve-auth-box {
+    animation: eveFadeRise 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.eve-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+    display: inline-block;
+    animation: evePulseSoft 2.8s ease-in-out infinite;
 }
 
 /* Keyboard Skip Link (WCAG 2.4.1) */
@@ -493,6 +540,41 @@ h1, h2, h3, h4, h5, h6 {
     display: none;
 }
 
+.theme-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--apple-text-secondary);
+    width: 34px;
+    height: 34px;
+    border-radius: var(--apple-radius-xs);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.18s var(--apple-ease), color 0.18s var(--apple-ease), transform 0.15s var(--apple-ease);
+}
+
+.theme-toggle-btn:hover {
+    background-color: var(--apple-surface-subtle);
+    color: var(--apple-text);
+    transform: rotate(15deg);
+}
+
+.theme-toggle-btn:active {
+    transform: scale(0.92);
+}
+
+.theme-toggle-btn:focus-visible {
+    outline: 2px solid var(--apple-blue-link);
+    outline-offset: 2px;
+}
+
+.eve-theme-icon-indicator {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    display: inline-block;
+}
+
 .eve-dropdown-menu {
     background-color: var(--apple-surface);
     border: 1px solid var(--apple-border);
@@ -501,6 +583,8 @@ h1, h2, h3, h4, h5, h6 {
     padding: 6px;
     min-width: 230px;
     margin-top: 8px !important;
+    animation: eveFadeRise 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top right;
 }
 
 .eve-dropdown-header {
@@ -824,7 +908,14 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: border-color 0.25s var(--apple-ease), box-shadow 0.25s var(--apple-ease);
+    transition: border-color 0.22s var(--apple-ease), box-shadow 0.22s var(--apple-ease), transform 0.22s var(--apple-ease), background-color 0.28s var(--apple-ease);
+}
+
+.apple-tile:hover,
+.eve-bento-card:hover {
+    border-color: var(--apple-border-strong);
+    box-shadow: var(--apple-shadow-hover);
+    transform: translateY(-2px);
 }
 
 /* Eve Dark Forest Studio Tile */
@@ -980,14 +1071,6 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.2;
 }
 
-.eve-status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: currentColor;
-    display: inline-block;
-}
-
 .eve-status-confirmed,
 .badge-apple-green {
     background-color: var(--apple-green-tint) !important;
@@ -1119,6 +1202,28 @@ h1, h2, h3, h4, h5, h6 {
     background-color: var(--apple-surface-subtle);
     color: var(--apple-text-secondary);
     border-color: var(--apple-divider);
+}
+
+/* Switches & Checkboxes */
+.form-check-input {
+    background-color: var(--apple-surface-subtle);
+    border: 1px solid var(--apple-border);
+    cursor: pointer;
+    transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                background-position 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.form-check-input:checked {
+    background-color: var(--apple-blue-link);
+    border-color: var(--apple-blue-link);
+}
+
+.form-check-input:focus {
+    border-color: var(--apple-blue-link);
+    box-shadow: 0 0 0 3px var(--apple-focus-ring);
+    outline: none;
 }
 
 /* Alerts */
