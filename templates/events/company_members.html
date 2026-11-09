@@ -2,36 +2,17 @@
 
 {% block title %}Team Roster — {{ company.name }}{% endblock %}
 
-{% block local_nav %}
-<div class="apple-localnav">
-    <div class="apple-localnav-inner">
-        <div class="d-flex align-items-center gap-2 text-truncate">
-            <a href="{% url 'events:company_list' %}" class="apple-caption text-decoration-none d-none d-sm-inline" style="color: var(--eve-text-muted);">Organizations</a>
-            <span class="apple-caption d-none d-sm-inline" aria-hidden="true">/</span>
-            <span class="apple-localnav-title text-truncate">{{ company.name }}</span>
-        </div>
-
-        <div class="d-flex align-items-center gap-2">
-            <a href="{% url 'events:event_list' %}?company_id={{ company.id }}" class="btn-apple-secondary btn-apple-sm">
-                Organization Events
-            </a>
-            {% if can_manage %}
-            <a href="{% url 'events:event_create' %}" class="btn-apple-primary btn-apple-sm">
-                Schedule Event
-            </a>
-            {% endif %}
-        </div>
-    </div>
-</div>
-{% endblock %}
-
 {% block full_bleed %}
-<!-- 1. Organization Header (White Surface) -->
+<!-- 1. Organization Roster Header -->
 <section class="apple-section-white">
     <div class="apple-container-wide">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+        <div class="eve-workspace-header">
             <div>
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <a href="{% url 'events:company_list' %}" class="apple-caption text-decoration-none fw-semibold" style="color: var(--eve-text-muted);">
+                        &larr; Organizations
+                    </a>
+                    <span class="apple-caption">/</span>
                     <span class="eve-role-badge {% if current_membership.role == 'OWNER' %}eve-role-owner{% elif current_membership.role == 'MANAGER' %}eve-role-manager{% endif %}">
                         Your Role: {{ current_membership.get_role_display }}
                     </span>
@@ -44,21 +25,33 @@
                 <h1 class="apple-headline-section">{{ company.name }}</h1>
                 <p class="apple-subhead mb-0">
                     {% if company.address %}{{ company.address }} &middot; {% endif %}
-                    {% if company.contact_number %}{{ company.contact_number }} &middot; {% endif %}
-                    {{ members.count }} active team member{{ members.count|pluralize }}
+                    {% if company.contact_number %}<span class="tabular-nums">{{ company.contact_number }}</span> &middot; {% endif %}
+                    <span class="tabular-nums">{{ members.count }}</span> active team member{{ members.count|pluralize }}
                 </p>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'events:event_list' %}?company_id={{ company.id }}" class="btn-apple-secondary btn-apple-sm">
+                    Workspace Events
+                </a>
+                {% if can_manage %}
+                <a href="{% url 'events:event_create' %}" class="btn-apple-primary btn-apple-sm">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Schedule Event</span>
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>
 </section>
 
-<!-- 2. Organization Roster Specification Table on Apple Canvas -->
+<!-- 2. Organization Roster Specification Table -->
 <section class="apple-section-canvas">
     <div class="apple-container-wide">
         <div class="apple-tile p-0 overflow-hidden">
-            <div class="p-4 d-flex flex-wrap justify-content-between align-items-center gap-2" style="border-bottom: 1px solid var(--eve-border);">
+            <div class="p-4 d-flex flex-wrap justify-content-between align-items-center gap-2 apple-divider-bottom">
                 <div>
-                    <h2 class="apple-headline-tile mb-0" style="font-size: 22px;">Directory &amp; permissions</h2>
+                    <h2 class="apple-headline-tile mb-0">Directory &amp; permissions</h2>
                     <p class="apple-caption mb-0">Owners and Managers can promote members or update access levels in real time.</p>
                 </div>
                 <span class="apple-caption tabular-nums">{{ members.count }} total</span>
@@ -115,7 +108,7 @@
                                         <input type="hidden" name="action" value="change_role">
                                         <input type="hidden" name="member_id" value="{{ m.id }}">
                                         <label for="role_{{ m.id }}" class="visually-hidden">Role for {{ m.user.username }}</label>
-                                        <select name="new_role" id="role_{{ m.id }}" class="form-select py-1 px-3" style="border-radius: 980px; font-size: 13px; min-height: 36px; width: auto;" onchange="this.form.submit()">
+                                        <select name="new_role" id="role_{{ m.id }}" class="form-select eve-select py-1 px-3" style="font-size: 13px; min-height: 36px; width: auto;" onchange="this.form.submit()">
                                             {% for role_code, role_name in role_choices %}
                                             <option value="{{ role_code }}" {% if m.role == role_code %}selected{% endif %}>
                                                 {{ role_name }}

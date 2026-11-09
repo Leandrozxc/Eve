@@ -2,25 +2,19 @@
 
 {% block title %}Preferences{% endblock %}
 
-{% block local_nav %}
-<div class="apple-localnav">
-    <div class="apple-localnav-inner">
-        <span class="apple-localnav-title">System Preferences</span>
-        <a href="{% url 'userprofile:profile' %}" class="apple-link-cta apple-link-cta-sm">
-            Account Profile <span class="chevron" aria-hidden="true">&rsaquo;</span>
-        </a>
-    </div>
-</div>
-{% endblock %}
-
 {% block full_bleed %}
 <section class="apple-section-canvas">
     <div class="apple-container" style="max-width: 680px;">
-        <div class="text-center mb-4 pb-2">
-            <h1 class="apple-headline-section mb-2">Appearance &amp; notifications.</h1>
-            <p class="apple-body">
-                Tailor your Eve workspace experience between Daylight and Pro Dark appearance modes.
-            </p>
+        <div class="eve-workspace-header mb-4">
+            <div>
+                <h1 class="apple-headline-section mb-1">Workspace preferences</h1>
+                <p class="apple-body mb-0">
+                    Customize your interface theme and shift notification delivery.
+                </p>
+            </div>
+            <a href="{% url 'userprofile:profile' %}" class="btn-apple-secondary btn-apple-sm">
+                Account Profile
+            </a>
         </div>
 
         <div class="apple-tile">
@@ -31,11 +25,11 @@
                     <!-- Dark Mode Toggle Row -->
                     <div class="apple-row-item py-4" style="border-top: none;">
                         <div style="max-width: 460px;">
-                            <label class="fw-semibold fs-5 d-block mb-1" for="dark_mode" style="color: var(--eve-text); cursor: pointer;">
-                                Pro Dark Appearance
+                            <label class="fw-bold d-block mb-1" for="dark_mode" style="font-size: 16px; color: var(--eve-text); cursor: pointer;">
+                                Carbon Dark Theme
                             </label>
-                            <p class="apple-body mb-0" style="font-size: 14px;">
-                                Switch the entire interface from Apple Daylight Warm Gray to high-contrast Obsidian Dark Mode.
+                            <p class="apple-body mb-0">
+                                Switch the workspace from Warm Alabaster daylight mode to low-glare Carbon Dark mode.
                             </p>
                         </div>
                         <div class="form-check form-switch m-0 ps-0">
@@ -46,10 +40,10 @@
                     <!-- Email Notifications Toggle Row -->
                     <div class="apple-row-item py-4">
                         <div style="max-width: 460px;">
-                            <label class="fw-semibold fs-5 d-block mb-1" for="email_notifications" style="color: var(--eve-text); cursor: pointer;">
+                            <label class="fw-bold d-block mb-1" for="email_notifications" style="font-size: 16px; color: var(--eve-text); cursor: pointer;">
                                 Shift &amp; Roster Notifications
                             </label>
-                            <p class="apple-body mb-0" style="font-size: 14px;">
+                            <p class="apple-body mb-0">
                                 Receive updates when you are assigned to an upcoming shift or when an event schedule changes.
                             </p>
                         </div>
@@ -59,7 +53,7 @@
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-end align-items-center gap-3 pt-4" style="border-top: 1px solid var(--eve-border);">
+                <div class="d-flex justify-content-end align-items-center gap-3 pt-4 apple-divider-top">
                     <a href="{% url 'home:home' %}" class="btn-apple-secondary">Cancel</a>
                     <button type="submit" class="btn-apple-primary">
                         Save Preferences

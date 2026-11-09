@@ -22,7 +22,7 @@ A multi-workspace shift coordination platform where a single user account can be
 ## Operating Context
 
 - Used across desktop and mobile web browsers before and during live events.
-- Supports both Daylight (`Light`) and low-ambient venue (`Pro Dark`) appearance modes via user preferences (`UserSettings.dark_mode`).
+- Supports both Warm Alabaster (`Light`) and low-glare Carbon Studio (`Dark`) appearance modes via user preferences (`UserSettings.dark_mode`).
 
 ## Capabilities and Constraints
 
@@ -32,4 +32,4 @@ A multi-workspace shift coordination platform where a single user account can be
 
 ## Brand Commitments
 
-- **Visual Reference:** Apple's official website (`apple.com`) and Apple Human Interface Guidelines—minimalist, spacious, typographic, and product-focused.
+- **Visual Direction:** Unique tactile editorial minimalism ("Chronometer Studio")—spacious and calm like Apple's design philosophy, but distinctly Eve with Warm Alabaster stone surfaces, Obsidian & Deep Forest Emerald accents, `Plus Jakarta Sans` headings, and `JetBrains Mono` timekeeping telemetry.

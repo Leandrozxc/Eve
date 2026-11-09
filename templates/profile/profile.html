@@ -2,42 +2,34 @@
 
 {% block title %}Account Profile{% endblock %}
 
-{% block local_nav %}
-<div class="apple-localnav">
-    <div class="apple-localnav-inner">
-        <span class="apple-localnav-title">Eve Account</span>
-        <div class="d-flex align-items-center gap-3">
-            <a href="{% url 'usersettings:settings' %}" class="apple-link-cta apple-link-cta-sm">
-                Preferences <span class="chevron" aria-hidden="true">&rsaquo;</span>
-            </a>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
 {% block full_bleed %}
-<!-- 1. Apple Account Identity Header (White Surface) -->
+<!-- 1. Account Identity Header -->
 <section class="apple-section-white">
     <div class="apple-container" style="max-width: 820px;">
-        <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-4">
-            <span class="eve-avatar-xs" style="width: 72px; height: 72px; font-size: 28px;">
-                {{ user.first_name|default:user.username|make_list|first|upper }}
-            </span>
-            <div>
-                <h1 class="apple-headline-section mb-1">{{ profile.full_name|default:user.username }}</h1>
-                <p class="apple-subhead mb-0">{{ user.email }} &middot; @{{ user.username }}</p>
+        <div class="eve-workspace-header">
+            <div class="d-flex align-items-center gap-3">
+                <span class="eve-avatar-xs" style="width: 56px; height: 56px; font-size: 20px; border-radius: 14px;">
+                    {{ user.first_name|default:user.username|make_list|first|upper }}
+                </span>
+                <div>
+                    <h1 class="apple-headline-section mb-1">{{ profile.full_name|default:user.username }}</h1>
+                    <p class="apple-subhead mb-0">{{ user.email }} &middot; @{{ user.username }}</p>
+                </div>
             </div>
+            <a href="{% url 'usersettings:settings' %}" class="btn-apple-secondary btn-apple-sm">
+                Preferences
+            </a>
         </div>
     </div>
 </section>
 
-<!-- 2. Profile Details & Memberships on Apple Canvas -->
+<!-- 2. Profile Details & Memberships -->
 <section class="apple-section-canvas">
     <div class="apple-container" style="max-width: 820px;">
         <!-- Personal Information Tile -->
         <div class="apple-tile mb-4">
             <div class="mb-4">
-                <h2 class="apple-headline-tile mb-1" style="font-size: 22px;">Personal information</h2>
+                <h2 class="apple-headline-tile mb-1">Personal information</h2>
                 <p class="apple-caption mb-0">Keep your display name and shift availability notes current for your team managers.</p>
             </div>
 
@@ -60,7 +52,7 @@
                     <textarea class="form-control eve-textarea" id="bio" name="bio" rows="4" placeholder="Share your department specialty, certifications, or preferred shift hours...">{{ profile.bio }}</textarea>
                 </div>
 
-                <div class="d-flex justify-content-end align-items-center gap-3 pt-3" style="border-top: 1px solid var(--eve-border);">
+                <div class="d-flex justify-content-end align-items-center gap-3 pt-3 apple-divider-top">
                     <a href="{% url 'home:home' %}" class="btn-apple-secondary">Cancel</a>
                     <button type="submit" class="btn-apple-primary">Save Profile</button>
                 </div>
@@ -70,9 +62,9 @@
         <!-- Organization Memberships Hairline Row List (Zero Nested Cards) -->
         <div class="apple-tile">
             <div class="d-flex justify-content-between align-items-baseline mb-2">
-                <h2 class="apple-headline-tile" style="font-size: 22px;">Organization memberships</h2>
+                <h2 class="apple-headline-tile">Organization memberships</h2>
                 <a href="{% url 'events:company_list' %}" class="apple-link-cta apple-link-cta-sm">
-                    Manage workspaces <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                    Manage workspaces <span class="chevron" aria-hidden="true">&rarr;</span>
                 </a>
             </div>
             <p class="apple-caption mb-3">Your active roles across organizations on Eve.</p>
@@ -82,7 +74,7 @@
                 {% for mem in memberships %}
                 <div class="apple-row-item py-3">
                     <div>
-                        <div class="fw-semibold" style="color: var(--eve-text);">{{ mem.company.name }}</div>
+                        <div class="fw-bold" style="color: var(--eve-text);">{{ mem.company.name }}</div>
                         <div class="apple-caption tabular-nums">Member since {{ mem.joined_at|date:"M d, Y" }}</div>
                     </div>
                     <div class="d-flex align-items-center gap-3">
@@ -90,7 +82,7 @@
                             {{ mem.get_role_display }}
                         </span>
                         <a href="{% url 'events:company_members' company_id=mem.company.id %}" class="apple-link-cta apple-link-cta-sm">
-                            Roster <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                            Roster <span class="chevron" aria-hidden="true">&rarr;</span>
                         </a>
                     </div>
                 </div>

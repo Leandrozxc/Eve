@@ -3,38 +3,36 @@
 {% block title %}Overview — Shift Scheduling{% endblock %}
 
 {% block full_bleed %}
-<!-- 1. Apple Product Hero Stage (Full-Bleed White Surface) -->
+<!-- 1. Eve Minimalist Studio Workspace Header -->
 <section class="apple-section-white">
     <div class="apple-container-wide">
-        <div class="apple-hero">
-            <h1 class="apple-headline-hero">
-                Welcome, {{ user.first_name|default:user.username }}.
-            </h1>
-            <p class="apple-lead mt-3">
-                Shift Scheduling, organization rosters, and real-time attendance confirmation—engineered to keep every event effortless and in sync.
-            </p>
-            <div class="apple-cta-row">
-                <a href="{% url 'events:event_create' %}" class="btn-apple-primary">
-                    Schedule an Event
+        <div class="eve-workspace-header">
+            <div>
+                <h1 class="apple-headline-hero">
+                    Welcome, {{ user.first_name|default:user.username }}.
+                </h1>
+                <p class="apple-lead mt-2 mb-0">
+                    Shift Scheduling, organization rosters, and live attendance coordination across your active workspaces.
+                </p>
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <a href="{% url 'events:company_list' %}" class="btn-apple-secondary">
+                    Organizations
                 </a>
-                <a href="{% url 'events:company_list' %}" class="apple-link-cta">
-                    Explore organizations <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                <a href="{% url 'events:event_create' %}" class="btn-apple-primary">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Schedule Event</span>
                 </a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 2. Asymmetric Bento Showcase (8 + 4 Split on Apple Warm Gray Canvas) -->
+<!-- 2. Asymmetric Chronometer Dispatch & Readiness Grid (8 + 4 Split) -->
 <section class="apple-section-canvas">
     <div class="apple-container-wide">
-        <div class="mb-4 pb-2">
-            <h2 class="apple-headline-section">At a glance.</h2>
-            <p class="apple-subhead">Your next assignment and live attendance telemetry.</p>
-        </div>
-
         <div class="apple-bento-grid">
-            <!-- 8-Column Primary Spotlight: Next Upcoming Shift -->
+            <!-- 8-Column Next Shift Dispatch Card -->
             <div class="apple-tile bento-span-8">
                 {% with next_shift=my_assignments|first %}
                 {% if next_shift %}
@@ -43,15 +41,15 @@
                         <span class="eve-status-pill {% if next_shift.status == 'CONFIRMED' or next_shift.status == 'COMPLETED' %}eve-status-confirmed{% elif next_shift.status == 'CANCELLED' %}eve-status-declined{% else %}eve-status-pending{% endif %}">
                             <span class="eve-status-dot"></span> {{ next_shift.get_status_display }}
                         </span>
-                        <span class="apple-caption">{{ next_shift.event.company.name }}</span>
+                        <span class="apple-caption tabular-nums">{{ next_shift.event.company.name }}</span>
                     </div>
-                    <h3 class="apple-headline-tile mb-2">
+                    <h2 class="apple-headline-tile mb-2">
                         <a href="{% url 'events:event_detail' event_id=next_shift.event.id %}" class="text-decoration-none" style="color: inherit;">
                             {{ next_shift.event.title }}
                         </a>
-                    </h3>
-                    <p class="apple-body" style="max-width: 56ch;">
-                        Role: <strong>{{ next_shift.assigned_role }}</strong>. {{ next_shift.event.description|default:"Coordinate with your team lead and verify your shift arrival window below."|truncatewords:24 }}
+                    </h2>
+                    <p class="apple-body" style="max-width: 58ch;">
+                        Assigned duty: <strong>{{ next_shift.assigned_role }}</strong>. {{ next_shift.event.description|default:"Review your station assignment and confirm your arrival window below."|truncatewords:24 }}
                     </p>
                 </div>
 
@@ -66,19 +64,19 @@
                             <div class="apple-spec-value tabular-nums">{{ next_shift.start_time|time:"g:i A" }} &ndash; {{ next_shift.end_time|time:"g:i A" }}</div>
                         </div>
                         <div>
-                            <div class="apple-spec-label">Venue</div>
+                            <div class="apple-spec-label">Station / Venue</div>
                             <div class="apple-spec-value">{{ next_shift.assigned_location|default:next_shift.event.location }}</div>
                         </div>
                     </div>
 
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-4">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3">
                         <div class="d-flex flex-wrap align-items-center gap-2">
                             {% if next_shift.status == 'ASSIGNED' %}
                             <form method="POST" action="{% url 'events:assignment_update' assignment_id=next_shift.id %}" class="m-0">
                                 {% csrf_token %}
                                 <input type="hidden" name="status" value="CONFIRMED">
                                 <button type="submit" class="btn-apple-primary btn-apple-sm">
-                                    Confirm Attendance
+                                    Confirm Shift
                                 </button>
                             </form>
                             {% elif next_shift.status == 'CONFIRMED' %}
@@ -92,31 +90,31 @@
                             {% endif %}
                         </div>
                         <a href="{% url 'events:event_detail' event_id=next_shift.event.id %}" class="apple-link-cta apple-link-cta-sm">
-                            Open shift briefing <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                            Open shift brief <span class="chevron" aria-hidden="true">&rarr;</span>
                         </a>
                     </div>
                 </div>
                 {% else %}
                 <div>
-                    <h3 class="apple-headline-tile mb-2">Your schedule is clear.</h3>
+                    <h2 class="apple-headline-tile mb-2">No upcoming shift dispatches.</h2>
                     <p class="apple-body" style="max-width: 52ch;">
-                        You have no upcoming shift assignments right now. Schedule a new event for your organization or browse open schedules across your teams.
+                        Your personal shift queue is currently clear. Schedule a new event for your organization or inspect upcoming schedules across your teams.
                     </p>
                 </div>
                 <div class="d-flex flex-wrap align-items-center gap-3 pt-4">
                     <a href="{% url 'events:event_create' %}" class="btn-apple-primary btn-apple-sm">Schedule Event</a>
                     <a href="{% url 'events:event_list' %}" class="apple-link-cta apple-link-cta-sm">
-                        Browse all events <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                        Browse all events <span class="chevron" aria-hidden="true">&rarr;</span>
                     </a>
                 </div>
                 {% endif %}
                 {% endwith %}
             </div>
 
-            <!-- 4-Column Telemetry Tile: Confirmation Rate & Counts -->
+            <!-- 4-Column Readiness Ledger -->
             <div class="apple-tile bento-span-4">
                 <div>
-                    <div class="apple-caption mb-2">Attendance Readiness</div>
+                    <div class="apple-caption mb-2">Shift Confirmation Index</div>
                     <div class="apple-stat-figure">{{ confirmation_rate }}%</div>
                     <p class="apple-caption mt-2 mb-3">
                         Confirmed or completed across {{ total_assignments_count }} total shifts.
@@ -129,11 +127,11 @@
                 <div class="apple-spec-strip mt-4" style="grid-template-columns: repeat(2, 1fr);">
                     <div>
                         <div class="apple-spec-label">Upcoming Events</div>
-                        <div class="apple-spec-value fs-4 tabular-nums">{{ upcoming_events_count }}</div>
+                        <div class="apple-spec-value tabular-nums">{{ upcoming_events_count }}</div>
                     </div>
                     <div>
-                        <div class="apple-spec-label">Organizations</div>
-                        <div class="apple-spec-value fs-4 tabular-nums">{{ user_memberships.count }}</div>
+                        <div class="apple-spec-label">Workspaces</div>
+                        <div class="apple-spec-value tabular-nums">{{ user_memberships.count }}</div>
                     </div>
                 </div>
             </div>
@@ -141,16 +139,16 @@
     </div>
 </section>
 
-<!-- 3. Personal Shift Lineup (Full-Bleed White Section with Clean Row Architecture) -->
+<!-- 3. Personal Shift Timeline -->
 <section class="apple-section-white">
     <div class="apple-container-wide">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4 pb-2">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
             <div>
-                <h2 class="apple-headline-section">Your upcoming shifts.</h2>
-                <p class="apple-subhead">Confirm attendance or open any event to inspect full team rosters.</p>
+                <h2 class="apple-headline-section">Upcoming shift timeline</h2>
+                <p class="apple-subhead">Confirm attendance or open any event to review the full team roster.</p>
             </div>
             <a href="{% url 'events:event_list' %}" class="apple-link-cta">
-                See all events <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                All scheduled events <span class="chevron" aria-hidden="true">&rarr;</span>
             </a>
         </div>
 
@@ -165,19 +163,19 @@
                     </div>
                     <div>
                         <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                            <a href="{% url 'events:event_detail' event_id=assign.event.id %}" class="fw-semibold fs-5 text-decoration-none" style="color: var(--eve-text); letter-spacing: -0.015em;">
+                            <a href="{% url 'events:event_detail' event_id=assign.event.id %}" class="fw-bold text-decoration-none" style="font-size: 16px; color: var(--eve-text);">
                                 {{ assign.event.title }}
                             </a>
                             <span class="eve-status-pill {% if assign.status == 'CONFIRMED' or assign.status == 'COMPLETED' %}eve-status-confirmed{% elif assign.status == 'CANCELLED' %}eve-status-declined{% else %}eve-status-pending{% endif %}">
                                 <span class="eve-status-dot"></span> {{ assign.get_status_display }}
                             </span>
                         </div>
-                        <div class="apple-caption d-flex flex-wrap align-items-center gap-2 gap-md-3 tabular-nums">
-                            <span class="fw-medium" style="color: var(--eve-text);">{{ assign.assigned_role }}</span>
+                        <div class="apple-caption d-flex flex-wrap align-items-center gap-2 gap-md-3">
+                            <span class="fw-semibold" style="color: var(--eve-text);">{{ assign.assigned_role }}</span>
                             <span>&middot;</span>
                             <span>{{ assign.event.company.name }}</span>
                             <span>&middot;</span>
-                            <span>{{ assign.start_time|time:"g:i A" }} &ndash; {{ assign.end_time|time:"g:i A" }}</span>
+                            <span class="tabular-nums">{{ assign.start_time|time:"g:i A" }} &ndash; {{ assign.end_time|time:"g:i A" }}</span>
                             {% if assign.assigned_location %}
                             <span>&middot;</span>
                             <span>{{ assign.assigned_location }}</span>
@@ -195,27 +193,27 @@
                     </form>
                     {% endif %}
                     <a href="{% url 'events:event_detail' event_id=assign.event.id %}" class="btn-apple-secondary btn-apple-sm">
-                        Details
+                        Briefing
                     </a>
                 </div>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="apple-tile text-center py-5" style="background: var(--eve-bg);">
+        <div class="apple-tile text-center py-5">
             <div class="mx-auto" style="max-width: 440px;">
-                <h3 class="apple-headline-tile mb-2">No shifts assigned yet.</h3>
+                <h3 class="apple-headline-tile mb-2">No shifts assigned yet</h3>
                 <p class="apple-body mb-4">
-                    When an organization manager assigns you to an event shift, it will appear right here for instant confirmation.
+                    When an organization manager assigns you to an event shift, it will appear in this timeline for one-tap confirmation.
                 </p>
-                <a href="{% url 'events:event_list' %}" class="btn-apple-primary btn-apple-sm">Browse Organization Events</a>
+                <a href="{% url 'events:event_list' %}" class="btn-apple-primary btn-apple-sm">Explore Events</a>
             </div>
         </div>
         {% endif %}
     </div>
 </section>
 
-<!-- 4. Organizations & Pro Capabilities (7 + 5 Asymmetric Bento on Canvas) -->
+<!-- 4. Workspaces & Quick Dispatch (7 + 5 Asymmetric Grid) -->
 <section class="apple-section-canvas">
     <div class="apple-container-wide">
         <div class="apple-bento-grid">
@@ -223,13 +221,13 @@
             <div class="apple-tile bento-span-7">
                 <div>
                     <div class="d-flex justify-content-between align-items-baseline mb-2">
-                        <h2 class="apple-headline-tile">Your organizations.</h2>
+                        <h2 class="apple-headline-tile">Active workspaces</h2>
                         <a href="{% url 'events:company_list' %}" class="apple-link-cta apple-link-cta-sm">
-                            Directory ({{ user_memberships.count }}) <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                            Directory ({{ user_memberships.count }}) <span class="chevron" aria-hidden="true">&rarr;</span>
                         </a>
                     </div>
                     <p class="apple-body mb-3">
-                        Switch between workspaces, inspect member rosters, and manage permissions.
+                        Switch between organizations, review member rosters, and manage access permissions.
                     </p>
 
                     {% if user_memberships %}
@@ -237,11 +235,11 @@
                         {% for membership in user_memberships %}
                         <div class="apple-row-item py-3">
                             <div>
-                                <div class="fw-semibold" style="font-size: 16px; color: var(--eve-text);">
+                                <div class="fw-bold" style="font-size: 15px; color: var(--eve-text);">
                                     {{ membership.company.name }}
                                 </div>
-                                <div class="apple-caption">
-                                    Member since {{ membership.joined_at|date:"M Y" }}
+                                <div class="apple-caption tabular-nums">
+                                    Joined {{ membership.joined_at|date:"M Y" }}
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-3">
@@ -249,7 +247,7 @@
                                     {{ membership.get_role_display }}
                                 </span>
                                 <a href="{% url 'events:company_members' company_id=membership.company.id %}" class="apple-link-cta apple-link-cta-sm">
-                                    Roster <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                                    Roster <span class="chevron" aria-hidden="true">&rarr;</span>
                                 </a>
                             </div>
                         </div>
@@ -263,19 +261,19 @@
                     {% endif %}
                 </div>
 
-                <div class="pt-4 mt-3 apple-divider-top">
+                <div class="pt-3 mt-3 apple-divider-top">
                     <a href="{% url 'events:company_create' %}" class="apple-link-cta apple-link-cta-sm">
-                        Launch a new organization <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                        Create a new organization <span class="chevron" aria-hidden="true">&rarr;</span>
                     </a>
                 </div>
             </div>
 
-            <!-- 5-Column Apple Pro Dark Surface -->
+            <!-- 5-Column Dark Forest Studio Surface -->
             <div class="apple-tile apple-tile-pro bento-span-5">
                 <div>
-                    <h2 class="apple-headline-tile mb-2">Built for precision operations.</h2>
+                    <h2 class="apple-headline-tile mb-2">Command &amp; preferences</h2>
                     <p class="apple-body mb-4">
-                        Schedule multi-shift events, assign verified team members, or switch between Daylight and Pro Dark appearance modes anytime.
+                        Publish new multi-shift events, assign verified staff to stations, or toggle between Warm Alabaster and Carbon Dark themes.
                     </p>
                 </div>
 
@@ -283,17 +281,17 @@
                     <div class="apple-pro-row">
                         <div>
                             <div class="fw-semibold" style="font-size: 15px;">Schedule an Event</div>
-                            <div class="apple-caption">Publish dates, hours, and venue details</div>
+                            <div class="apple-caption">Set dates, shift windows, and venue</div>
                         </div>
                         <a href="{% url 'events:event_create' %}" class="btn-apple-primary btn-apple-sm">New Event</a>
                     </div>
                     <div class="apple-pro-row">
                         <div>
-                            <div class="fw-semibold" style="font-size: 15px;">Display Appearance</div>
-                            <div class="apple-caption">Customize Light or Pro Dark theme</div>
+                            <div class="fw-semibold" style="font-size: 15px;">Interface Theme</div>
+                            <div class="apple-caption">Switch Warm Alabaster or Carbon Dark</div>
                         </div>
                         <a href="{% url 'usersettings:settings' %}" class="apple-link-cta apple-link-cta-sm">
-                            Configure <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                            Configure <span class="chevron" aria-hidden="true">&rarr;</span>
                         </a>
                     </div>
                 </div>

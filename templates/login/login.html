@@ -5,12 +5,12 @@
 {% block full_bleed %}
 <section class="eve-auth-stage">
     <div class="eve-auth-box">
-        <div class="text-center mb-4 pb-1">
-            <div class="eve-auth-logo mx-auto" aria-hidden="true">
-                <i class="bi bi-calendar2-check-fill"></i>
+        <div class="mb-4">
+            <div class="eve-auth-logo" aria-hidden="true">
+                <i class="bi bi-clock-history"></i>
             </div>
-            <h1 class="apple-headline-tile mb-2" style="font-size: 32px;">Sign in to Eve</h1>
-            <p class="apple-body">Enter your email or username to access your workspace.</p>
+            <h1 class="apple-headline-tile mb-1">Sign in to Eve</h1>
+            <p class="apple-body mb-0">Enter your email or username to access your shift workspace.</p>
         </div>
 
         {% if error %}
@@ -56,31 +56,31 @@
             </button>
         </form>
 
-        <div class="text-center mt-4 pt-3" style="border-top: 1px solid var(--eve-border);">
+        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 apple-divider-top">
             <span class="apple-caption">New to Eve?</span>
-            <a href="{% url 'register:register' %}" class="apple-link-cta apple-link-cta-sm ms-1">
-                Create yours now <span class="chevron" aria-hidden="true">&rsaquo;</span>
+            <a href="{% url 'register:register' %}" class="apple-link-cta apple-link-cta-sm">
+                Create an account <span class="chevron" aria-hidden="true">&rarr;</span>
             </a>
         </div>
 
         <!-- One-Tap Quick Demo Access -->
-        <div class="mt-4 pt-3" style="border-top: 1px solid var(--eve-border);">
+        <div class="mt-3 pt-3 apple-divider-top">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="apple-caption fw-semibold" style="color: var(--eve-text);">Instant Demo Accounts</span>
-                <span class="apple-caption tabular-nums">Password: <code>demo12345</code></span>
+                <span class="apple-caption fw-semibold" style="color: var(--eve-text);">Instant Demo Workspaces</span>
+                <span class="apple-caption tabular-nums">Pass: <code>demo12345</code></span>
             </div>
             <div class="d-flex flex-column gap-2">
                 <button type="button" class="eve-demo-pill w-100 text-start" onclick="fillDemoCredentials('owner@demo.com')">
                     <span><strong>Owner</strong> &middot; Apex Events Co.</span>
-                    <span class="tabular-nums" style="color: var(--eve-accent);">owner@demo.com &rsaquo;</span>
+                    <span class="tabular-nums" style="color: var(--eve-accent);">owner@demo.com &rarr;</span>
                 </button>
                 <button type="button" class="eve-demo-pill w-100 text-start" onclick="fillDemoCredentials('manager@demo.com')">
                     <span><strong>Manager</strong> &middot; Shift Coordinator</span>
-                    <span class="tabular-nums" style="color: var(--eve-accent);">manager@demo.com &rsaquo;</span>
+                    <span class="tabular-nums" style="color: var(--eve-accent);">manager@demo.com &rarr;</span>
                 </button>
                 <button type="button" class="eve-demo-pill w-100 text-start" onclick="fillDemoCredentials('staff1@demo.com')">
                     <span><strong>Staff</strong> &middot; Event Operations</span>
-                    <span class="tabular-nums" style="color: var(--eve-accent);">staff1@demo.com &rsaquo;</span>
+                    <span class="tabular-nums" style="color: var(--eve-accent);">staff1@demo.com &rarr;</span>
                 </button>
             </div>
         </div>

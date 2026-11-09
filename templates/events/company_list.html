@@ -2,49 +2,36 @@
 
 {% block title %}Organizations &amp; Roles{% endblock %}
 
-{% block local_nav %}
-<div class="apple-localnav">
-    <div class="apple-localnav-inner">
-        <a href="{% url 'events:company_list' %}" class="apple-localnav-title">Organizations</a>
-        <div class="d-flex align-items-center gap-3">
-            <a href="{% url 'events:event_list' %}" class="apple-link-cta apple-link-cta-sm d-none d-sm-inline-flex">
-                All Events <span class="chevron" aria-hidden="true">&rsaquo;</span>
-            </a>
-            <a href="{% url 'events:company_create' %}" class="btn-apple-primary btn-apple-sm">
-                Create Organization
-            </a>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
 {% block full_bleed %}
-<!-- 1. Apple Hero Stage (White Surface) -->
+<!-- 1. Left-Aligned Minimalist Workspace Header -->
 <section class="apple-section-white">
     <div class="apple-container-wide">
-        <div class="apple-hero" style="padding: 40px 0 28px;">
-            <h1 class="apple-headline-section">Your organizations. Built for teamwork.</h1>
-            <p class="apple-lead mt-2" style="font-size: 19px;">
-                Manage team rosters, assign Owner, Manager, or Staff permissions, or join existing organizations across Eve.
-            </p>
-            <div class="apple-cta-row mt-4">
-                <a href="{% url 'events:company_create' %}" class="btn-apple-primary">
-                    Create Organization
+        <div class="eve-workspace-header">
+            <div>
+                <h1 class="apple-headline-section">Organizations &amp; team rosters</h1>
+                <p class="apple-subhead">
+                    Manage workspaces, assign Owner, Manager, or Staff roles, or join existing organizations across Eve.
+                </p>
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <a href="{% url 'events:event_list' %}" class="btn-apple-secondary btn-apple-sm">
+                    View Events
                 </a>
-                <a href="{% url 'events:event_list' %}" class="apple-link-cta">
-                    View scheduled events <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                <a href="{% url 'events:company_create' %}" class="btn-apple-primary btn-apple-sm">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Create Organization</span>
                 </a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 2. Active Organization Memberships on Apple Warm Gray Canvas -->
+<!-- 2. Active Organization Memberships on Warm Alabaster Canvas -->
 <section class="apple-section-canvas">
     <div class="apple-container-wide">
         <div class="mb-4">
-            <h2 class="apple-headline-tile">Active workspaces ({{ my_memberships.count }})</h2>
-            <p class="apple-body">Organizations where you hold an active role and schedule access.</p>
+            <h2 class="apple-headline-tile">Your workspaces ({{ my_memberships.count }})</h2>
+            <p class="apple-body mb-0">Organizations where you hold an active membership and schedule access.</p>
         </div>
 
         {% if my_memberships %}
@@ -61,7 +48,7 @@
 
                     <h3 class="apple-headline-tile mb-2">{{ mem.company.name }}</h3>
                     <p class="apple-body mb-0">
-                        {% if mem.company.address %}{{ mem.company.address }}{% else %}Headquarters location not specified{% endif %}
+                        {% if mem.company.address %}{{ mem.company.address }}{% else %}Primary headquarters not specified{% endif %}
                     </p>
                 </div>
 
@@ -72,17 +59,17 @@
                             <div class="apple-spec-value tabular-nums">{{ mem.company.members.count }} member{{ mem.company.members.count|pluralize }}</div>
                         </div>
                         <div>
-                            <div class="apple-spec-label">Contact</div>
+                            <div class="apple-spec-label">Dispatch Contact</div>
                             <div class="apple-spec-value tabular-nums">{{ mem.company.contact_number|default:"Direct Roster" }}</div>
                         </div>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center pt-2">
                         <a href="{% url 'events:event_list' %}?company_id={{ mem.company.id }}" class="apple-link-cta apple-link-cta-sm">
-                            View events <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                            View events <span class="chevron" aria-hidden="true">&rarr;</span>
                         </a>
                         <a href="{% url 'events:company_members' company_id=mem.company.id %}" class="btn-apple-secondary btn-apple-sm">
-                            Manage Roster
+                            Team Roster
                         </a>
                     </div>
                 </div>
@@ -92,7 +79,7 @@
         {% else %}
         <div class="apple-tile text-center py-5 mx-auto" style="max-width: 600px;">
             <div class="mx-auto py-2" style="max-width: 400px;">
-                <h3 class="apple-headline-tile mb-2">No organizations joined yet.</h3>
+                <h3 class="apple-headline-tile mb-2">No organizations joined yet</h3>
                 <p class="apple-body mb-4">
                     Create your own organization to automatically become Owner, or join one of the open workspaces listed below.
                 </p>
@@ -103,13 +90,13 @@
     </div>
 </section>
 
-<!-- 3. Discover & Join Open Organizations (Full-Bleed White Section) -->
+<!-- 3. Discover & Join Open Organizations -->
 {% if other_companies %}
 <section class="apple-section-white">
     <div class="apple-container-wide">
-        <div class="mb-4 pb-2">
-            <h2 class="apple-headline-section">Discover organizations.</h2>
-            <p class="apple-subhead">Join an existing workspace as Staff to receive event shift assignments.</p>
+        <div class="mb-4">
+            <h2 class="apple-headline-section">Discover open workspaces</h2>
+            <p class="apple-subhead">Join an existing organization as Staff to receive shift assignments.</p>
         </div>
 
         <div class="apple-row-list">
@@ -117,7 +104,7 @@
             <div class="apple-row-item">
                 <div>
                     <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                        <span class="fw-semibold fs-5" style="color: var(--eve-text); letter-spacing: -0.015em;">{{ comp.name }}</span>
+                        <span class="fw-bold" style="font-size: 16px; color: var(--eve-text);">{{ comp.name }}</span>
                         <span class="eve-role-badge tabular-nums">{{ comp.members.count }} member{{ comp.members.count|pluralize }}</span>
                     </div>
                     <div class="apple-caption d-flex flex-wrap align-items-center gap-3">
@@ -125,7 +112,7 @@
                         <span>{{ comp.address }}</span>
                         {% endif %}
                         {% if comp.contact_number %}
-                        <span>&middot; {{ comp.contact_number }}</span>
+                        <span class="tabular-nums">&middot; {{ comp.contact_number }}</span>
                         {% endif %}
                         <span>&middot; Entry Role: Staff</span>
                     </div>

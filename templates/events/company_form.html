@@ -2,25 +2,19 @@
 
 {% block title %}Create Organization{% endblock %}
 
-{% block local_nav %}
-<div class="apple-localnav">
-    <div class="apple-localnav-inner">
-        <span class="apple-localnav-title">New Organization</span>
-        <a href="{% url 'events:company_list' %}" class="btn-apple-ghost btn-apple-sm">
-            Cancel
-        </a>
-    </div>
-</div>
-{% endblock %}
-
 {% block full_bleed %}
 <section class="apple-section-canvas">
     <div class="apple-container" style="max-width: 640px;">
-        <div class="text-center mb-4 pb-2">
-            <h1 class="apple-headline-section mb-2">Launch an organization.</h1>
-            <p class="apple-body">
-                Set up your workspace directory. Your account will automatically be granted <strong>Owner</strong> permissions.
-            </p>
+        <div class="eve-workspace-header mb-4">
+            <div>
+                <h1 class="apple-headline-section mb-1">Create an organization</h1>
+                <p class="apple-body mb-0">
+                    Set up your workspace directory. Your account will automatically receive <strong>Owner</strong> permissions.
+                </p>
+            </div>
+            <a href="{% url 'events:company_list' %}" class="btn-apple-secondary btn-apple-sm">
+                Cancel
+            </a>
         </div>
 
         <div class="apple-tile">
@@ -34,7 +28,7 @@
 
                 <div class="mb-4">
                     <label for="contact_number" class="eve-form-label">Dispatch or Contact Phone</label>
-                    <input type="text" class="form-control eve-input" id="contact_number" name="contact_number" placeholder="e.g. +63 900 123 4567">
+                    <input type="text" class="form-control eve-input tabular-nums" id="contact_number" name="contact_number" placeholder="e.g. +63 900 123 4567">
                 </div>
 
                 <div class="mb-4">
@@ -42,7 +36,7 @@
                     <input type="text" class="form-control eve-input" id="address" name="address" placeholder="e.g. 100 Ayala Avenue, Makati City">
                 </div>
 
-                <div class="d-flex justify-content-end align-items-center gap-3 pt-4" style="border-top: 1px solid var(--eve-border);">
+                <div class="d-flex justify-content-end align-items-center gap-3 pt-4 apple-divider-top">
                     <a href="{% url 'events:company_list' %}" class="btn-apple-secondary">Cancel</a>
                     <button type="submit" class="btn-apple-primary">
                         Create Organization

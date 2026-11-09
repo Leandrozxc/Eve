@@ -2,79 +2,75 @@
 
 {% block title %}{{ event.title }} — Shift Management{% endblock %}
 
-{% block local_nav %}
-<div class="apple-localnav">
-    <div class="apple-localnav-inner">
-        <div class="d-flex align-items-center gap-2 text-truncate">
-            <a href="{% url 'events:event_list' %}" class="apple-caption text-decoration-none d-none d-sm-inline" style="color: var(--eve-text-muted);">Events</a>
-            <span class="apple-caption d-none d-sm-inline" aria-hidden="true">/</span>
-            <span class="apple-localnav-title text-truncate">{{ event.title }}</span>
-        </div>
-
-        <div class="d-flex align-items-center flex-wrap gap-2">
-            {% if can_manage %}
-            <form method="post" action="{% url 'events:event_update_status' event_id=event.id %}" class="m-0">
-                {% csrf_token %}
-                <label for="event_status" class="visually-hidden">Event Status</label>
-                <select name="status" id="event_status" class="form-select py-1 px-3" style="border-radius: 980px; min-height: 36px; font-size: 13px; width: auto;" onchange="this.form.submit()">
-                    {% for code, label in status_choices %}
-                    <option value="{{ code }}" {% if event.status == code %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </form>
-            <a href="{% url 'events:event_edit' event_id=event.id %}" class="btn-apple-secondary btn-apple-sm">
-                Edit
-            </a>
-            <form method="post" action="{% url 'events:event_delete' event_id=event.id %}" class="m-0" onsubmit="return confirm('Delete this event and all associated shifts?');">
-                {% csrf_token %}
-                <button type="submit" class="btn-apple-ghost btn-apple-sm text-danger" aria-label="Delete Event">
-                    Delete
-                </button>
-            </form>
-            {% endif %}
-        </div>
-    </div>
-</div>
-{% endblock %}
-
 {% block full_bleed %}
-<!-- 1. Event Hero Summary & Personal Shift Callout (White Surface) -->
+<!-- 1. Event Briefing Header & Personal Shift Callout -->
 <section class="apple-section-white">
     <div class="apple-container-wide">
-        <div class="py-3">
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-                <span class="eve-status-pill {% if event.status == 'UPCOMING' %}eve-status-confirmed{% elif event.status == 'COMPLETED' %}eve-status-completed{% elif event.status == 'CANCELLED' %}eve-status-declined{% else %}eve-status-pending{% endif %}">
-                    <span class="eve-status-dot"></span> {{ event.get_status_display }}
-                </span>
-                <span class="apple-caption">&middot;</span>
-                <a href="{% url 'events:company_members' company_id=event.company.id %}" class="apple-caption fw-semibold text-decoration-none" style="color: var(--eve-accent);">
-                    {{ event.company.name }}
-                </a>
-                <span class="apple-caption">&middot;</span>
-                <span class="apple-caption">Organized by {{ event.created_by.user.get_full_name|default:event.created_by.user.username }}</span>
+        <div class="eve-workspace-header">
+            <div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <a href="{% url 'events:event_list' %}" class="apple-caption text-decoration-none fw-semibold" style="color: var(--eve-text-muted);">
+                        &larr; Events
+                    </a>
+                    <span class="apple-caption">/</span>
+                    <a href="{% url 'events:company_members' company_id=event.company.id %}" class="apple-caption fw-semibold text-decoration-none" style="color: var(--eve-accent);">
+                        {{ event.company.name }}
+                    </a>
+                    <span class="apple-caption">&middot;</span>
+                    <span class="eve-status-pill {% if event.status == 'UPCOMING' %}eve-status-confirmed{% elif event.status == 'COMPLETED' %}eve-status-completed{% elif event.status == 'CANCELLED' %}eve-status-declined{% else %}eve-status-pending{% endif %}">
+                        <span class="eve-status-dot"></span> {{ event.get_status_display }}
+                    </span>
+                </div>
+
+                <h1 class="apple-headline-section mb-2">{{ event.title }}</h1>
+                {% if event.description %}
+                <p class="apple-body mb-0" style="max-width: 66ch;">
+                    {{ event.description }}
+                </p>
+                {% else %}
+                <p class="apple-caption mb-0">
+                    Organized by {{ event.created_by.user.get_full_name|default:event.created_by.user.username }}
+                </p>
+                {% endif %}
             </div>
 
-            <h1 class="apple-headline-section mb-3">{{ event.title }}</h1>
-            {% if event.description %}
-            <p class="apple-lead" style="margin-left: 0; max-width: 68ch; font-size: 19px;">
-                {{ event.description }}
-            </p>
+            {% if can_manage %}
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                <form method="post" action="{% url 'events:event_update_status' event_id=event.id %}" class="m-0">
+                    {% csrf_token %}
+                    <label for="event_status" class="visually-hidden">Event Status</label>
+                    <select name="status" id="event_status" class="form-select eve-select py-1 px-3" style="min-height: 36px; font-size: 13px; width: auto;" onchange="this.form.submit()">
+                        {% for code, label in status_choices %}
+                        <option value="{{ code }}" {% if event.status == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <a href="{% url 'events:event_edit' event_id=event.id %}" class="btn-apple-secondary btn-apple-sm">
+                    Edit Event
+                </a>
+                <form method="post" action="{% url 'events:event_delete' event_id=event.id %}" class="m-0" onsubmit="return confirm('Delete this event and all associated shifts?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-apple-ghost btn-apple-sm text-danger" aria-label="Delete Event">
+                        Delete
+                    </button>
+                </form>
+            </div>
             {% endif %}
         </div>
 
         <!-- Personal Shift Assignment Callout Ribbon (If logged-in user is assigned) -->
         {% if my_assignment %}
-        <div class="mt-4 p-4 rounded-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3" style="background: var(--eve-bg); border: 1px solid var(--eve-border);">
+        <div class="mt-4 p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3" style="background: var(--eve-bg); border: 1px solid var(--eve-border-strong); border-radius: var(--apple-radius-md);">
             <div>
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                    <span class="fw-semibold" style="color: var(--eve-text);">Your Personal Assignment: {{ my_assignment.assigned_role }}</span>
+                    <span class="fw-bold" style="color: var(--eve-text);">Your Shift Assignment: {{ my_assignment.assigned_role }}</span>
                     <span class="eve-status-pill {% if my_assignment.status == 'CONFIRMED' or my_assignment.status == 'COMPLETED' %}eve-status-confirmed{% elif my_assignment.status == 'CANCELLED' %}eve-status-declined{% else %}eve-status-pending{% endif %}">
                         <span class="eve-status-dot"></span> {{ my_assignment.get_status_display }}
                     </span>
                 </div>
-                <div class="apple-caption tabular-nums">
-                    Location: <strong>{{ my_assignment.assigned_location|default:event.location }}</strong>
-                    &middot; Shift Hours: <strong>{{ my_assignment.start_time|time:"g:i A" }} &ndash; {{ my_assignment.end_time|time:"g:i A" }}</strong>
+                <div class="apple-caption">
+                    Station: <strong>{{ my_assignment.assigned_location|default:event.location }}</strong>
+                    &middot; Window: <strong class="tabular-nums">{{ my_assignment.start_time|time:"g:i A" }} &ndash; {{ my_assignment.end_time|time:"g:i A" }}</strong>
                 </div>
             </div>
             <div>
@@ -101,7 +97,7 @@
     </div>
 </section>
 
-<!-- 2. Asymmetric 8 + 4 Event Telemetry & Roster Stage on Apple Canvas -->
+<!-- 2. Asymmetric 8 + 4 Event Telemetry & Roster Stage -->
 <section class="apple-section-canvas">
     <div class="apple-container-wide">
         <!-- Bento Overview Row -->
@@ -109,11 +105,11 @@
             <!-- 8-Column Event Specifications Tile -->
             <div class="apple-tile bento-span-8">
                 <div>
-                    <h2 class="apple-headline-tile mb-1">Logistics &amp; venue specifications.</h2>
-                    <p class="apple-body">Verified schedule window and operational location for all assigned personnel.</p>
+                    <h2 class="apple-headline-tile mb-1">Schedule &amp; venue logistics</h2>
+                    <p class="apple-body">Verified shift window and primary location for all assigned personnel.</p>
                 </div>
 
-                <div class="apple-spec-strip mb-0" style="border-bottom: none; padding-bottom: 0;">
+                <div class="apple-spec-strip mb-0" style="padding-bottom: 0;">
                     <div>
                         <div class="apple-spec-label">Event Date</div>
                         <div class="apple-spec-value tabular-nums">{{ event.event_date|date:"F d, Y" }}</div>
@@ -136,13 +132,13 @@
                         <span class="apple-caption">Shift Readiness</span>
                         <span class="apple-caption fw-semibold tabular-nums" style="color: var(--eve-text);">{{ progress_pct }}%</span>
                     </div>
-                    <div class="apple-stat-figure mb-2">{{ confirmed_count }}<span class="fs-4 fw-normal" style="color: var(--eve-text-muted);"> / {{ total_assignments }}</span></div>
+                    <div class="apple-stat-figure mb-2">{{ confirmed_count }}<span class="fs-5 fw-normal" style="color: var(--eve-text-muted);"> / {{ total_assignments }}</span></div>
                     <div class="eve-progress mb-3">
                         <div class="eve-progress-bar" role="progressbar" style="width: {{ progress_pct }}%;" aria-valuenow="{{ progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between pt-3 apple-caption tabular-nums" style="border-top: 1px solid var(--eve-border);">
+                <div class="d-flex justify-content-between pt-3 apple-caption tabular-nums apple-divider-top">
                     <span>Assigned: <strong>{{ assigned_count }}</strong></span>
                     <span>Confirmed: <strong>{{ confirmed_count }}</strong></span>
                     <span>Done: <strong>{{ completed_count }}</strong></span>
@@ -152,13 +148,13 @@
 
         <!-- Assigned Team Shifts Specification Table -->
         <div class="apple-tile mb-4 p-0 overflow-hidden">
-            <div class="p-4 d-flex flex-wrap justify-content-between align-items-center gap-2" style="border-bottom: 1px solid var(--eve-border);">
+            <div class="p-4 d-flex flex-wrap justify-content-between align-items-center gap-2 apple-divider-bottom">
                 <div>
-                    <h2 class="apple-headline-tile mb-0" style="font-size: 22px;">Assigned team roster</h2>
+                    <h2 class="apple-headline-tile mb-0">Assigned team roster</h2>
                     <p class="apple-caption mb-0">{{ assignments.count }} shift assignment{{ assignments.count|pluralize }} scheduled for this event.</p>
                 </div>
                 <a href="{% url 'events:company_members' company_id=event.company.id %}" class="apple-link-cta apple-link-cta-sm">
-                    Organization directory <span class="chevron" aria-hidden="true">&rsaquo;</span>
+                    Organization directory <span class="chevron" aria-hidden="true">&rarr;</span>
                 </a>
             </div>
 
@@ -191,7 +187,7 @@
                                 </div>
                             </td>
                             <td>
-                                <span class="fw-medium" style="color: var(--eve-text);">{{ a.assigned_role }}</span>
+                                <span class="fw-semibold" style="color: var(--eve-text);">{{ a.assigned_role }}</span>
                             </td>
                             <td>
                                 <span class="apple-caption" style="color: var(--eve-text);">{{ a.assigned_location|default:event.location }}</span>
@@ -210,7 +206,7 @@
                                     <form method="post" action="{% url 'events:assignment_update' assignment_id=a.id %}" class="m-0">
                                         {% csrf_token %}
                                         <label for="status_{{ a.id }}" class="visually-hidden">Status for {{ a.member.user.username }}</label>
-                                        <select name="status" id="status_{{ a.id }}" class="form-select py-1 px-3" style="border-radius: 980px; font-size: 13px; min-height: 36px; width: auto;" onchange="this.form.submit()">
+                                        <select name="status" id="status_{{ a.id }}" class="form-select eve-select py-1 px-3" style="font-size: 13px; min-height: 36px; width: auto;" onchange="this.form.submit()">
                                             {% for status_code, status_label in assignment_status_choices %}
                                             <option value="{{ status_code }}" {% if a.status == status_code %}selected{% endif %}>
                                                 {{ status_label }}
@@ -245,7 +241,7 @@
         {% if can_manage %}
         <div class="apple-tile">
             <div class="mb-4">
-                <h2 class="apple-headline-tile mb-1" style="font-size: 22px;">Assign team member to shift</h2>
+                <h2 class="apple-headline-tile mb-1">Assign team member to shift</h2>
                 <p class="apple-caption mb-0">Select an available member from {{ event.company.name }} and define their station and hours.</p>
             </div>
 
@@ -302,14 +298,14 @@
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-end mt-4 pt-3" style="border-top: 1px solid var(--eve-border);">
+                <div class="d-flex justify-content-end mt-4 pt-3 apple-divider-top">
                     <button type="submit" class="btn-apple-primary">
                         Assign to Shift
                     </button>
                 </div>
             </form>
             {% else %}
-            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 pt-2" style="border-top: 1px solid var(--eve-border);">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 pt-3 apple-divider-top">
                 <p class="apple-body mb-0">
                     All active members of <strong>{{ event.company.name }}</strong> are already assigned to this event.
                 </p>

@@ -2,31 +2,25 @@
 
 {% block title %}{% if is_edit %}Edit {{ event.title }}{% else %}Schedule Event{% endif %}{% endblock %}
 
-{% block local_nav %}
-<div class="apple-localnav">
-    <div class="apple-localnav-inner">
-        <span class="apple-localnav-title">{% if is_edit %}Edit Event{% else %}Schedule Event{% endif %}</span>
-        <a href="{% if is_edit %}{% url 'events:event_detail' event_id=event.id %}{% else %}{% url 'events:event_list' %}{% endif %}" class="btn-apple-ghost btn-apple-sm">
-            Cancel
-        </a>
-    </div>
-</div>
-{% endblock %}
-
 {% block full_bleed %}
 <section class="apple-section-canvas">
     <div class="apple-container" style="max-width: 720px;">
-        <div class="text-center mb-4 pb-2">
-            <h1 class="apple-headline-section mb-2">
-                {% if is_edit %}Update event details.{% else %}Schedule a new event.{% endif %}
-            </h1>
-            <p class="apple-body">
-                {% if is_edit %}
-                    Modify timing, venue, or briefing instructions for <strong>{{ event.company.name }}</strong>.
-                {% else %}
-                    Define the date, shift window, and location so your team can confirm attendance.
-                {% endif %}
-            </p>
+        <div class="eve-workspace-header mb-4">
+            <div>
+                <h1 class="apple-headline-section mb-1">
+                    {% if is_edit %}Update event details{% else %}Schedule a new event{% endif %}
+                </h1>
+                <p class="apple-body mb-0">
+                    {% if is_edit %}
+                        Modify timing, venue, or briefing instructions for <strong>{{ event.company.name }}</strong>.
+                    {% else %}
+                        Define the date, shift window, and location so your team can confirm attendance.
+                    {% endif %}
+                </p>
+            </div>
+            <a href="{% if is_edit %}{% url 'events:event_detail' event_id=event.id %}{% else %}{% url 'events:event_list' %}{% endif %}" class="btn-apple-secondary btn-apple-sm">
+                Cancel
+            </a>
         </div>
 
         <div class="apple-tile">
@@ -48,7 +42,7 @@
 
                 <div class="mb-4">
                     <label for="title" class="eve-form-label">Event Title</label>
-                    <input type="text" class="form-control eve-input" id="title" name="title" value="{{ event.title|default:'' }}" placeholder="e.g. Annual Product Keynote, Weekend Arena Shift" required>
+                    <input type="text" class="form-control eve-input" id="title" name="title" value="{{ event.title|default:'' }}" placeholder="e.g. Annual Summit, Weekend Arena Shift" required>
                 </div>
 
                 <div class="mb-4">
@@ -59,15 +53,15 @@
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
                         <label for="event_date" class="eve-form-label">Event Date</label>
-                        <input type="date" class="form-control eve-input" id="event_date" name="event_date" value="{{ event.event_date|date:'Y-m-d'|default:'' }}" required>
+                        <input type="date" class="form-control eve-input tabular-nums" id="event_date" name="event_date" value="{{ event.event_date|date:'Y-m-d'|default:'' }}" required>
                     </div>
                     <div class="col-md-4">
                         <label for="start_time" class="eve-form-label">Start Time</label>
-                        <input type="time" class="form-control eve-input" id="start_time" name="start_time" value="{{ event.start_time|time:'H:i'|default:'' }}" required>
+                        <input type="time" class="form-control eve-input tabular-nums" id="start_time" name="start_time" value="{{ event.start_time|time:'H:i'|default:'' }}" required>
                     </div>
                     <div class="col-md-4">
                         <label for="end_time" class="eve-form-label">End Time</label>
-                        <input type="time" class="form-control eve-input" id="end_time" name="end_time" value="{{ event.end_time|time:'H:i'|default:'' }}" required>
+                        <input type="time" class="form-control eve-input tabular-nums" id="end_time" name="end_time" value="{{ event.end_time|time:'H:i'|default:'' }}" required>
                     </div>
                 </div>
 
@@ -87,7 +81,7 @@
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-end align-items-center gap-3 pt-4" style="border-top: 1px solid var(--eve-border);">
+                <div class="d-flex justify-content-end align-items-center gap-3 pt-4 apple-divider-top">
                     <a href="{% if is_edit %}{% url 'events:event_detail' event_id=event.id %}{% else %}{% url 'events:event_list' %}{% endif %}" class="btn-apple-secondary">
                         Cancel
                     </a>
