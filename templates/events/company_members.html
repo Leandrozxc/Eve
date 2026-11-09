@@ -89,7 +89,7 @@
                                         <div class="fw-semibold" style="color: var(--eve-text);">
                                             {{ m.user.get_full_name|default:m.user.username }}
                                             {% if m.user == request.user %}
-                                            <span class="eve-role-badge ms-1" style="font-size: 10px; padding: 2px 8px;">You</span>
+                                            <span class="eve-role-badge ms-1">You</span>
                                             {% endif %}
                                         </div>
                                         <div class="apple-caption">@{{ m.user.username }}</div>
@@ -115,7 +115,7 @@
                                         <input type="hidden" name="action" value="change_role">
                                         <input type="hidden" name="member_id" value="{{ m.id }}">
                                         <label for="role_{{ m.id }}" class="visually-hidden">Role for {{ m.user.username }}</label>
-                                        <select name="new_role" id="role_{{ m.id }}" class="form-select py-1 px-2" style="border-radius: 980px; font-size: 12px; min-height: 30px; width: auto;" onchange="this.form.submit()">
+                                        <select name="new_role" id="role_{{ m.id }}" class="form-select py-1 px-3" style="border-radius: 980px; font-size: 13px; min-height: 36px; width: auto;" onchange="this.form.submit()">
                                             {% for role_code, role_name in role_choices %}
                                             <option value="{{ role_code }}" {% if m.role == role_code %}selected{% endif %}>
                                                 {{ role_name }}
@@ -128,7 +128,7 @@
                                         {% csrf_token %}
                                         <input type="hidden" name="action" value="remove_member">
                                         <input type="hidden" name="member_id" value="{{ m.id }}">
-                                        <button type="submit" class="btn-apple-ghost btn-apple-sm text-danger px-2 py-1" title="Remove member" aria-label="Remove {{ m.user.username }} from organization">
+                                        <button type="submit" class="btn-apple-ghost btn-apple-sm text-danger" title="Remove member" aria-label="Remove {{ m.user.username }} from organization">
                                             <i class="bi bi-person-x" aria-hidden="true"></i>
                                         </button>
                                     </form>

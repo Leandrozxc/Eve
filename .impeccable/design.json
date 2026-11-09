@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T22:50:00+08:00",
+  "title": "Design System: Eve",
+  "extensions": {
+    "colorMeta": {
+      "apple-blue": {
+        "role": "primary",
+        "displayName": "Apple Interactive Blue",
+        "canonical": "#0071e3",
+        "tonalRamp": ["#002b5c", "#004085", "#0055b3", "#0071e3", "#2997ff", "#66b2ff", "#b3d9ff", "#e8f3ff"]
+      },
+      "apple-bg": {
+        "role": "neutral",
+        "displayName": "Warm Aluminum Canvas",
+        "canonical": "#f5f5f7",
+        "tonalRamp": ["#161617", "#1d1d1f", "#424245", "#515154", "#5c5c61", "#d2d2d7", "#f5f5f7", "#ffffff"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display Hero", "purpose": "Centered hero greetings and primary landing statements." },
+      "headline": { "displayName": "Section Headline", "purpose": "Section titles introducing Bento grids and shift lineups." },
+      "title": { "displayName": "Tile Title", "purpose": "Bento tile titles and card headers." },
+      "body": { "displayName": "Body Copy", "purpose": "Primary interface prose and descriptions." },
+      "label": { "displayName": "UI Label", "purpose": "GlobalNav items, status pills, and specification labels." }
+    },
+    "shadows": [
+      { "name": "card-rest", "value": "0 6px 24px rgba(0, 0, 0, 0.04)", "purpose": "Subtle ambient lift on Bento tiles." },
+      { "name": "card-hover", "value": "0 12px 36px rgba(0, 0, 0, 0.08)", "purpose": "Elevated state when hovering interactive Bento tiles." }
+    ],
+    "motion": [
+      { "name": "apple-ease", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Smooth deceleration curve for hover, focus, and layout transitions." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "992px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Pill Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary call-to-action pill button used for scheduling events and confirming shifts.",
+      "html": "<button class=\"ds-btn-primary\">Schedule an Event</button>",
+      "css": ".ds-btn-primary { background-color: var(--apple-blue, #0071e3); color: #ffffff; border: 1px solid transparent; font-weight: 500; font-size: 15px; padding: 0.65rem 1.4rem; border-radius: 980px; min-height: 42px; cursor: pointer; transition: background-color 0.2s cubic-bezier(0.22, 1, 0.36, 1), transform 0.15s cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-primary:hover { background-color: #0077ed; } .ds-btn-primary:active { transform: scale(0.985); } .ds-btn-primary:focus-visible { outline: 2px solid #0066cc; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Outline Pill Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary action button with 1px Apple link blue outline.",
+      "html": "<button class=\"ds-btn-secondary\">Manage Roster</button>",
+      "css": ".ds-btn-secondary { background-color: transparent; color: var(--apple-blue-link, #0066cc); border: 1px solid var(--apple-blue-link, #0066cc); font-weight: 500; font-size: 15px; padding: 0.65rem 1.4rem; border-radius: 980px; min-height: 42px; cursor: pointer; transition: background-color 0.2s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-secondary:hover { background-color: #0071e3; border-color: #0071e3; color: #ffffff; } .ds-btn-secondary:focus-visible { outline: 2px solid #0066cc; outline-offset: 2px; }"
+    },
+    {
+      "name": "Apple Input Field",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "50px tactile form input with focus halo.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"name@organization.com\" />",
+      "css": ".ds-input { background-color: #ffffff; color: #1d1d1f; border: 1px solid #d2d2d7; border-radius: 12px; padding: 0.78rem 1rem; font-size: 16px; min-height: 50px; width: 100%; transition: border-color 0.2s, box-shadow 0.2s; } .ds-input:focus { border-color: #0071e3; box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.28); outline: none; }"
+    },
+    {
+      "name": "Status Pill Badge",
+      "kind": "chip",
+      "refersTo": "chip-status",
+      "description": "Semantic status pill with live indicator dot.",
+      "html": "<span class=\"ds-status-pill\"><span class=\"ds-dot\"></span> Confirmed</span>",
+      "css": ".ds-status-pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 980px; padding: 5px 12px; font-size: 12px; font-weight: 500; background-color: rgba(40, 205, 65, 0.14); color: #186a3b; } .ds-dot { width: 6px; height: 6px; border-radius: 50%; background-color: currentColor; }"
+    },
+    {
+      "name": "Bento Specification Tile",
+      "kind": "card",
+      "refersTo": "card-bento",
+      "description": "24px radius Bento surface with hairline specification strip.",
+      "html": "<div class=\"ds-bento-tile\"><h3>Annual Keynote</h3><div class=\"ds-spec-strip\"><div><div class=\"ds-label\">Date</div><div class=\"ds-val\">Nov 15, 2026</div></div><div><div class=\"ds-label\">Venue</div><div class=\"ds-val\">Main Hall</div></div></div></div>",
+      "css": ".ds-bento-tile { background: #ffffff; border: 1px solid rgba(0,0,0,0.06); border-radius: 24px; padding: 28px; box-shadow: 0 6px 24px rgba(0,0,0,0.04); } .ds-bento-tile h3 { margin: 0 0 12px; font-size: 22px; color: #1d1d1f; } .ds-spec-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.08); } .ds-label { font-size: 12px; color: #5c5c61; } .ds-val { font-size: 15px; font-weight: 600; color: #1d1d1f; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Cupertino Editorial Precision",
+    "overview": "Eve adopts the spatial architecture, typographic authority, and tactile restraint of Apple's official website (apple.com). Instead of dense admin chrome or nested Bootstrap boxes, every page is structured as a sequence of full-bleed alternating chapters—pure white editorial stages (#ffffff) paired with warm aluminum-gray Bento canvases (#f5f5f7 in Daylight, #000000 / #161617 in Pro Dark).",
+    "keyCharacteristics": [
+      "44px frosted-glass GlobalNav paired with 52px sticky LocalSubNav chapter bars",
+      "Full-bleed alternating section rhythm (.apple-section-white and .apple-section-canvas)",
+      "Asymmetric 12-column Bento grids (8 + 4 and 7 + 5 spans) with zero nested cards",
+      "Hairline specification strips (.apple-spec-strip) and clean horizontal row lists (.apple-row-list)",
+      "Tabular numerals (font-variant-numeric: tabular-nums) across all dates, shift windows, and telemetry counters"
+    ],
+    "rules": [
+      { "name": "The Single Accent Rule", "body": "Apple Interactive Blue (#0071e3) appears only on actionable controls and live progress indicators—never as decorative card borders or background fills.", "section": "colors" },
+      { "name": "The Contrast Floor Rule", "body": "All functional text, including 12px captions and input placeholders, maintains at least 4.5:1 contrast against both #ffffff surfaces and #f5f5f7 canvases.", "section": "colors" },
+      { "name": "The No-Kicker Rule", "body": "Headings never carry uppercase eyebrow or kicker labels above them; the headline's scale and phrasing establish context on their own.", "section": "typography" },
+      { "name": "The Zero-Nested-Box Rule", "body": "Cards and Bento tiles never contain smaller bordered cards inside them; internal metadata is separated strictly with 1px hairline specification strips (.apple-spec-strip).", "section": "elevation" }
+    ],
+    "dos": [
+      "Do alternate .apple-section-white and .apple-section-canvas to create clear chapter transitions across long pages.",
+      "Do use .apple-spec-strip and .apple-row-list with 1px hairlines (--apple-divider) to organize metadata without adding box clutter.",
+      "Do keep all functional UI text at 11px or larger and interactive touch targets at 36px–44px minimum height."
+    ],
+    "donts": [
+      "Don't place uppercase eyebrow/kicker labels above headings.",
+      "Don't nest bordered cards or shaded boxes inside .apple-tile containers.",
+      "Don't use 4 equal-width icon+heading+blurb cards as a page scaffold; use asymmetric Bento spans (8+4, 7+5, 6+6) or horizontal row lists instead."
+    ]
+  }
+}

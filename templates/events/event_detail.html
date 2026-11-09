@@ -16,7 +16,7 @@
             <form method="post" action="{% url 'events:event_update_status' event_id=event.id %}" class="m-0">
                 {% csrf_token %}
                 <label for="event_status" class="visually-hidden">Event Status</label>
-                <select name="status" id="event_status" class="form-select py-1 px-3" style="border-radius: 980px; min-height: 32px; font-size: 12px; width: auto;" onchange="this.form.submit()">
+                <select name="status" id="event_status" class="form-select py-1 px-3" style="border-radius: 980px; min-height: 36px; font-size: 13px; width: auto;" onchange="this.form.submit()">
                     {% for code, label in status_choices %}
                     <option value="{{ code }}" {% if event.status == code %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
@@ -210,7 +210,7 @@
                                     <form method="post" action="{% url 'events:assignment_update' assignment_id=a.id %}" class="m-0">
                                         {% csrf_token %}
                                         <label for="status_{{ a.id }}" class="visually-hidden">Status for {{ a.member.user.username }}</label>
-                                        <select name="status" id="status_{{ a.id }}" class="form-select py-1 px-2" style="border-radius: 980px; font-size: 12px; min-height: 30px; width: auto;" onchange="this.form.submit()">
+                                        <select name="status" id="status_{{ a.id }}" class="form-select py-1 px-3" style="border-radius: 980px; font-size: 13px; min-height: 36px; width: auto;" onchange="this.form.submit()">
                                             {% for status_code, status_label in assignment_status_choices %}
                                             <option value="{{ status_code }}" {% if a.status == status_code %}selected{% endif %}>
                                                 {{ status_label }}
@@ -221,7 +221,7 @@
 
                                     <form method="post" action="{% url 'events:assignment_delete' assignment_id=a.id %}" class="m-0" onsubmit="return confirm('Remove assignment for {{ a.member.user.username }}?');">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn-apple-ghost btn-apple-sm text-danger px-2 py-1" title="Remove assignment" aria-label="Remove assignment for {{ a.member.user.username }}">
+                                        <button type="submit" class="btn-apple-ghost btn-apple-sm text-danger" title="Remove assignment" aria-label="Remove assignment for {{ a.member.user.username }}">
                                             <i class="bi bi-trash" aria-hidden="true"></i>
                                         </button>
                                     </form>

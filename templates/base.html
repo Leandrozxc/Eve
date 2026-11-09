@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Eve — Precision shift scheduling, organization rosters, and real-time attendance tracking.">
     <title>{% block title %}Eve{% endblock %} | Eve</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <!-- Bootstrap 5.3 CSS for responsive collapse/grid utilities -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -69,7 +70,7 @@
                     <span class="eve-avatar-xs">{{ user.first_name|default:user.username|make_list|first|upper }}</span>
                     <span>{{ user.first_name|default:user.username }}</span>
                 </a>
-                <a href="{% url 'login:logout' %}" class="btn-apple-ghost btn-apple-sm border-0 text-decoration-none" style="padding: 3px 10px; font-size: 11px;">
+                <a href="{% url 'login:logout' %}" class="btn-apple-ghost btn-apple-sm border-0 text-decoration-none">
                     Sign Out
                 </a>
             </div>

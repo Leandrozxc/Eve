@@ -13,10 +13,10 @@
     --apple-surface-dark: #1d1d1f;
     --apple-surface-dark-text: #f5f5f7;
 
-    /* Apple Typography Colors */
+    /* Apple Typography Colors (WCAG AA >= 4.5:1 verified) */
     --apple-text: #1d1d1f;
-    --apple-text-secondary: #6e6e73;
-    --apple-text-tertiary: #86868b;
+    --apple-text-secondary: #515154;
+    --apple-text-tertiary: #5c5c61;
 
     /* Hairlines & Dividers */
     --apple-divider: rgba(0, 0, 0, 0.08);
@@ -29,27 +29,28 @@
     --apple-blue-active: #0068d1;
     --apple-blue-link: #0066cc;
     --apple-blue-tint: rgba(0, 113, 227, 0.08);
+    --apple-pro-link: #66b2ff;
 
-    --apple-green: #1d8348;
+    --apple-green: #186a3b;
     --apple-green-bright: #28cd41;
-    --apple-green-tint: rgba(40, 205, 65, 0.12);
+    --apple-green-tint: rgba(40, 205, 65, 0.14);
 
-    --apple-orange: #b45309;
-    --apple-orange-tint: rgba(255, 149, 0, 0.14);
+    --apple-orange: #9a4406;
+    --apple-orange-tint: rgba(255, 149, 0, 0.15);
 
-    --apple-red: #d70015;
+    --apple-red: #c50013;
     --apple-red-tint: rgba(255, 59, 48, 0.12);
 
-    --apple-purple: #6e3bc7;
+    --apple-purple: #6332b8;
     --apple-purple-tint: rgba(175, 82, 222, 0.12);
 
     /* Global Chrome */
-    --apple-nav-bg: rgba(251, 251, 253, 0.8);
-    --apple-localnav-bg: rgba(255, 255, 255, 0.72);
+    --apple-nav-bg: rgba(251, 251, 253, 0.82);
+    --apple-localnav-bg: rgba(255, 255, 255, 0.78);
     --apple-focus-ring: rgba(0, 113, 227, 0.28);
 
-    /* Shadows */
-    --apple-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.04);
+    /* Shadows (Offset + Soft Blur per Craft Floor) */
+    --apple-shadow-card: 0 6px 24px rgba(0, 0, 0, 0.04);
     --apple-shadow-hover: 0 12px 36px rgba(0, 0, 0, 0.08);
     --apple-shadow-float: 0 20px 50px rgba(0, 0, 0, 0.12);
 
@@ -61,10 +62,22 @@
     --apple-radius-xl: 28px;
     --apple-radius-pill: 980px;
 
-    /* Spacing Rhythm */
-    --apple-ease: cubic-bezier(0.25, 1, 0.5, 1);
+    /* Motion Curve */
+    --apple-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    /* Unified --eve-* Semantic Token Aliases */
+    --eve-bg: var(--apple-bg);
+    --eve-surface: var(--apple-surface);
+    --eve-surface-subtle: var(--apple-surface-subtle);
+    --eve-text: var(--apple-text);
+    --eve-text-secondary: var(--apple-text-secondary);
+    --eve-text-muted: var(--apple-text-tertiary);
+    --eve-border: var(--apple-divider);
+    --eve-border-strong: var(--apple-border);
+    --eve-accent: var(--apple-blue-link);
 }
 
+[data-theme="dark"],
 [data-bs-theme="dark"] {
     /* Apple Surface & Canvas Palette (Dark Mode) */
     --apple-bg: #000000;
@@ -75,10 +88,10 @@
     --apple-surface-dark: #1d1d1f;
     --apple-surface-dark-text: #f5f5f7;
 
-    /* Apple Typography Colors (Dark Mode) */
+    /* Apple Typography Colors (Dark Mode — WCAG AA >= 4.5:1 verified) */
     --apple-text: #f5f5f7;
     --apple-text-secondary: #a1a1a6;
-    --apple-text-tertiary: #86868b;
+    --apple-text-tertiary: #98989d;
 
     /* Hairlines & Dividers */
     --apple-divider: rgba(255, 255, 255, 0.12);
@@ -91,6 +104,7 @@
     --apple-blue-active: #0068d1;
     --apple-blue-link: #2997ff;
     --apple-blue-tint: rgba(41, 151, 255, 0.16);
+    --apple-pro-link: #66b2ff;
 
     --apple-green: #30d158;
     --apple-green-bright: #30d158;
@@ -106,18 +120,29 @@
     --apple-purple-tint: rgba(191, 90, 242, 0.16);
 
     /* Global Chrome */
-    --apple-nav-bg: rgba(22, 22, 23, 0.8);
-    --apple-localnav-bg: rgba(22, 22, 23, 0.75);
+    --apple-nav-bg: rgba(22, 22, 23, 0.82);
+    --apple-localnav-bg: rgba(22, 22, 23, 0.78);
     --apple-focus-ring: rgba(41, 151, 255, 0.35);
 
     /* Shadows */
-    --apple-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.35);
+    --apple-shadow-card: 0 6px 24px rgba(0, 0, 0, 0.35);
     --apple-shadow-hover: 0 14px 40px rgba(0, 0, 0, 0.55);
     --apple-shadow-float: 0 24px 60px rgba(0, 0, 0, 0.7);
+
+    /* Unified --eve-* Semantic Token Aliases */
+    --eve-bg: var(--apple-bg);
+    --eve-surface: var(--apple-surface);
+    --eve-surface-subtle: var(--apple-surface-subtle);
+    --eve-text: var(--apple-text);
+    --eve-text-secondary: var(--apple-text-secondary);
+    --eve-text-muted: var(--apple-text-tertiary);
+    --eve-border: var(--apple-divider);
+    --eve-border-strong: var(--apple-border);
+    --eve-accent: var(--apple-blue-link);
 }
 
 /* ==========================================================================
-   1. RESET & TYPOGRAPHY FOUNDATION
+   1. RESET, ACCESSIBILITY & BROWSER SURFACES
    ========================================================================== */
 
 *, *::before, *::after {
@@ -127,6 +152,9 @@
 html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    caret-color: var(--apple-blue);
+    scrollbar-width: thin;
+    scrollbar-color: var(--apple-border) var(--apple-bg);
 }
 
 body {
@@ -144,6 +172,30 @@ body {
     display: flex;
     flex-direction: column;
     transition: background-color 0.25s var(--apple-ease), color 0.25s var(--apple-ease);
+}
+
+/* Keyboard Skip Link (WCAG 2.4.1) */
+.skip-link {
+    position: fixed;
+    top: -100px;
+    left: 16px;
+    z-index: 2000;
+    background-color: var(--apple-blue);
+    color: #ffffff !important;
+    padding: 10px 20px;
+    border-radius: var(--apple-radius-pill);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: var(--apple-shadow-float);
+    transition: top 0.2s var(--apple-ease);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+    top: 10px;
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -164,7 +216,10 @@ h1, h2, h3, h4, h5, h6 {
     outline-offset: 2px;
 }
 
-/* Apple Display & Editorial Type Scale */
+/* ==========================================================================
+   2. APPLE DISPLAY & EDITORIAL TYPE SCALE
+   ========================================================================== */
+
 .apple-headline-hero {
     font-size: clamp(2.5rem, 5vw, 3.75rem);
     line-height: 1.06;
@@ -172,6 +227,7 @@ h1, h2, h3, h4, h5, h6 {
     letter-spacing: -0.035em;
     color: var(--apple-text);
     text-wrap: balance;
+    margin-bottom: 0;
 }
 
 .apple-headline-section {
@@ -181,6 +237,7 @@ h1, h2, h3, h4, h5, h6 {
     letter-spacing: -0.03em;
     color: var(--apple-text);
     text-wrap: balance;
+    margin-bottom: 0.35rem;
 }
 
 .apple-headline-tile {
@@ -197,18 +254,30 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 400;
     letter-spacing: 0.004em;
     color: var(--apple-text-secondary);
+    max-width: 64ch;
+    margin-left: auto;
+    margin-right: auto;
     text-wrap: pretty;
 }
 
+.apple-subhead {
+    font-size: 19px;
+    line-height: 1.4;
+    font-weight: 400;
+    color: var(--apple-text-secondary);
+    margin-bottom: 0;
+}
+
+.apple-body,
 .apple-body-secondary {
-    font-size: 0.94rem;
-    line-height: 1.45;
+    font-size: 15px;
+    line-height: 1.48;
     color: var(--apple-text-secondary);
 }
 
 .apple-caption {
-    font-size: 0.78rem;
-    line-height: 1.35;
+    font-size: 12px;
+    line-height: 1.4;
     letter-spacing: -0.008em;
     color: var(--apple-text-tertiary);
 }
@@ -218,7 +287,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================================================
-   2. CONTAINERS & SECTION ARCHITECTURE
+   3. CONTAINERS, HEROES & SECTION ARCHITECTURE
    ========================================================================== */
 
 .apple-container {
@@ -239,26 +308,43 @@ h1, h2, h3, h4, h5, h6 {
     padding-right: 22px;
 }
 
-.apple-Container-narrow {
-    width: 100%;
-    max-width: 680px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 22px;
-    padding-right: 22px;
-}
-
 .apple-section-white {
     background-color: var(--apple-bg-alt);
     border-bottom: 1px solid var(--apple-divider);
+    padding: 56px 0;
 }
 
 .apple-section-canvas {
     background-color: var(--apple-bg);
+    padding: 64px 0;
+}
+
+.apple-hero {
+    text-align: center;
+    padding: 28px 0 20px;
+    max-width: 780px;
+    margin: 0 auto;
+}
+
+.apple-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.75rem;
+}
+
+.apple-divider-top {
+    border-top: 1px solid var(--apple-divider);
+}
+
+.apple-divider-bottom {
+    border-bottom: 1px solid var(--apple-divider);
 }
 
 /* ==========================================================================
-   3. APPLE GLOBAL NAVIGATION (44px Desktop Bar)
+   4. APPLE GLOBAL NAVIGATION (44px Desktop Bar) & LOCALNAV (52px)
    ========================================================================== */
 
 .eve-navbar {
@@ -268,6 +354,8 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom: 1px solid var(--apple-divider);
     min-height: 44px;
     padding: 0;
+    position: sticky;
+    top: 0;
     z-index: 1040;
     transition: background-color 0.25s var(--apple-ease);
 }
@@ -288,85 +376,116 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     gap: 0.45rem;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 15px;
     color: var(--apple-text) !important;
     text-decoration: none;
     letter-spacing: -0.02em;
     opacity: 0.92;
     transition: opacity 0.2s var(--apple-ease);
-    padding: 0.25rem 0;
+    padding: 0.35rem 0;
+    min-height: 36px;
 }
 
 .eve-brand:hover {
     opacity: 1;
 }
 
+.eve-brand-mark,
 .eve-logo-circle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     background-color: var(--apple-text);
     color: var(--apple-surface);
     font-weight: 700;
-    font-size: 0.72rem;
+    font-size: 12px;
     letter-spacing: 0;
 }
 
 .eve-nav-list {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 1.85rem;
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
+.eve-nav-list .nav-link,
 .eve-nav-link {
     color: var(--apple-text) !important;
-    opacity: 0.72;
+    opacity: 0.76;
     font-weight: 400;
     font-size: 12px;
     letter-spacing: -0.01em;
     text-decoration: none;
-    padding: 0.35rem 0 !important;
+    padding: 0.5rem 0.15rem !important;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
     transition: opacity 0.2s var(--apple-ease), color 0.2s var(--apple-ease);
     position: relative;
     white-space: nowrap;
 }
 
+.eve-nav-list .nav-link:hover,
 .eve-nav-link:hover {
     opacity: 1;
 }
 
+.eve-nav-list .nav-link.active,
 .eve-nav-link.active {
     opacity: 1;
     font-weight: 500;
 }
 
+.eve-nav-list .nav-link.active::after,
 .eve-nav-link.active::after {
     content: "";
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -6px;
+    bottom: 2px;
     height: 1.5px;
     background-color: var(--apple-text);
     border-radius: 2px;
 }
 
-.eve-nav-action {
+.eve-user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
     font-size: 12px;
-    color: var(--apple-text-secondary) !important;
-    text-decoration: none;
-    transition: color 0.2s var(--apple-ease);
-    white-space: nowrap;
+    font-weight: 500;
+    color: var(--apple-text);
+    padding: 4px 10px 4px 5px;
+    min-height: 32px;
+    border-radius: var(--apple-radius-pill);
+    background-color: var(--apple-surface-subtle);
+    border: 1px solid var(--apple-divider);
+    transition: background-color 0.2s var(--apple-ease), border-color 0.2s var(--apple-ease);
 }
 
-.eve-nav-action:hover {
-    color: var(--apple-text) !important;
+.eve-user-chip:hover {
+    border-color: var(--apple-border);
+    color: var(--apple-text);
+}
+
+.eve-avatar-xs {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: var(--apple-blue);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
 }
 
 /* Local Sub-Navigation Bar (Apple Chapter / Product Bar) */
@@ -394,40 +513,37 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .apple-localnav-title {
-    font-size: 1.2rem;
+    font-size: 19px;
     font-weight: 600;
     letter-spacing: -0.022em;
     color: var(--apple-text);
     margin: 0;
     text-decoration: none;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.5rem;
 }
 
-/* System Flash Ribbon */
-.apple-ribbon {
-    background-color: var(--apple-surface);
-    border-bottom: 1px solid var(--apple-divider);
-    padding: 0.65rem 0;
-    font-size: 0.85rem;
+.apple-localnav-title:hover {
+    color: var(--apple-text);
 }
 
 /* ==========================================================================
-   4. APPLE BUTTONS & CALLS TO ACTION
+   5. APPLE BUTTONS & CALLS TO ACTION
    ========================================================================== */
 
+.btn-apple-primary,
 .eve-btn-primary {
     background-color: var(--apple-blue);
     color: #ffffff !important;
     border: 1px solid transparent;
-    font-weight: 400;
+    font-weight: 500;
     font-size: 15px;
     line-height: 1.2;
     letter-spacing: -0.015em;
-    padding: 0.6rem 1.35rem;
+    padding: 0.65rem 1.4rem;
     border-radius: var(--apple-radius-pill);
-    min-height: 40px;
+    min-height: 42px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -437,38 +553,59 @@ h1, h2, h3, h4, h5, h6 {
     transition: background-color 0.2s var(--apple-ease), transform 0.15s var(--apple-ease);
 }
 
+.btn-apple-primary:hover,
 .eve-btn-primary:hover {
     background-color: var(--apple-blue-hover);
     color: #ffffff !important;
 }
 
+.btn-apple-primary:active,
 .eve-btn-primary:active {
     background-color: var(--apple-blue-active);
     transform: scale(0.985);
 }
 
-.eve-btn-primary.btn-lg-apple {
-    font-size: 17px;
-    padding: 0.75rem 1.65rem;
-    min-height: 46px;
-}
-
-.eve-btn-primary.btn-sm-apple {
-    font-size: 12px;
-    padding: 0.35rem 0.9rem;
-    min-height: 30px;
-    font-weight: 500;
-}
-
+.btn-apple-secondary,
 .eve-btn-outline {
     background-color: transparent;
     color: var(--apple-blue-link) !important;
     border: 1px solid var(--apple-blue-link);
-    font-weight: 400;
+    font-weight: 500;
     font-size: 15px;
     line-height: 1.2;
     letter-spacing: -0.015em;
-    padding: 0.6rem 1.35rem;
+    padding: 0.65rem 1.4rem;
+    border-radius: var(--apple-radius-pill);
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s var(--apple-ease), color 0.2s var(--apple-ease), border-color 0.2s var(--apple-ease), transform 0.15s var(--apple-ease);
+}
+
+.btn-apple-secondary:hover,
+.eve-btn-outline:hover {
+    background-color: var(--apple-blue);
+    border-color: var(--apple-blue);
+    color: #ffffff !important;
+}
+
+.btn-apple-secondary:active,
+.eve-btn-outline:active {
+    transform: scale(0.985);
+}
+
+.btn-apple-ghost,
+.eve-btn-neutral {
+    background-color: var(--apple-surface-subtle);
+    color: var(--apple-text) !important;
+    border: 1px solid var(--apple-divider);
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0.55rem 1.15rem;
     border-radius: var(--apple-radius-pill);
     min-height: 40px;
     display: inline-flex;
@@ -477,48 +614,29 @@ h1, h2, h3, h4, h5, h6 {
     gap: 0.4rem;
     text-decoration: none;
     cursor: pointer;
-    transition: background-color 0.2s var(--apple-ease), color 0.2s var(--apple-ease), transform 0.15s var(--apple-ease);
+    transition: background-color 0.2s var(--apple-ease), border-color 0.2s var(--apple-ease), color 0.2s var(--apple-ease);
 }
 
-.eve-btn-outline:hover {
-    background-color: var(--apple-blue);
-    border-color: var(--apple-blue);
-    color: #ffffff !important;
-}
-
-.eve-btn-outline:active {
-    transform: scale(0.985);
-}
-
-.eve-btn-outline.btn-sm-apple {
-    font-size: 12px;
-    padding: 0.35rem 0.9rem;
-    min-height: 30px;
-    font-weight: 500;
-}
-
-.eve-btn-neutral {
-    background-color: var(--apple-surface-subtle);
-    color: var(--apple-text) !important;
-    border: 1px solid var(--apple-divider);
-    font-weight: 400;
-    font-size: 14px;
-    padding: 0.5rem 1.15rem;
-    border-radius: var(--apple-radius-pill);
-    min-height: 38px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color 0.2s var(--apple-ease), border-color 0.2s var(--apple-ease);
-}
-
+.btn-apple-ghost:hover,
 .eve-btn-neutral:hover {
     background-color: var(--apple-border-subtle);
     border-color: var(--apple-border);
     color: var(--apple-text) !important;
+}
+
+.btn-apple-sm,
+.btn-sm-apple {
+    font-size: 13px;
+    padding: 0.42rem 1rem;
+    min-height: 36px;
+    font-weight: 500;
+}
+
+.btn-apple-lg,
+.btn-lg-apple {
+    font-size: 17px;
+    padding: 0.8rem 1.75rem;
+    min-height: 48px;
 }
 
 /* Apple Chevron Link CTA ("Explore organizations ›") */
@@ -528,37 +646,34 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 400;
     letter-spacing: -0.015em;
     text-decoration: none;
+    text-underline-offset: 4px;
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    transition: gap 0.2s var(--apple-ease);
+    min-height: 36px;
+    transition: color 0.2s var(--apple-ease);
 }
 
 .apple-link-cta:hover {
     text-decoration: underline;
-    text-underline-offset: 4px;
-    gap: 0.4rem;
+}
+
+.apple-link-cta .chevron {
+    display: inline-block;
+    transition: transform 0.2s var(--apple-ease);
+}
+
+.apple-link-cta:hover .chevron {
+    transform: translateX(2px);
 }
 
 .apple-link-cta-sm {
-    color: var(--apple-blue-link) !important;
     font-size: 14px;
-    font-weight: 400;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.2rem;
-    transition: gap 0.2s var(--apple-ease);
-}
-
-.apple-link-cta-sm:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    gap: 0.35rem;
+    min-height: 32px;
 }
 
 /* ==========================================================================
-   5. BENTO TILES & EDITORIAL SURFACES (Zero Nested Boxes)
+   6. BENTO TILES & EDITORIAL SURFACES (Zero Nested Boxes)
    ========================================================================== */
 
 .apple-bento-grid {
@@ -580,7 +695,8 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-.apple-tile, .eve-bento-card, .card {
+.apple-tile,
+.eve-bento-card {
     background-color: var(--apple-surface);
     border: 1px solid var(--apple-border-subtle);
     border-radius: var(--apple-radius-lg);
@@ -588,36 +704,56 @@ h1, h2, h3, h4, h5, h6 {
     padding: 32px;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     transition: transform 0.3s var(--apple-ease), box-shadow 0.3s var(--apple-ease);
 }
 
-.card {
-    padding: 0;
-}
-
-.apple-tile-interactive:hover, .eve-bento-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--apple-shadow-hover);
-}
-
-/* Apple Pro Dark Tile (Dark even in light mode, like MacBook Pro feature tiles) */
+/* Apple Pro Dark Tile */
 .apple-tile-pro {
-    background: radial-gradient(circle at top right, #2c2c2e 0%, #161617 70%);
+    background: radial-gradient(circle at top right, #2c2c2e 0%, #161617 75%);
     color: #f5f5f7;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: var(--apple-radius-lg);
     padding: 36px;
     box-shadow: var(--apple-shadow-card);
-    position: relative;
-    overflow: hidden;
 }
 
-.apple-tile-pro h2, .apple-tile-pro h3, .apple-tile-pro h4, .apple-tile-pro h5 {
+.apple-tile-pro h2,
+.apple-tile-pro h3,
+.apple-tile-pro h4,
+.apple-tile-pro .apple-headline-tile {
     color: #f5f5f7;
 }
 
-.apple-tile-pro p {
+.apple-tile-pro p,
+.apple-tile-pro .apple-body,
+.apple-tile-pro .apple-caption {
     color: #a1a1a6;
+}
+
+.apple-tile-pro .apple-link-cta {
+    color: var(--apple-pro-link) !important;
+}
+
+.apple-pro-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1.25rem;
+}
+
+.apple-pro-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 16px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.apple-pro-row:last-child {
+    padding-bottom: 0;
 }
 
 /* Large Apple Metric Display */
@@ -630,31 +766,26 @@ h1, h2, h3, h4, h5, h6 {
     font-variant-numeric: tabular-nums;
 }
 
-.apple-stat-caption {
-    font-size: 0.92rem;
-    font-weight: 500;
-    color: var(--apple-text-secondary);
-    margin-top: 0.4rem;
-}
-
 /* Hairline Specification Strip */
 .apple-spec-strip {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 1.5rem;
-    padding-top: 1.5rem;
-    margin-top: 1.5rem;
+    padding: 1.25rem 0;
+    margin-top: 1.25rem;
     border-top: 1px solid var(--apple-divider);
 }
 
+.apple-spec-label,
 .apple-spec-item-label {
-    font-size: 0.78rem;
+    font-size: 12px;
     color: var(--apple-text-tertiary);
     margin-bottom: 0.2rem;
 }
 
+.apple-spec-value,
 .apple-spec-item-value {
-    font-size: 1.05rem;
+    font-size: 16px;
     font-weight: 600;
     color: var(--apple-text);
     letter-spacing: -0.015em;
@@ -671,7 +802,7 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
-    padding: 1.35rem 0;
+    padding: 1.25rem 0;
     border-bottom: 1px solid var(--apple-divider);
     transition: background-color 0.15s var(--apple-ease);
 }
@@ -694,71 +825,91 @@ h1, h2, h3, h4, h5, h6 {
     flex-shrink: 0;
 }
 
+.apple-date-month,
 .apple-date-badge-month {
-    font-size: 0.68rem;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: var(--apple-red);
 }
 
+.apple-date-day,
 .apple-date-badge-day {
-    font-size: 1.25rem;
+    font-size: 19px;
     font-weight: 700;
     color: var(--apple-text);
     font-variant-numeric: tabular-nums;
 }
 
 /* ==========================================================================
-   6. STATUS PILLS & SEGMENTED CONTROLS
+   7. STATUS PILLS, ROLE BADGES & SEGMENTED CONTROLS
    ========================================================================== */
 
+.eve-status-pill,
+.eve-role-badge,
 .badge {
     border-radius: var(--apple-radius-pill);
-    padding: 0.32rem 0.78rem;
+    padding: 0.3rem 0.78rem;
     font-weight: 500;
     font-size: 0.75rem;
     letter-spacing: -0.008em;
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.38rem;
+    line-height: 1.2;
 }
 
-.badge-apple-blue {
-    background-color: var(--apple-blue-tint) !important;
-    color: var(--apple-blue-link) !important;
+.eve-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+    display: inline-block;
 }
 
+.eve-status-confirmed,
 .badge-apple-green {
     background-color: var(--apple-green-tint) !important;
     color: var(--apple-green) !important;
 }
 
+.eve-status-completed,
+.eve-role-manager,
+.badge-apple-blue {
+    background-color: var(--apple-blue-tint) !important;
+    color: var(--apple-blue-link) !important;
+}
+
+.eve-status-pending,
 .badge-apple-orange {
     background-color: var(--apple-orange-tint) !important;
     color: var(--apple-orange) !important;
 }
 
+.eve-status-declined,
 .badge-apple-red {
     background-color: var(--apple-red-tint) !important;
     color: var(--apple-red) !important;
 }
 
+.eve-role-owner,
 .badge-apple-purple {
     background-color: var(--apple-purple-tint) !important;
     color: var(--apple-purple) !important;
 }
 
+.eve-role-badge,
 .badge-apple-neutral {
-    background-color: var(--apple-surface-subtle) !important;
-    color: var(--apple-text-secondary) !important;
+    background-color: var(--apple-surface-subtle);
+    color: var(--apple-text-secondary);
     border: 1px solid var(--apple-divider);
 }
 
 /* Segmented Filter Control */
 .eve-segmented-control {
     background-color: rgba(118, 118, 128, 0.12);
-    padding: 3px;
+    padding: 4px;
     border-radius: var(--apple-radius-pill);
     display: inline-flex;
     flex-wrap: wrap;
@@ -767,12 +918,15 @@ h1, h2, h3, h4, h5, h6 {
 
 .eve-segmented-item {
     border-radius: var(--apple-radius-pill);
-    padding: 0.38rem 1.05rem;
+    padding: 0.42rem 1.1rem;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
     font-size: 13px;
     font-weight: 500;
     color: var(--apple-text-secondary);
     text-decoration: none;
-    transition: all 0.2s var(--apple-ease);
+    transition: background-color 0.2s var(--apple-ease), color 0.2s var(--apple-ease), box-shadow 0.2s var(--apple-ease);
 }
 
 .eve-segmented-item:hover {
@@ -787,33 +941,50 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================================================
-   7. FORMS & APPLE ID INPUTS
+   8. FORMS, ALERTS & APPLE ACCOUNT STAGE
    ========================================================================== */
 
+.eve-form-label,
 .form-label {
+    display: block;
     color: var(--apple-text);
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 14px;
     margin-bottom: 0.45rem;
     letter-spacing: -0.01em;
 }
 
-.form-control, .form-select {
+.eve-input,
+.eve-select,
+.eve-textarea,
+.form-control,
+.form-select {
     background-color: var(--apple-surface);
     color: var(--apple-text);
     border: 1px solid var(--apple-border);
     border-radius: var(--apple-radius-sm);
-    padding: 0.8rem 1rem;
+    padding: 0.78rem 1rem;
     font-size: 16px;
     min-height: 50px;
     transition: border-color 0.2s var(--apple-ease), box-shadow 0.2s var(--apple-ease);
 }
 
-.form-control::placeholder {
-    color: var(--apple-text-tertiary);
+.eve-textarea {
+    min-height: 110px;
 }
 
-.form-control:focus, .form-select:focus {
+.eve-input::placeholder,
+.eve-textarea::placeholder,
+.form-control::placeholder {
+    color: var(--apple-text-secondary);
+    opacity: 0.85;
+}
+
+.eve-input:focus,
+.eve-select:focus,
+.eve-textarea:focus,
+.form-control:focus,
+.form-select:focus {
     background-color: var(--apple-surface);
     color: var(--apple-text);
     border-color: var(--apple-blue);
@@ -821,10 +992,46 @@ h1, h2, h3, h4, h5, h6 {
     outline: none;
 }
 
-.form-control:disabled, .form-control[readonly] {
+.eve-input:disabled,
+.eve-input[readonly],
+.form-control:disabled,
+.form-control[readonly] {
     background-color: var(--apple-surface-subtle);
-    color: var(--apple-text-tertiary);
+    color: var(--apple-text-secondary);
     border-color: var(--apple-divider);
+}
+
+/* Alerts & Ribbons */
+.eve-alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: var(--apple-radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    background-color: var(--apple-surface);
+    border: 1px solid var(--apple-border);
+    box-shadow: var(--apple-shadow-card);
+}
+
+.eve-alert-danger {
+    background-color: var(--apple-red-tint);
+    color: var(--apple-red);
+    border-color: rgba(197, 0, 19, 0.2);
+}
+
+.eve-alert-success {
+    background-color: var(--apple-green-tint);
+    color: var(--apple-green);
+    border-color: rgba(24, 106, 59, 0.2);
+}
+
+.eve-alert-info {
+    background-color: var(--apple-blue-tint);
+    color: var(--apple-blue-link);
+    border-color: rgba(0, 102, 204, 0.2);
 }
 
 /* Apple Auth Stage */
@@ -835,6 +1042,7 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: center;
     align-items: center;
     padding: 3.5rem 1.25rem;
+    background-color: var(--apple-bg-alt);
 }
 
 .eve-auth-box {
@@ -842,32 +1050,50 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 440px;
 }
 
+.eve-auth-logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background-color: var(--apple-text);
+    color: var(--apple-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    margin-bottom: 1.25rem;
+}
+
 .eve-demo-pill {
-    background-color: var(--apple-surface);
-    border: 1px solid var(--apple-border);
-    border-radius: var(--apple-radius-pill);
-    padding: 0.35rem 0.85rem;
-    font-size: 12px;
+    background-color: var(--apple-surface-subtle);
+    border: 1px solid var(--apple-divider);
+    border-radius: var(--apple-radius-sm);
+    padding: 0.6rem 1rem;
+    min-height: 44px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--apple-text);
     cursor: pointer;
-    transition: all 0.15s var(--apple-ease);
-    display: inline-flex;
+    transition: background-color 0.15s var(--apple-ease), border-color 0.15s var(--apple-ease), color 0.15s var(--apple-ease);
+    display: flex;
     align-items: center;
-    gap: 0.35rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .eve-demo-pill:hover {
     border-color: var(--apple-blue);
-    color: var(--apple-blue-link);
     background-color: var(--apple-blue-tint);
 }
 
 /* ==========================================================================
-   8. TABLES & PROGRESS TRACKERS
+   9. TABLES & PROGRESS TRACKERS
    ========================================================================== */
 
+.eve-table,
 .table {
+    width: 100%;
+    border-collapse: collapse;
     --bs-table-color: var(--apple-text);
     --bs-table-bg: transparent;
     --bs-table-border-color: var(--apple-divider);
@@ -875,6 +1101,7 @@ h1, h2, h3, h4, h5, h6 {
     font-variant-numeric: tabular-nums;
 }
 
+.eve-table th,
 .table th {
     font-size: 11px;
     font-weight: 600;
@@ -884,8 +1111,10 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom: 1px solid var(--apple-divider);
     padding: 0.9rem 1.5rem;
     background-color: transparent;
+    text-align: left;
 }
 
+.eve-table td,
 .table td {
     padding: 1.15rem 1.5rem;
     border-bottom: 1px solid var(--apple-divider);
@@ -893,14 +1122,17 @@ h1, h2, h3, h4, h5, h6 {
     vertical-align: middle;
 }
 
+.eve-table tbody tr:last-child td,
 .table tbody tr:last-child td {
     border-bottom: none;
 }
 
+.eve-table tbody tr:hover td,
 .table-hover tbody tr:hover td {
     background-color: var(--apple-surface-subtle);
 }
 
+.eve-progress,
 .progress {
     height: 6px;
     background-color: rgba(120, 120, 128, 0.16);
@@ -908,14 +1140,16 @@ h1, h2, h3, h4, h5, h6 {
     overflow: hidden;
 }
 
+.eve-progress-bar,
 .progress-bar {
+    height: 100%;
     background-color: var(--apple-blue);
     border-radius: var(--apple-radius-pill);
     transition: width 0.5s var(--apple-ease);
 }
 
 /* ==========================================================================
-   9. APPLE MULTI-COLUMN DIRECTORY FOOTER
+   10. APPLE MULTI-COLUMN DIRECTORY FOOTER
    ========================================================================== */
 
 .eve-footer {
@@ -927,13 +1161,6 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.4;
     letter-spacing: -0.01em;
     margin-top: auto;
-}
-
-.eve-footer-note {
-    padding-bottom: 1.25rem;
-    margin-bottom: 1.25rem;
-    border-bottom: 1px solid var(--apple-divider);
-    color: var(--apple-text-tertiary);
 }
 
 .eve-footer-grid {
@@ -964,6 +1191,7 @@ h1, h2, h3, h4, h5, h6 {
 .eve-footer a {
     color: var(--apple-text-secondary);
     text-decoration: none;
+    text-underline-offset: 3px;
     transition: color 0.15s var(--apple-ease);
 }
 
@@ -973,10 +1201,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 767.98px) {
+    .apple-section-white,
+    .apple-section-canvas {
+        padding: 40px 0;
+    }
     .eve-footer-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-    .apple-tile, .eve-bento-card {
+    .apple-tile,
+    .apple-tile-pro,
+    .eve-bento-card {
         padding: 24px;
     }
     .apple-row-item {
@@ -987,18 +1221,24 @@ h1, h2, h3, h4, h5, h6 {
     .eve-nav-list {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.5rem;
-        padding: 1rem 0;
+        gap: 0.25rem;
+        padding: 0.75rem 0;
     }
+    .eve-nav-list .nav-link.active::after,
     .eve-nav-link.active::after {
         display: none;
     }
 }
 
+/* Intentional Reduced Motion (Preserves non-vestibular state feedback) */
 @media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
+        animation-iteration-count: 1 !important;
+        transform: none !important;
+        transition-duration: 120ms !important;
     }
 }
