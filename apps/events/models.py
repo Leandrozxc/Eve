@@ -216,3 +216,50 @@ class MemberAvailability(models.Model):
         target = self.get_day_of_week_display() if self.day_of_week is not None else str(self.specific_date)
         return f"{self.member.user.username} - {self.get_availability_type_display()} ({target})"
 
+
+class EventTask(models.Model):
+    PRIORITY_CHOICES = [
+        ("LOW", "Low"),
+        ("MEDIUM", "Medium"),
+        ("HIGH", "High"),
+        ("URGENT", "Urgent"),
+    ]
+
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE,
+        related_name="tasks",
+    )
+    assigned_to = models.ForeignKey(
+        CompanyMember,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_tasks",
+    )
+    title = models.CharField(max_length=150)
+    priority = models.CharField(
+        max_length=20,
+        choices=PRIORITY_CHOICES,
+        default="MEDIUM",
+    )
+    is_completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    completed_by = models.ForeignKey(
+        CompanyMember,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="completed_tasks",
+    )
+    due_time = models.TimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["is_completed", "-priority", "created_at"]
+
+    def __str__(self):
+        status = "Done" if self.is_completed else "Pending"
+        return f"[{status}] {self.title} ({self.event.title})"
+
+

@@ -245,6 +245,95 @@
             </div>
         </div>
 
+        <!-- Operational Task Checklist Section -->
+        <div class="apple-tile mb-4 p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div>
+                    <h2 class="apple-headline-tile mb-0">Operational Task Checklist</h2>
+                    <p class="apple-caption mb-0">Action items and team preparation checks for {{ event.title }}.</p>
+                </div>
+                <span class="badge bg-secondary-subtle text-secondary">{{ tasks|length }} task{{ tasks|length|pluralize }}</span>
+            </div>
+
+            <!-- Task List -->
+            {% if tasks %}
+            <div class="list-group list-group-flush mb-4 border rounded-3 overflow-hidden">
+                {% for t in tasks %}
+                <div class="list-group-item d-flex align-items-center justify-content-between py-3 px-3 {% if t.is_completed %}bg-light text-muted{% endif %}">
+                    <div class="d-flex align-items-center gap-3">
+                        <form method="post" action="{% url 'events:task_toggle' task_id=t.id %}" class="m-0">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm p-0 border-0 bg-transparent text-primary fs-5" title="Toggle Task">
+                                {% if t.is_completed %}
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                {% else %}
+                                    <i class="bi bi-circle text-secondary"></i>
+                                {% endif %}
+                            </button>
+                        </form>
+                        <div>
+                            <span class="fw-semibold {% if t.is_completed %}text-decoration-line-through text-muted{% endif %}">{{ t.title }}</span>
+                            <div class="apple-caption text-muted">
+                                {% if t.assigned_to %}
+                                    Assigned to: <strong>{{ t.assigned_to.user.get_full_name|default:t.assigned_to.user.username }}</strong> &bull;
+                                {% endif %}
+                                {% if t.due_time %}Due by {{ t.due_time|time:"g:i A" }} &bull;{% endif %}
+                                Priority:
+                                <span class="badge {% if t.priority == 'URGENT' %}bg-danger{% elif t.priority == 'HIGH' %}bg-warning text-dark{% else %}bg-light text-dark border{% endif %}">
+                                    {{ t.priority|title }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% if can_manage %}
+                    <form method="post" action="{% url 'events:task_delete' task_id=t.id %}" class="m-0" onsubmit="return confirm('Delete task?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-apple-ghost btn-apple-sm text-danger" title="Delete Task">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted small py-2 mb-3">No operational checklist tasks created for this event yet.</p>
+            {% endif %}
+
+            <!-- Add Task Form -->
+            <form method="post" action="{% url 'events:task_create' event_id=event.id %}" class="p-3 bg-light rounded-3 border">
+                {% csrf_token %}
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <label for="task_title" class="form-label small fw-semibold mb-1">New Action Item</label>
+                        <input type="text" name="title" id="task_title" class="form-control form-control-sm" placeholder="e.g. Inspect audio monitors and setup credential station" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="assigned_to" class="form-label small fw-semibold mb-1">Assignee</label>
+                        <select name="assigned_to" id="assigned_to" class="form-select form-select-sm">
+                            <option value="">-- Open to Crew --</option>
+                            {% for a in assignments %}
+                            <option value="{{ a.member.id }}">{{ a.member.user.get_full_name|default:a.member.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="priority" class="form-label small fw-semibold mb-1">Priority</label>
+                        <select name="priority" id="priority" class="form-select form-select-sm">
+                            {% for code, label in task_priority_choices %}
+                            <option value="{{ code }}" {% if code == 'MEDIUM' %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-sm btn-apple-primary w-100">
+                            <i class="bi bi-plus-lg me-1"></i> Add Task
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <!-- Assign Member Form Tile (Owners & Managers Only) -->
         {% if can_manage %}
         <div class="apple-tile">

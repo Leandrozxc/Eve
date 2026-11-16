@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from apps.events.models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord, MemberAvailability
+from apps.events.models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord, MemberAvailability, EventTask
 
 User = get_user_model()
 
@@ -305,6 +305,63 @@ class AvailabilityWorkflowTest(TestCase):
         response = self.client.post(reverse("events:availability_delete", kwargs={"record_id": record.id}))
         self.assertRedirects(response, reverse("events:availability_list"))
         self.assertFalse(MemberAvailability.objects.filter(id=record.id).exists())
+
+
+class TaskAndAnalyticsWorkflowTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username="analytics_user", password="password123")
+        self.company = Company.objects.create(name="Analytics Corp")
+        self.member = CompanyMember.objects.create(
+            company=self.company, user=self.user, role="OWNER"
+        )
+        self.event = Event.objects.create(
+            company=self.company,
+            created_by=self.member,
+            title="Tech Summit",
+            event_date=date.today(),
+            start_time=time(10, 0),
+            end_time=time(18, 0),
+            location="Auditorium",
+            status="UPCOMING",
+        )
+        self.client.login(username="analytics_user", password="password123")
+
+    def test_analytics_report_renders(self):
+        response = self.client.get(reverse("events:analytics_report"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "events/analytics_report.html")
+        self.assertEqual(response.context["total_events"], 1)
+
+    def test_create_event_task(self):
+        response = self.client.post(
+            reverse("events:task_create", kwargs={"event_id": self.event.id}),
+            {
+                "title": "Stage audio calibration",
+                "priority": "HIGH",
+            },
+        )
+        self.assertRedirects(response, reverse("events:event_detail", kwargs={"event_id": self.event.id}))
+        self.assertTrue(EventTask.objects.filter(event=self.event, title="Stage audio calibration").exists())
+
+    def test_toggle_and_delete_task(self):
+        task = EventTask.objects.create(
+            event=self.event,
+            title="Credential check",
+            priority="MEDIUM",
+        )
+        # Toggle completion
+        response = self.client.post(reverse("events:task_toggle", kwargs={"task_id": task.id}))
+        self.assertRedirects(response, reverse("events:event_detail", kwargs={"event_id": self.event.id}))
+        task.refresh_from_db()
+        self.assertTrue(task.is_completed)
+        self.assertIsNotNone(task.completed_at)
+
+        # Delete task
+        response = self.client.post(reverse("events:task_delete", kwargs={"task_id": task.id}))
+        self.assertRedirects(response, reverse("events:event_detail", kwargs={"event_id": self.event.id}))
+        self.assertFalse(EventTask.objects.filter(id=task.id).exists())
+
 
 
 

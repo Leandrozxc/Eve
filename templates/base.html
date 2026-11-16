@@ -66,6 +66,9 @@
                         <li>
                             <a class="nav-link {% if 'availability' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'events:availability_list' %}">Availability</a>
                         </li>
+                        <li>
+                            <a class="nav-link {% if 'analytics' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'events:analytics_report' %}">Analytics &amp; Reports</a>
+                        </li>
                         <!-- Mobile-only Account & Preferences section -->
                         <li class="d-lg-none pt-2 mt-1 apple-divider-top">
                             <a class="nav-link {% if request.resolver_match.app_name == 'userprofile' %}active{% endif %}" href="{% url 'userprofile:profile' %}">Account Profile</a>

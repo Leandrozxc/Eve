@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord, MemberAvailability
+from .models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord, MemberAvailability, EventTask
 
 
 # ==============================================================================
@@ -351,6 +351,8 @@ def event_detail(request, event_id):
         "progress_pct": progress_pct,
         "status_choices": Event.STATUS_CHOICES,
         "assignment_status_choices": EventAssignment.STATUS_CHOICES,
+        "tasks": event.tasks.select_related("assigned_to__user", "completed_by__user").all(),
+        "task_priority_choices": EventTask.PRIORITY_CHOICES,
     }
     return render(request, "events/event_detail.html", context)
 
@@ -767,5 +769,161 @@ def availability_delete(request, record_id):
         messages.success(request, "Availability entry deleted.")
 
     return redirect("events:availability_list")
+
+
+# ==============================================================================
+# EVENT OPERATIONAL TASKS & TELEMETRY ANALYTICS VIEWS
+# ==============================================================================
+
+@login_required
+def task_create(request, event_id):
+    """Add a new operational task checklist item to an event."""
+    event = get_object_or_404(Event, id=event_id)
+    user_membership = CompanyMember.objects.filter(
+        company=event.company, user=request.user
+    ).first()
+
+    if not user_membership:
+        messages.error(request, "You are not a member of this event's organization.")
+        return redirect("events:event_detail", event_id=event.id)
+
+    if request.method == "POST":
+        title = request.POST.get("title", "").strip()
+        priority = request.POST.get("priority", "MEDIUM")
+        assigned_to_id = request.POST.get("assigned_to")
+        due_time = request.POST.get("due_time") or None
+
+        if not title:
+            messages.error(request, "Task title is required.")
+            return redirect("events:event_detail", event_id=event.id)
+
+        assigned_to = None
+        if assigned_to_id:
+            assigned_to = CompanyMember.objects.filter(id=assigned_to_id, company=event.company).first()
+
+        EventTask.objects.create(
+            event=event,
+            title=title,
+            priority=priority,
+            assigned_to=assigned_to,
+            due_time=due_time,
+        )
+        messages.success(request, f'Task "{title}" added to checklist.')
+
+    return redirect("events:event_detail", event_id=event.id)
+
+
+@login_required
+def task_toggle(request, task_id):
+    """Toggle completion status of an operational task."""
+    task = get_object_or_404(
+        EventTask.objects.select_related("event__company"), id=task_id
+    )
+    user_membership = CompanyMember.objects.filter(
+        company=task.event.company, user=request.user
+    ).first()
+
+    if not user_membership:
+        messages.error(request, "You do not have access to toggle tasks for this event.")
+        return redirect("events:event_detail", event_id=task.event.id)
+
+    if request.method == "POST":
+        task.is_completed = not task.is_completed
+        if task.is_completed:
+            task.completed_at = timezone.now()
+            task.completed_by = user_membership
+        else:
+            task.completed_at = None
+            task.completed_by = None
+        task.save()
+        status_label = "completed" if task.is_completed else "marked pending"
+        messages.success(request, f'Task "{task.title}" {status_label}.')
+
+    return redirect("events:event_detail", event_id=task.event.id)
+
+
+@login_required
+def task_delete(request, task_id):
+    """Delete an operational task."""
+    task = get_object_or_404(
+        EventTask.objects.select_related("event__company"), id=task_id
+    )
+    user_membership = CompanyMember.objects.filter(
+        company=task.event.company, user=request.user
+    ).first()
+
+    if not user_membership or user_membership.role not in ("OWNER", "MANAGER"):
+        messages.error(request, "Only Owners and Managers can delete checklist tasks.")
+        return redirect("events:event_detail", event_id=task.event.id)
+
+    if request.method == "POST":
+        title = task.title
+        event_id = task.event.id
+        task.delete()
+        messages.success(request, f'Task "{title}" deleted.')
+
+    return redirect("events:event_detail", event_id=event_id)
+
+
+@login_required
+def analytics_report(request, company_id=None):
+    """Consolidated telemetry and shift readiness analytics report."""
+    user_memberships = (
+        CompanyMember.objects.filter(user=request.user)
+        .select_related("company")
+        .order_by("company__name")
+    )
+    user_company_ids = list(user_memberships.values_list("company_id", flat=True))
+
+    selected_company = None
+    if company_id:
+        selected_company = get_object_or_404(Company, id=company_id, id__in=user_company_ids)
+        target_company_ids = [selected_company.id]
+    else:
+        target_company_ids = user_company_ids
+
+    events = Event.objects.filter(company_id__in=target_company_ids)
+    total_events = events.count()
+    upcoming_events = events.filter(status="UPCOMING").count()
+    completed_events = events.filter(status="COMPLETED").count()
+    draft_events = events.filter(status="DRAFT").count()
+
+    assignments = EventAssignment.objects.filter(event__company_id__in=target_company_ids)
+    total_assignments = assignments.count()
+    confirmed_assignments = assignments.filter(status__in=["CONFIRMED", "COMPLETED"]).count()
+    completed_assignments = assignments.filter(status="COMPLETED").count()
+    confirmation_rate = int(confirmed_assignments / total_assignments * 100) if total_assignments > 0 else 0
+
+    attendance_records = AttendanceRecord.objects.filter(assignment__event__company_id__in=target_company_ids)
+    total_logs = attendance_records.count()
+    verified_logs = attendance_records.filter(status="VERIFIED").count()
+    verification_rate = int(verified_logs / total_logs * 100) if total_logs > 0 else 0
+
+    tasks = EventTask.objects.filter(event__company_id__in=target_company_ids)
+    total_tasks = tasks.count()
+    completed_tasks = tasks.filter(is_completed=True).count()
+    task_rate = int(completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+
+    context = {
+        "user_memberships": user_memberships,
+        "selected_company": selected_company,
+        "total_events": total_events,
+        "upcoming_events": upcoming_events,
+        "completed_events": completed_events,
+        "draft_events": draft_events,
+        "total_assignments": total_assignments,
+        "confirmed_assignments": confirmed_assignments,
+        "completed_assignments": completed_assignments,
+        "confirmation_rate": confirmation_rate,
+        "total_logs": total_logs,
+        "verified_logs": verified_logs,
+        "verification_rate": verification_rate,
+        "total_tasks": total_tasks,
+        "completed_tasks": completed_tasks,
+        "task_rate": task_rate,
+        "events": events.order_by("-event_date")[:10],
+    }
+    return render(request, "events/analytics_report.html", context)
+
 
 

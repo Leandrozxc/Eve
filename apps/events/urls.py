@@ -33,4 +33,11 @@ urlpatterns = [
     path("availability/company/<int:company_id>/", views.availability_list, name="company_availability_list"),
     path("availability/create/", views.availability_create, name="availability_create"),
     path("availability/<int:record_id>/delete/", views.availability_delete, name="availability_delete"),
+
+    # Operational Task Checklists & Analytics Reporting
+    path("<int:event_id>/tasks/create/", views.task_create, name="task_create"),
+    path("tasks/<int:task_id>/toggle/", views.task_toggle, name="task_toggle"),
+    path("tasks/<int:task_id>/delete/", views.task_delete, name="task_delete"),
+    path("analytics/", views.analytics_report, name="analytics_report"),
+    path("analytics/company/<int:company_id>/", views.analytics_report, name="company_analytics_report"),
 ]
