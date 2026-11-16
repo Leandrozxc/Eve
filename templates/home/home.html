@@ -77,6 +77,12 @@
                                 </button>
                             </form>
                             {% elif next_shift.status == 'CONFIRMED' %}
+                            <form method="POST" action="{% url 'events:clock_in' assignment_id=next_shift.id %}" class="m-0">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-apple-primary btn-apple-sm">
+                                    <i class="bi bi-box-arrow-in-right"></i> Clock In
+                                </button>
+                            </form>
                             <form method="POST" action="{% url 'events:assignment_update' assignment_id=next_shift.id %}" class="m-0">
                                 {% csrf_token %}
                                 <input type="hidden" name="status" value="COMPLETED">

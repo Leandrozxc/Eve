@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from apps.events.models import Company, CompanyMember, Event, EventAssignment
+from apps.events.models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord
 
 User = get_user_model()
 
@@ -177,4 +177,90 @@ class EventEditDeleteViewTest(TestCase):
         response = self.client.post(reverse("events:event_delete", kwargs={"event_id": self.event.id}))
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Event.objects.filter(id=self.event.id).exists())
+
+
+class AttendanceWorkflowTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.owner = User.objects.create_user(username="owner_att", password="password123")
+        self.staff = User.objects.create_user(username="staff_att", password="password123")
+
+        self.company = Company.objects.create(name="Attendance Test Org")
+        self.owner_member = CompanyMember.objects.create(
+            company=self.company, user=self.owner, role="OWNER"
+        )
+        self.staff_member = CompanyMember.objects.create(
+            company=self.company, user=self.staff, role="STAFF"
+        )
+
+        self.event = Event.objects.create(
+            company=self.company,
+            created_by=self.owner_member,
+            title="Concert Shift",
+            event_date=date.today(),
+            start_time=time(9, 0),
+            end_time=time(17, 0),
+            location="Stage A",
+            status="UPCOMING",
+        )
+        self.assignment = EventAssignment.objects.create(
+            event=self.event,
+            member=self.staff_member,
+            assigned_role="Sound Engineer",
+            start_time=time(9, 0),
+            end_time=time(17, 0),
+            status="ASSIGNED",
+        )
+
+    def test_attendance_dashboard_renders(self):
+        self.client.login(username="owner_att", password="password123")
+        response = self.client.get(reverse("events:attendance_dashboard"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "events/attendance_dashboard.html")
+
+    def test_clock_in_creates_record(self):
+        self.client.login(username="staff_att", password="password123")
+        response = self.client.post(
+            reverse("events:clock_in", kwargs={"assignment_id": self.assignment.id}),
+            {"notes": "Station sound check complete"},
+        )
+        self.assertRedirects(response, reverse("events:attendance_dashboard"))
+        self.assertTrue(AttendanceRecord.objects.filter(assignment=self.assignment).exists())
+        record = AttendanceRecord.objects.get(assignment=self.assignment)
+        self.assertEqual(record.status, "CLOCKED_IN")
+        self.assertEqual(record.clock_in_notes, "Station sound check complete")
+        self.assignment.refresh_from_db()
+        self.assertEqual(self.assignment.status, "CONFIRMED")
+
+    def test_clock_out_completes_shift(self):
+        self.client.login(username="staff_att", password="password123")
+        self.client.post(reverse("events:clock_in", kwargs={"assignment_id": self.assignment.id}))
+        response = self.client.post(
+            reverse("events:clock_out", kwargs={"assignment_id": self.assignment.id}),
+            {"notes": "Shift ended smoothly"},
+        )
+        self.assertRedirects(response, reverse("events:attendance_dashboard"))
+        record = AttendanceRecord.objects.get(assignment=self.assignment)
+        self.assertEqual(record.status, "CLOCKED_OUT")
+        self.assertIsNotNone(record.clock_out_time)
+        self.assertEqual(record.clock_out_notes, "Shift ended smoothly")
+        self.assignment.refresh_from_db()
+        self.assertEqual(self.assignment.status, "COMPLETED")
+
+    def test_manager_can_verify_attendance(self):
+        # Staff clocks in and out
+        self.client.login(username="staff_att", password="password123")
+        self.client.post(reverse("events:clock_in", kwargs={"assignment_id": self.assignment.id}))
+        self.client.post(reverse("events:clock_out", kwargs={"assignment_id": self.assignment.id}))
+        record = AttendanceRecord.objects.get(assignment=self.assignment)
+
+        # Owner verifies
+        self.client.login(username="owner_att", password="password123")
+        response = self.client.post(reverse("events:verify_attendance", kwargs={"record_id": record.id}))
+        self.assertRedirects(response, reverse("events:attendance_dashboard"))
+        record.refresh_from_db()
+        self.assertEqual(record.status, "VERIFIED")
+        self.assertEqual(record.verified_by, self.owner_member)
+        self.assertIsNotNone(record.verified_at)
+
 

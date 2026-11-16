@@ -20,4 +20,11 @@ urlpatterns = [
     path("companies/create/", views.company_create, name="company_create"),
     path("companies/<int:company_id>/join/", views.company_join, name="company_join"),
     path("companies/<int:company_id>/members/", views.company_members, name="company_members"),
+
+    # Attendance & Clock-In/Out routes
+    path("attendance/", views.attendance_dashboard, name="attendance_dashboard"),
+    path("attendance/company/<int:company_id>/", views.attendance_dashboard, name="company_attendance_dashboard"),
+    path("assignments/<int:assignment_id>/clock-in/", views.clock_in, name="clock_in"),
+    path("assignments/<int:assignment_id>/clock-out/", views.clock_out, name="clock_out"),
+    path("attendance/<int:record_id>/verify/", views.verify_attendance, name="verify_attendance"),
 ]

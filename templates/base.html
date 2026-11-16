@@ -60,6 +60,9 @@
                         <li>
                             <a class="nav-link {% if 'event' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'events:event_list' %}">Events &amp; Shifts</a>
                         </li>
+                        <li>
+                            <a class="nav-link {% if 'attendance' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'events:attendance_dashboard' %}">Attendance</a>
+                        </li>
                         <!-- Mobile-only Account & Preferences section -->
                         <li class="d-lg-none pt-2 mt-1 apple-divider-top">
                             <a class="nav-link {% if request.resolver_match.app_name == 'userprofile' %}active{% endif %}" href="{% url 'userprofile:profile' %}">Account Profile</a>

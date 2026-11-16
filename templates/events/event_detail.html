@@ -199,6 +199,14 @@
                                 <span class="eve-status-pill {% if a.status == 'CONFIRMED' %}eve-status-confirmed{% elif a.status == 'COMPLETED' %}eve-status-completed{% elif a.status == 'CANCELLED' %}eve-status-declined{% else %}eve-status-pending{% endif %}">
                                     <span class="eve-status-dot"></span> {{ a.get_status_display }}
                                 </span>
+                                {% if a.attendance_record %}
+                                    <div class="apple-caption text-success mt-1">
+                                        <i class="bi bi-clock"></i> In: {{ a.attendance_record.clock_in_time|time:"g:i A" }}
+                                        {% if a.attendance_record.clock_out_time %}
+                                            &bull; Out: {{ a.attendance_record.clock_out_time|time:"g:i A" }}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
                             </td>
                             {% if can_manage %}
                             <td class="text-end pe-4">

@@ -124,3 +124,45 @@ class EventAssignment(models.Model):
 
     def __str__(self):
         return f"{self.member.user.username} - {self.event.title}"
+
+
+class AttendanceRecord(models.Model):
+    STATUS_CHOICES = [
+        ("CLOCKED_IN", "Clocked In"),
+        ("CLOCKED_OUT", "Clocked Out"),
+        ("VERIFIED", "Verified by Manager"),
+    ]
+
+    assignment = models.OneToOneField(
+        EventAssignment,
+        on_delete=models.CASCADE,
+        related_name="attendance_record",
+    )
+    clock_in_time = models.DateTimeField(auto_now_add=True)
+    clock_out_time = models.DateTimeField(null=True, blank=True)
+    clock_in_notes = models.CharField(max_length=255, blank=True)
+    clock_out_notes = models.CharField(max_length=255, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="CLOCKED_IN",
+    )
+    verified_by = models.ForeignKey(
+        CompanyMember,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="verified_attendances",
+    )
+    verified_at = models.DateTimeField(null=True, blank=True)
+
+    def duration_display(self):
+        if not self.clock_out_time:
+            return "In progress"
+        diff = self.clock_out_time - self.clock_in_time
+        hours, remainder = divmod(int(diff.total_seconds()), 3600)
+        minutes, _ = divmod(remainder, 60)
+        return f"{hours}h {minutes}m"
+
+    def __str__(self):
+        return f"Attendance: {self.assignment.member.user.username} @ {self.assignment.event.title}"

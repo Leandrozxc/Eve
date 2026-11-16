@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 
-from .models import Company, CompanyMember, Event, EventAssignment
+from .models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord
 
 
 # ==============================================================================
@@ -484,3 +485,175 @@ def assignment_delete(request, assignment_id):
         messages.success(request, f"Removed assignment for {username}.")
 
     return redirect("events:event_detail", event_id=event_id)
+
+
+# ==============================================================================
+# ATTENDANCE & REAL-TIME CLOCK-IN/OUT VIEWS
+# ==============================================================================
+
+@login_required
+def attendance_dashboard(request, company_id=None):
+    """Real-time attendance tracking board across user's companies."""
+    user_memberships = (
+        CompanyMember.objects.filter(user=request.user)
+        .select_related("company")
+        .order_by("company__name")
+    )
+    user_company_ids = list(user_memberships.values_list("company_id", flat=True))
+
+    selected_company = None
+    if company_id:
+        selected_company = get_object_or_404(Company, id=company_id, id__in=user_company_ids)
+        target_company_ids = [selected_company.id]
+    else:
+        target_company_ids = user_company_ids
+
+    records = (
+        AttendanceRecord.objects.filter(assignment__event__company_id__in=target_company_ids)
+        .select_related(
+            "assignment__member__user",
+            "assignment__event__company",
+            "assignment__event",
+            "verified_by__user",
+        )
+        .order_by("-clock_in_time")
+    )
+
+    total_clocked_in = records.filter(status="CLOCKED_IN").count()
+    total_clocked_out = records.filter(status="CLOCKED_OUT").count()
+    total_verified = records.filter(status="VERIFIED").count()
+
+    # Find assignments assigned to the current user that have not yet clocked in
+    my_pending_clockins = (
+        EventAssignment.objects.filter(
+            member__user=request.user,
+            event__company_id__in=target_company_ids,
+            attendance_record__isnull=True,
+            status__in=["ASSIGNED", "CONFIRMED"],
+        )
+        .select_related("event__company", "event")
+        .order_by("event__event_date", "start_time")
+    )
+
+    # Check manager permissions in selected or any company
+    is_manager = user_memberships.filter(
+        company_id__in=target_company_ids,
+        role__in=["OWNER", "MANAGER"],
+    ).exists()
+
+    context = {
+        "user_memberships": user_memberships,
+        "selected_company": selected_company,
+        "records": records,
+        "total_clocked_in": total_clocked_in,
+        "total_clocked_out": total_clocked_out,
+        "total_verified": total_verified,
+        "my_pending_clockins": my_pending_clockins,
+        "is_manager": is_manager,
+    }
+    return render(request, "events/attendance_dashboard.html", context)
+
+
+@login_required
+def clock_in(request, assignment_id):
+    """Clock in for a specific event assignment."""
+    assignment = get_object_or_404(
+        EventAssignment.objects.select_related("event__company", "member__user"),
+        id=assignment_id,
+    )
+    user_membership = CompanyMember.objects.filter(
+        company=assignment.event.company, user=request.user
+    ).first()
+
+    is_owner_or_manager = user_membership and user_membership.role in ("OWNER", "MANAGER")
+    is_assignee = assignment.member.user == request.user
+
+    if not (is_owner_or_manager or is_assignee):
+        messages.error(request, "You are not authorized to clock in for this assignment.")
+        return redirect("events:attendance_dashboard")
+
+    if hasattr(assignment, "attendance_record"):
+        messages.warning(request, f"{assignment.member.user.username} is already clocked in.")
+        return redirect("events:attendance_dashboard")
+
+    notes = request.POST.get("notes", "").strip() if request.method == "POST" else ""
+    with transaction.atomic():
+        AttendanceRecord.objects.create(
+            assignment=assignment,
+            clock_in_notes=notes,
+            status="CLOCKED_IN",
+        )
+        assignment.status = "CONFIRMED"
+        assignment.save(update_fields=["status"])
+
+    messages.success(request, f"Successfully clocked in for {assignment.event.title} ({assignment.assigned_role})!")
+    return redirect("events:attendance_dashboard")
+
+
+@login_required
+def clock_out(request, assignment_id):
+    """Clock out from an active event assignment."""
+    assignment = get_object_or_404(
+        EventAssignment.objects.select_related("event__company", "member__user"),
+        id=assignment_id,
+    )
+    user_membership = CompanyMember.objects.filter(
+        company=assignment.event.company, user=request.user
+    ).first()
+
+    is_owner_or_manager = user_membership and user_membership.role in ("OWNER", "MANAGER")
+    is_assignee = assignment.member.user == request.user
+
+    if not (is_owner_or_manager or is_assignee):
+        messages.error(request, "You are not authorized to clock out for this assignment.")
+        return redirect("events:attendance_dashboard")
+
+    if not hasattr(assignment, "attendance_record"):
+        messages.error(request, "No active clock-in record found to clock out from.")
+        return redirect("events:attendance_dashboard")
+
+    record = assignment.attendance_record
+    if record.clock_out_time:
+        messages.warning(request, "This assignment has already been clocked out.")
+        return redirect("events:attendance_dashboard")
+
+    notes = request.POST.get("notes", "").strip() if request.method == "POST" else ""
+    with transaction.atomic():
+        record.clock_out_time = timezone.now()
+        record.clock_out_notes = notes
+        record.status = "CLOCKED_OUT"
+        record.save()
+
+        assignment.status = "COMPLETED"
+        assignment.save(update_fields=["status"])
+
+    messages.success(request, f"Clocked out from {assignment.event.title}. Total time: {record.duration_display()}.")
+    return redirect("events:attendance_dashboard")
+
+
+@login_required
+def verify_attendance(request, record_id):
+    """Manager verification of an employee's completed attendance record."""
+    record = get_object_or_404(
+        AttendanceRecord.objects.select_related("assignment__event__company"),
+        id=record_id,
+    )
+    user_membership = CompanyMember.objects.filter(
+        company=record.assignment.event.company,
+        user=request.user,
+        role__in=["OWNER", "MANAGER"],
+    ).first()
+
+    if not user_membership:
+        messages.error(request, "Only Owners and Managers can verify attendance records.")
+        return redirect("events:attendance_dashboard")
+
+    if request.method == "POST":
+        record.status = "VERIFIED"
+        record.verified_by = user_membership
+        record.verified_at = timezone.now()
+        record.save(update_fields=["status", "verified_by", "verified_at"])
+        messages.success(request, f"Attendance record for {record.assignment.member.user.username} verified!")
+
+    return redirect("events:attendance_dashboard")
+
