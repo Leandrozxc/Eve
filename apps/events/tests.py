@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from apps.events.models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord
+from apps.events.models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord, MemberAvailability
 
 User = get_user_model()
 
@@ -262,5 +262,49 @@ class AttendanceWorkflowTest(TestCase):
         self.assertEqual(record.status, "VERIFIED")
         self.assertEqual(record.verified_by, self.owner_member)
         self.assertIsNotNone(record.verified_at)
+
+
+class AvailabilityWorkflowTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username="avail_user", password="password123")
+        self.company = Company.objects.create(name="Availability Org")
+        self.member = CompanyMember.objects.create(
+            company=self.company, user=self.user, role="STAFF"
+        )
+        self.client.login(username="avail_user", password="password123")
+
+    def test_availability_list_renders(self):
+        response = self.client.get(reverse("events:availability_list"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "events/availability_list.html")
+
+    def test_create_weekly_availability(self):
+        response = self.client.post(reverse("events:availability_create"), {
+            "company_id": self.company.id,
+            "availability_type": "AVAILABLE",
+            "timing_type": "weekly",
+            "day_of_week": "2",  # Wednesday
+            "start_time": "09:00",
+            "end_time": "17:00",
+            "reason": "Available Wednesdays",
+        })
+        self.assertRedirects(response, reverse("events:availability_list"))
+        self.assertTrue(MemberAvailability.objects.filter(member=self.member).exists())
+        record = MemberAvailability.objects.get(member=self.member)
+        self.assertEqual(record.day_of_week, 2)
+        self.assertEqual(record.availability_type, "AVAILABLE")
+
+    def test_delete_availability(self):
+        record = MemberAvailability.objects.create(
+            member=self.member,
+            availability_type="UNAVAILABLE",
+            day_of_week=5,
+            reason="Weekend offline",
+        )
+        response = self.client.post(reverse("events:availability_delete", kwargs={"record_id": record.id}))
+        self.assertRedirects(response, reverse("events:availability_list"))
+        self.assertFalse(MemberAvailability.objects.filter(id=record.id).exists())
+
 
 

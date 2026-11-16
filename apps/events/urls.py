@@ -27,4 +27,10 @@ urlpatterns = [
     path("assignments/<int:assignment_id>/clock-in/", views.clock_in, name="clock_in"),
     path("assignments/<int:assignment_id>/clock-out/", views.clock_out, name="clock_out"),
     path("attendance/<int:record_id>/verify/", views.verify_attendance, name="verify_attendance"),
+
+    # Availability & Schedule Preference routes
+    path("availability/", views.availability_list, name="availability_list"),
+    path("availability/company/<int:company_id>/", views.availability_list, name="company_availability_list"),
+    path("availability/create/", views.availability_create, name="availability_create"),
+    path("availability/<int:record_id>/delete/", views.availability_delete, name="availability_delete"),
 ]

@@ -166,3 +166,53 @@ class AttendanceRecord(models.Model):
 
     def __str__(self):
         return f"Attendance: {self.assignment.member.user.username} @ {self.assignment.event.title}"
+
+
+class MemberAvailability(models.Model):
+    AVAILABILITY_TYPES = [
+        ("AVAILABLE", "Preferred Available"),
+        ("UNAVAILABLE", "Unavailable / Time Off"),
+    ]
+    DAYS_OF_WEEK = [
+        (0, "Monday"),
+        (1, "Tuesday"),
+        (2, "Wednesday"),
+        (3, "Thursday"),
+        (4, "Friday"),
+        (5, "Saturday"),
+        (6, "Sunday"),
+    ]
+
+    member = models.ForeignKey(
+        CompanyMember,
+        on_delete=models.CASCADE,
+        related_name="availability_preferences",
+    )
+    availability_type = models.CharField(
+        max_length=20,
+        choices=AVAILABILITY_TYPES,
+        default="AVAILABLE",
+    )
+    day_of_week = models.IntegerField(
+        choices=DAYS_OF_WEEK,
+        null=True,
+        blank=True,
+        help_text="Recurring weekly day preference",
+    )
+    specific_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Specific single date time-off or override",
+    )
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
+    reason = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["day_of_week", "specific_date", "start_time"]
+
+    def __str__(self):
+        target = self.get_day_of_week_display() if self.day_of_week is not None else str(self.specific_date)
+        return f"{self.member.user.username} - {self.get_availability_type_display()} ({target})"
+

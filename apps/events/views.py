@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord
+from .models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord, MemberAvailability
 
 
 # ==============================================================================
@@ -656,4 +656,116 @@ def verify_attendance(request, record_id):
         messages.success(request, f"Attendance record for {record.assignment.member.user.username} verified!")
 
     return redirect("events:attendance_dashboard")
+
+
+# ==============================================================================
+# EMPLOYEE AVAILABILITY & SCHEDULE PREFERENCE VIEWS
+# ==============================================================================
+
+@login_required
+def availability_list(request, company_id=None):
+    """Team availability directory and preference submission board."""
+    user_memberships = (
+        CompanyMember.objects.filter(user=request.user)
+        .select_related("company")
+        .order_by("company__name")
+    )
+    user_company_ids = list(user_memberships.values_list("company_id", flat=True))
+
+    selected_company = None
+    if company_id:
+        selected_company = get_object_or_404(Company, id=company_id, id__in=user_company_ids)
+        target_company_ids = [selected_company.id]
+    else:
+        target_company_ids = user_company_ids
+
+    # Query availability records for members in these companies
+    availabilities = (
+        MemberAvailability.objects.filter(member__company_id__in=target_company_ids)
+        .select_related("member__user", "member__company")
+        .order_by("availability_type", "day_of_week", "specific_date")
+    )
+
+    my_records = availabilities.filter(member__user=request.user)
+    team_records = availabilities.exclude(member__user=request.user)
+
+    available_count = availabilities.filter(availability_type="AVAILABLE").count()
+    timeoff_count = availabilities.filter(availability_type="UNAVAILABLE").count()
+
+    context = {
+        "user_memberships": user_memberships,
+        "selected_company": selected_company,
+        "availabilities": availabilities,
+        "my_records": my_records,
+        "team_records": team_records,
+        "available_count": available_count,
+        "timeoff_count": timeoff_count,
+        "days_of_week": MemberAvailability.DAYS_OF_WEEK,
+        "availability_types": MemberAvailability.AVAILABILITY_TYPES,
+    }
+    return render(request, "events/availability_list.html", context)
+
+
+@login_required
+def availability_create(request):
+    """Submit new availability preference or time-off request."""
+    if request.method == "POST":
+        company_id = request.POST.get("company_id")
+        availability_type = request.POST.get("availability_type", "AVAILABLE")
+        timing_type = request.POST.get("timing_type", "weekly")
+        day_of_week = request.POST.get("day_of_week")
+        specific_date = request.POST.get("specific_date")
+        start_time = request.POST.get("start_time") or None
+        end_time = request.POST.get("end_time") or None
+        reason = request.POST.get("reason", "").strip()
+
+        membership = CompanyMember.objects.filter(
+            company_id=company_id, user=request.user
+        ).first()
+
+        if not membership:
+            messages.error(request, "Invalid organization selected for availability.")
+            return redirect("events:availability_list")
+
+        clean_day = int(day_of_week) if (timing_type == "weekly" and day_of_week is not None and day_of_week != "") else None
+        clean_date = specific_date if (timing_type == "date" and specific_date) else None
+
+        MemberAvailability.objects.create(
+            member=membership,
+            availability_type=availability_type,
+            day_of_week=clean_day,
+            specific_date=clean_date,
+            start_time=start_time,
+            end_time=end_time,
+            reason=reason,
+        )
+        messages.success(request, "Availability preference recorded successfully!")
+
+    return redirect("events:availability_list")
+
+
+@login_required
+def availability_delete(request, record_id):
+    """Remove an availability entry."""
+    record = get_object_or_404(
+        MemberAvailability.objects.select_related("member__company", "member__user"),
+        id=record_id,
+    )
+    user_membership = CompanyMember.objects.filter(
+        company=record.member.company, user=request.user
+    ).first()
+
+    is_author = record.member.user == request.user
+    is_manager = user_membership and user_membership.role in ("OWNER", "MANAGER")
+
+    if not (is_author or is_manager):
+        messages.error(request, "You do not have permission to delete this availability record.")
+        return redirect("events:availability_list")
+
+    if request.method == "POST":
+        record.delete()
+        messages.success(request, "Availability entry deleted.")
+
+    return redirect("events:availability_list")
+
 
