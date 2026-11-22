@@ -10,3 +10,4 @@ def create_or_save_user_settings(sender, instance, created, **kwargs):
         UserSettings.objects.get_or_create(user=instance)
     elif hasattr(instance, 'usersettings'):
         instance.usersettings.save()
+
