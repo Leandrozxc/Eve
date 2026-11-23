@@ -1,228 +1,192 @@
 {% extends "base.html" %}
 
-{% block title %}Shift Telemetry &amp; Operational Analytics{% endblock %}
+{% block title %}Analytics &amp; Reports{% endblock %}
 
 {% block full_bleed %}
-<section class="apple-section-white">
-    <div class="apple-container-wide">
-        <div class="eve-workspace-header mb-4">
-            <div>
-                <h1 class="apple-headline-section">Operational Analytics &amp; Reports</h1>
-                <p class="apple-subhead">
-                    Comprehensive shift execution metrics, staffing readiness rates, and attendance audit telemetry.
-                </p>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <a href="{% url 'events:export_analytics_csv' %}" class="btn-apple-secondary btn-apple-sm">
-                    <i class="bi bi-download"></i>
-                    <span>Export CSV</span>
-                </a>
-                <button type="button" class="btn-apple-secondary btn-apple-sm" onclick="window.print()">
-                    <i class="bi bi-printer"></i>
-                    <span>Print Report</span>
-                </button>
-                <a href="{% url 'events:event_list' %}" class="btn-apple-primary btn-apple-sm">
-                    <i class="bi bi-calendar3"></i>
-                    <span>Events Schedule</span>
-                </a>
-            </div>
-        </div>
+<!-- 1. Page Header -->
+<div class="eve-page-header">
+    <div>
+        <div class="eve-page-eyebrow">Operational Telemetry</div>
+        <h1 class="eve-page-title">Analytics &amp; Reports</h1>
+        <p class="eve-page-subtitle">
+            {% if selected_company %}
+                Showing verified staffing, attendance, and task execution metrics for <strong>{{ selected_company.name }}</strong>.
+            {% else %}
+                Showing aggregated staffing, attendance, and task execution metrics across all your organizations.
+            {% endif %}
+        </p>
+    </div>
+    <div class="eve-page-actions">
+        <a href="{% url 'events:export_analytics_csv' %}" class="eve-btn eve-btn-secondary eve-btn-sm">
+            <i class="bi bi-download" aria-hidden="true"></i>
+            <span>Export CSV</span>
+        </a>
+        <button type="button" class="eve-btn eve-btn-secondary eve-btn-sm" onclick="window.print()">
+            <i class="bi bi-printer" aria-hidden="true"></i>
+            <span>Print</span>
+        </button>
+        <a href="{% url 'events:event_list' %}" class="eve-btn eve-btn-primary eve-btn-sm">
+            <i class="bi bi-calendar3" aria-hidden="true"></i>
+            <span>Events Schedule</span>
+        </a>
+    </div>
+</div>
 
-        <!-- Telemetry Key Metrics (KPIs) -->
-        <div class="row g-3 mb-4">
-            <div class="col-sm-6 col-lg-3">
-                <div class="card eve-feature-card p-3 h-100">
-                    <span class="apple-caption text-uppercase fw-semibold text-muted">Staffing Readiness</span>
-                    <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold text-primary">{{ confirmation_rate }}%</span>
-                        <span class="small text-muted">Confirmed</span>
-                    </div>
-                    <div class="eve-progress mt-2" style="height: 6px;">
-                        <div class="eve-progress-bar" style="width: {{ confirmation_rate }}%;"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card eve-feature-card p-3 h-100">
-                    <span class="apple-caption text-uppercase fw-semibold text-muted">Attendance Verification</span>
-                    <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold text-success">{{ verification_rate }}%</span>
-                        <span class="small text-muted">Audited</span>
-                    </div>
-                    <div class="eve-progress mt-2" style="height: 6px;">
-                        <div class="eve-progress-bar bg-success" style="width: {{ verification_rate }}%;"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card eve-feature-card p-3 h-100">
-                    <span class="apple-caption text-uppercase fw-semibold text-muted">Task Checklist Progress</span>
-                    <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold text-info">{{ task_rate }}%</span>
-                        <span class="small text-muted">Completed</span>
-                    </div>
-                    <div class="eve-progress mt-2" style="height: 6px;">
-                        <div class="eve-progress-bar bg-info" style="width: {{ task_rate }}%;"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card eve-feature-card p-3 h-100">
-                    <span class="apple-caption text-uppercase fw-semibold text-muted">Active Operations</span>
-                    <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold">{{ upcoming_events }}</span>
-                        <span class="small text-muted">Upcoming Events</span>
-                    </div>
-                    <div class="apple-caption text-muted mt-2">{{ total_assignments }} crew shifts scheduled</div>
-                </div>
-            </div>
-        </div>
+<!-- 2. Workspace Scope Filter Bar -->
+<div class="eve-filter-bar">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <a href="{% url 'events:analytics_report' %}" class="eve-btn eve-btn-sm {% if not selected_company %}eve-btn-primary{% else %}eve-btn-secondary{% endif %}">
+            All Workspaces
+        </a>
+        {% for mem in user_memberships %}
+        <a href="{% url 'events:company_analytics_report' company_id=mem.company.id %}" class="eve-btn eve-btn-sm {% if selected_company and selected_company.id == mem.company.id %}eve-btn-primary{% else %}eve-btn-secondary{% endif %}">
+            {{ mem.company.name }}
+        </a>
+        {% endfor %}
+    </div>
+    <span class="eve-mono" style="font-size: 12px; color: var(--eve-text-muted);">{{ total_events }} event{{ total_events|pluralize }} analyzed</span>
+</div>
 
-        <!-- Filter bar -->
-        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 pt-3 apple-divider-top">
-            <div class="eve-segmented-control" role="tablist">
-                <a href="{% url 'events:analytics_report' %}" class="eve-segmented-item {% if not selected_company %}active{% endif %}">
-                    All Workspaces
-                </a>
-                {% for mem in user_memberships %}
-                <a href="{% url 'events:company_analytics_report' company_id=mem.company.id %}" class="eve-segmented-item {% if selected_company and selected_company.id == mem.company.id %}active{% endif %}">
-                    {{ mem.company.name }}
-                </a>
+<!-- 3. Primary KPI Strip -->
+<div class="eve-metric-grid">
+    {% include 'components/metric_card.html' with label="Staffing Confirmation" value=confirmation_rate|stringformat:"s"|add:"%" meta=confirmed_assignments|stringformat:"s"|add:" of "|add:total_assignments|stringformat:"s"|add:" shifts confirmed" icon="bi-people" %}
+    {% include 'components/metric_card.html' with label="Attendance Verification" value=verification_rate|stringformat:"s"|add:"%" meta=verified_logs|stringformat:"s"|add:" of "|add:total_logs|stringformat:"s"|add:" logs verified" icon="bi-patch-check" %}
+    {% include 'components/metric_card.html' with label="Task Completion" value=task_rate|stringformat:"s"|add:"%" meta=completed_tasks|stringformat:"s"|add:" of "|add:total_tasks|stringformat:"s"|add:" tasks done" icon="bi-check2-square" %}
+    {% include 'components/metric_card.html' with label="Upcoming Events" value=upcoming_events meta=completed_events|stringformat:"s"|add:" completed · "|add:draft_events|stringformat:"s"|add:" draft" icon="bi-calendar-event" %}
+</div>
+
+<!-- 4. Detailed Breakdown Row -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <section class="eve-panel h-100" aria-label="Shift and Attendance Breakdown">
+            <div class="eve-panel-header">
+                <div>
+                    <h2 class="eve-panel-title">Shift &amp; Attendance Telemetry</h2>
+                    <p class="eve-panel-subtitle">Confirmation status tracked separately from actual clock-in logs</p>
+                </div>
+            </div>
+            <div class="eve-panel-body d-flex flex-column gap-3">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 13px;">
+                        <span style="color: var(--eve-text-secondary);">Confirmed &amp; Active Shifts</span>
+                        <span class="eve-mono fw-semibold">{{ confirmed_assignments }} / {{ total_assignments }} ({{ confirmation_rate }}%)</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar" style="width: {{ confirmation_rate }}%;"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 13px;">
+                        <span style="color: var(--eve-text-secondary);">Verified Attendance Records</span>
+                        <span class="eve-mono fw-semibold">{{ verified_logs }} / {{ total_logs }} ({{ verification_rate }}%)</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar" style="width: {{ verification_rate }}%;"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-2" style="border-top: 1px solid var(--eve-border); font-size: 13px;">
+                    <span style="color: var(--eve-text-secondary);">Completed Shifts</span>
+                    <span class="eve-mono fw-bold">{{ completed_assignments }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center" style="font-size: 13px;">
+                    <span style="color: var(--eve-text-secondary);">Total Attendance Logs Recorded</span>
+                    <span class="eve-mono fw-bold">{{ total_logs }}</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-lg-6">
+        <section class="eve-panel h-100" aria-label="Checklist and Event Breakdown">
+            <div class="eve-panel-header">
+                <div>
+                    <h2 class="eve-panel-title">Checklist &amp; Event Distribution</h2>
+                    <p class="eve-panel-subtitle">Operational readiness across active workspaces</p>
+                </div>
+            </div>
+            <div class="eve-panel-body d-flex flex-column gap-3">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 13px;">
+                        <span style="color: var(--eve-text-secondary);">Operational Checklist Completion</span>
+                        <span class="eve-mono fw-semibold">{{ completed_tasks }} / {{ total_tasks }} ({{ task_rate }}%)</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar" style="width: {{ task_rate }}%;"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-2" style="border-top: 1px solid var(--eve-border); font-size: 13px;">
+                    <span style="color: var(--eve-text-secondary);">Total Events in Scope</span>
+                    <span class="eve-mono fw-bold">{{ total_events }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center" style="font-size: 13px;">
+                    <span style="color: var(--eve-text-secondary);">Completed Events</span>
+                    <span class="eve-mono fw-bold">{{ completed_events }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center" style="font-size: 13px;">
+                    <span style="color: var(--eve-text-secondary);">Workspaces Monitored</span>
+                    <span class="eve-mono fw-bold">{{ user_memberships.count }}</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- 5. Event Execution Health Summary Table -->
+<section class="eve-panel overflow-hidden" aria-label="Event Execution Health Summary">
+    <div class="eve-panel-header">
+        <div>
+            <h2 class="eve-panel-title">Event Execution Health Summary</h2>
+            <p class="eve-panel-subtitle">Recent events ordered by date with crew staffing and checklist counts</p>
+        </div>
+        <span class="eve-badge eve-badge-neutral eve-mono">{{ events|length }} event{{ events|length|pluralize }}</span>
+    </div>
+
+    {% if events %}
+    <div class="table-responsive">
+        <table class="eve-data-table">
+            <thead>
+                <tr>
+                    <th>Event &amp; Venue</th>
+                    <th>Workspace</th>
+                    <th>Date &amp; Hours</th>
+                    <th>Status</th>
+                    <th>Crew Assigned</th>
+                    <th>Tasks</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ev in events %}
+                <tr>
+                    <td>
+                        <div class="fw-semibold">{{ ev.title }}</div>
+                        <div style="font-size: 12px; color: var(--eve-text-muted);"><i class="bi bi-geo-alt me-1" aria-hidden="true"></i>{{ ev.location }}</div>
+                    </td>
+                    <td style="color: var(--eve-text-secondary);">{{ ev.company.name }}</td>
+                    <td class="eve-mono" style="font-size: 12.5px;">
+                        <div>{{ ev.event_date|date:"M d, Y" }}</div>
+                        <div style="color: var(--eve-text-muted);">{{ ev.start_time|time:"g:i A" }}&ndash;{{ ev.end_time|time:"g:i A" }}</div>
+                    </td>
+                    <td>{% include 'components/status_badge.html' with status=ev.status label=ev.get_status_display %}</td>
+                    <td class="eve-mono">{{ ev.assignments.count }} crew</td>
+                    <td class="eve-mono">{{ ev.tasks.count }} items</td>
+                    <td class="text-end">
+                        <a href="{% url 'events:event_detail' event_id=ev.id %}" class="eve-btn eve-btn-secondary eve-btn-sm">
+                            <span>View Brief</span>
+                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    </td>
+                </tr>
                 {% endfor %}
-            </div>
-        </div>
+            </tbody>
+        </table>
     </div>
-</section>
-
-<section class="apple-section-canvas">
-    <div class="apple-container-wide">
-
-        <!-- Grid of Detailed Summary Cards -->
-        <div class="row g-4 mb-4">
-            <div class="col-lg-6">
-                <div class="card shadow-sm border rounded-4 p-4 h-100">
-                    <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                        <i class="bi bi-pie-chart text-primary"></i>
-                        <span>Shift Lifecycle Breakdown</span>
-                    </h5>
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                            <span class="text-muted"><i class="bi bi-circle-fill text-primary me-2 small"></i>Confirmed &amp; Active Shifts</span>
-                            <span class="fw-bold tabular-nums">{{ confirmed_assignments }}</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                            <span class="text-muted"><i class="bi bi-circle-fill text-success me-2 small"></i>Completed Shifts</span>
-                            <span class="fw-bold tabular-nums">{{ completed_assignments }}</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                            <span class="text-muted"><i class="bi bi-circle-fill text-warning me-2 small"></i>Total Scheduled Shifts</span>
-                            <span class="fw-bold tabular-nums">{{ total_assignments }}</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                            <span class="text-muted"><i class="bi bi-circle-fill text-info me-2 small"></i>Attendance Clock-In Logs</span>
-                            <span class="fw-bold tabular-nums">{{ total_logs }} ({{ verified_logs }} verified)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="card shadow-sm border rounded-4 p-4 h-100">
-                    <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                        <i class="bi bi-check2-square text-success"></i>
-                        <span>Checklist Execution Status</span>
-                    </h5>
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                            <span class="text-muted"><i class="bi bi-check-circle-fill text-success me-2 small"></i>Completed Operational Tasks</span>
-                            <span class="fw-bold tabular-nums text-success">{{ completed_tasks }}</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                            <span class="text-muted"><i class="bi bi-hourglass-split text-warning me-2 small"></i>Pending Operational Tasks</span>
-                            <span class="fw-bold tabular-nums text-warning">{{ total_tasks|add:"-"|add:completed_tasks|default:0 }}</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                            <span class="text-muted"><i class="bi bi-list-task text-primary me-2 small"></i>Total Tasks Created</span>
-                            <span class="fw-bold tabular-nums">{{ total_tasks }}</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                            <span class="text-muted"><i class="bi bi-building text-secondary me-2 small"></i>Workspaces Analyzed</span>
-                            <span class="fw-bold tabular-nums">{{ user_memberships.count }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Event Operations Telemetry Table -->
-        <div class="card shadow-sm border rounded-4 overflow-hidden">
-            <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
-                <h5 class="fw-bold mb-0">Event Execution Health Summary</h5>
-                <span class="badge bg-secondary-subtle text-secondary">{{ events|length }} events</span>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th class="ps-4">Event &amp; Venue</th>
-                            <th>Workspace</th>
-                            <th>Date &amp; Hours</th>
-                            <th>Status</th>
-                            <th>Crew Assigned</th>
-                            <th>Checklist Tasks</th>
-                            <th class="text-end pe-4">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for ev in events %}
-                        <tr>
-                            <td class="ps-4">
-                                <div class="fw-bold">{{ ev.title }}</div>
-                                <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ ev.location }}</small>
-                            </td>
-                            <td>
-                                <span class="badge bg-secondary-subtle text-body border">{{ ev.company.name }}</span>
-                            </td>
-                            <td>
-                                <div class="fw-semibold">{{ ev.event_date|date:"M d, Y" }}</div>
-                                <small class="text-muted">{{ ev.start_time|time:"g:i A" }} – {{ ev.end_time|time:"g:i A" }}</small>
-                            </td>
-                            <td>
-                                {% if ev.status == 'UPCOMING' %}
-                                    <span class="badge bg-primary">Upcoming</span>
-                                {% elif ev.status == 'COMPLETED' %}
-                                    <span class="badge bg-success">Completed</span>
-                                {% elif ev.status == 'DRAFT' %}
-                                    <span class="badge bg-secondary">Draft</span>
-                                {% else %}
-                                    <span class="badge bg-danger">Cancelled</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span class="fw-semibold">{{ ev.assignments.count }}</span> crew members
-                            </td>
-                            <td>
-                                <span class="fw-semibold">{{ ev.tasks.count }}</span> items
-                            </td>
-                            <td class="text-end pe-4">
-                                <a href="{% url 'events:event_detail' event_id=ev.id %}" class="btn btn-sm btn-outline-primary">
-                                    View Brief &rarr;
-                                </a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">
-                                <i class="bi bi-bar-chart-line fs-1 d-block mb-2 text-secondary"></i>
-                                <p class="mb-0">No event operational telemetry data available.</p>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </div>
+    {% else %}
+    {% url 'events:event_create' as create_url %}
+    {% include 'components/empty_state.html' with icon="bi-bar-chart-line" title="No analytics data available" description="Schedule an event and assign team members to populate operational telemetry." cta_url=create_url cta_label="Schedule Event" %}
+    {% endif %}
 </section>
 {% endblock %}
