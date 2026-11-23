@@ -85,7 +85,7 @@
 
         <!-- Pending Clock-Ins for Current User -->
         {% if my_pending_clockins %}
-        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
+        <div class="card shadow-sm border rounded-4 p-4 mb-4">
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-warning text-dark p-2 rounded-circle"><i class="bi bi-clock-history"></i></span>
@@ -119,14 +119,14 @@
         {% endif %}
 
         <!-- Master Attendance Log Table -->
-        <div class="card shadow-sm border-0 rounded-4 overflow-hidden bg-white">
+        <div class="card shadow-sm border rounded-4 overflow-hidden">
             <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
                 <h5 class="fw-bold mb-0">Live Attendance Records</h5>
                 <span class="badge bg-secondary-subtle text-secondary">{{ records|length }} total</span>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th class="ps-4">Member &amp; Role</th>
                             <th>Event &amp; Company</th>
@@ -141,7 +141,7 @@
                         {% for record in records %}
                         <tr>
                             <td class="ps-4">
-                                <div class="fw-bold text-dark">{{ record.assignment.member.user.get_full_name|default:record.assignment.member.user.username }}</div>
+                                <div class="fw-bold">{{ record.assignment.member.user.get_full_name|default:record.assignment.member.user.username }}</div>
                                 <small class="text-muted">{{ record.assignment.assigned_role }} &bull; {{ record.assignment.member.role|title }}</small>
                             </td>
                             <td>
@@ -149,7 +149,7 @@
                                 <small class="text-muted">{{ record.assignment.event.company.name }}</small>
                             </td>
                             <td>
-                                <div class="fw-semibold text-dark">{{ record.clock_in_time|date:"M d, Y" }}</div>
+                                <div class="fw-semibold">{{ record.clock_in_time|date:"M d, Y" }}</div>
                                 <small class="text-success"><i class="bi bi-clock me-1"></i>{{ record.clock_in_time|time:"g:i:s A" }}</small>
                                 {% if record.clock_in_notes %}
                                 <small class="d-block text-muted fst-italic">"{{ record.clock_in_notes }}"</small>
@@ -157,7 +157,7 @@
                             </td>
                             <td>
                                 {% if record.clock_out_time %}
-                                    <div class="fw-semibold text-dark">{{ record.clock_out_time|date:"M d, Y" }}</div>
+                                    <div class="fw-semibold">{{ record.clock_out_time|date:"M d, Y" }}</div>
                                     <small class="text-danger"><i class="bi bi-clock-history me-1"></i>{{ record.clock_out_time|time:"g:i:s A" }}</small>
                                     {% if record.clock_out_notes %}
                                     <small class="d-block text-muted fst-italic">"{{ record.clock_out_notes }}"</small>

@@ -100,7 +100,7 @@
         <!-- Grid of Detailed Summary Cards -->
         <div class="row g-4 mb-4">
             <div class="col-lg-6">
-                <div class="card shadow-sm border-0 rounded-4 p-4 bg-white h-100">
+                <div class="card shadow-sm border rounded-4 p-4 h-100">
                     <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
                         <i class="bi bi-pie-chart text-primary"></i>
                         <span>Shift Lifecycle Breakdown</span>
@@ -127,7 +127,7 @@
             </div>
 
             <div class="col-lg-6">
-                <div class="card shadow-sm border-0 rounded-4 p-4 bg-white h-100">
+                <div class="card shadow-sm border rounded-4 p-4 h-100">
                     <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
                         <i class="bi bi-check2-square text-success"></i>
                         <span>Checklist Execution Status</span>
@@ -155,14 +155,14 @@
         </div>
 
         <!-- Event Operations Telemetry Table -->
-        <div class="card shadow-sm border-0 rounded-4 overflow-hidden bg-white">
+        <div class="card shadow-sm border rounded-4 overflow-hidden">
             <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
                 <h5 class="fw-bold mb-0">Event Execution Health Summary</h5>
                 <span class="badge bg-secondary-subtle text-secondary">{{ events|length }} events</span>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th class="ps-4">Event &amp; Venue</th>
                             <th>Workspace</th>
@@ -177,11 +177,11 @@
                         {% for ev in events %}
                         <tr>
                             <td class="ps-4">
-                                <div class="fw-bold text-dark">{{ ev.title }}</div>
+                                <div class="fw-bold">{{ ev.title }}</div>
                                 <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ ev.location }}</small>
                             </td>
                             <td>
-                                <span class="badge bg-light text-dark border">{{ ev.company.name }}</span>
+                                <span class="badge bg-secondary-subtle text-body border">{{ ev.company.name }}</span>
                             </td>
                             <td>
                                 <div class="fw-semibold">{{ ev.event_date|date:"M d, Y" }}</div>

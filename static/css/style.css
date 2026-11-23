@@ -1454,3 +1454,65 @@ h1, h2, h3, h4, h5, h6 {
         transition-duration: 120ms !important;
     }
 }
+
+/* ==========================================================================
+   11. DARK MODE BOOTSTRAP SURFACE & CONTRAST OVERRIDES
+   ========================================================================== */
+
+[data-theme="dark"] .card,
+[data-bs-theme="dark"] .card,
+[data-theme="dark"] .eve-feature-card,
+[data-bs-theme="dark"] .eve-feature-card {
+    background-color: var(--eve-surface) !important;
+    color: var(--eve-text);
+    border-color: var(--eve-border-strong) !important;
+}
+
+[data-theme="dark"] .bg-white,
+[data-bs-theme="dark"] .bg-white {
+    background-color: var(--eve-surface) !important;
+    color: var(--eve-text);
+}
+
+[data-theme="dark"] .bg-light,
+[data-bs-theme="dark"] .bg-light {
+    background-color: var(--eve-surface-subtle) !important;
+    color: var(--eve-text) !important;
+}
+
+[data-theme="dark"] .text-dark,
+[data-bs-theme="dark"] .text-dark {
+    color: var(--eve-text) !important;
+}
+
+[data-theme="dark"] .table,
+[data-bs-theme="dark"] .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--eve-text);
+    --bs-table-border-color: var(--eve-border);
+    --bs-table-hover-bg: var(--eve-surface-subtle);
+    --bs-table-hover-color: var(--eve-text);
+    color: var(--eve-text);
+}
+
+[data-theme="dark"] .table-light,
+[data-bs-theme="dark"] .table-light > tr > th,
+[data-theme="dark"] .table-light > tr > td {
+    background-color: var(--eve-surface-subtle) !important;
+    color: var(--eve-text-secondary) !important;
+    border-color: var(--eve-border) !important;
+}
+
+[data-theme="dark"] .list-group-item,
+[data-bs-theme="dark"] .list-group-item {
+    background-color: transparent !important;
+    color: var(--eve-text);
+    border-color: var(--eve-border);
+}
+
+[data-theme="dark"] .modal-content,
+[data-bs-theme="dark"] .modal-content {
+    background-color: var(--eve-surface);
+    color: var(--eve-text);
+    border-color: var(--eve-border-strong);
+}
