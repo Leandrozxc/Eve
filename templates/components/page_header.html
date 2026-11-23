@@ -1,0 +1,23 @@
+<div class="eve-page-header">
+    <div>
+        {% if eyebrow %}<div class="eve-page-eyebrow">{{ eyebrow }}</div>{% endif %}
+        <h1 class="eve-page-title">{{ title }}</h1>
+        {% if subtitle %}<p class="eve-page-subtitle">{{ subtitle }}</p>{% endif %}
+    </div>
+    {% if primary_url or secondary_url %}
+    <div class="eve-page-actions">
+        {% if secondary_url %}
+        <a href="{{ secondary_url }}" class="eve-btn eve-btn-secondary eve-btn-sm">
+            {% if secondary_icon %}<i class="bi {{ secondary_icon }}" aria-hidden="true"></i>{% endif %}
+            <span>{{ secondary_label }}</span>
+        </a>
+        {% endif %}
+        {% if primary_url %}
+        <a href="{{ primary_url }}" class="eve-btn eve-btn-primary eve-btn-sm">
+            {% if primary_icon %}<i class="bi {{ primary_icon }}" aria-hidden="true"></i>{% endif %}
+            <span>{{ primary_label }}</span>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>

@@ -1,0 +1,8 @@
+<div class="eve-metric-card">
+    <div class="eve-metric-label">
+        <span>{{ label }}</span>
+        {% if icon %}<i class="bi {{ icon }}" style="color: var(--eve-text-muted);" aria-hidden="true"></i>{% endif %}
+    </div>
+    <div class="eve-metric-value">{{ value }}</div>
+    {% if meta %}<div class="eve-metric-meta">{{ meta }}</div>{% endif %}
+</div>

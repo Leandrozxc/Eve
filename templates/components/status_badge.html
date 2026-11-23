@@ -1,0 +1,8 @@
+{% comment %}
+Context-aware status badge.
+Pass: status (raw code), label (display text), variant (optional: success|warning|danger|info|neutral)
+{% endcomment %}
+<span class="eve-badge {% if variant %}eve-badge-{{ variant }}{% elif status in 'CONFIRMED COMPLETED VERIFIED APPROVED AVAILABLE' %}eve-badge-success{% elif status in 'UPCOMING CLOCKED_IN MEDIUM' %}eve-badge-info{% elif status in 'ASSIGNED PENDING HIGH CLOCKED_OUT' %}eve-badge-warning{% elif status in 'CANCELLED DECLINED UNAVAILABLE URGENT' %}eve-badge-danger{% else %}eve-badge-neutral{% endif %}">
+    <span class="eve-badge-dot" aria-hidden="true"></span>
+    <span>{{ label|default:status }}</span>
+</span>

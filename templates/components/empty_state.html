@@ -1,0 +1,12 @@
+<div class="eve-empty-state">
+    <div class="eve-empty-icon" aria-hidden="true">
+        <i class="bi {{ icon|default:'bi-inbox' }}"></i>
+    </div>
+    <h3 class="eve-empty-title">{{ title }}</h3>
+    {% if description %}<p class="eve-empty-desc">{{ description }}</p>{% endif %}
+    {% if cta_url and cta_label %}
+    <div class="mt-2">
+        <a href="{{ cta_url }}" class="eve-btn eve-btn-primary eve-btn-sm">{{ cta_label }}</a>
+    </div>
+    {% endif %}
+</div>

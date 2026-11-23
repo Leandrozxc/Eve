@@ -1,0 +1,170 @@
+/* ==========================================================================
+   EVE DESIGN SYSTEM — DESIGN TOKENS (LIGHT & CARBON DARK)
+   ========================================================================== */
+
+:root,
+[data-theme="light"],
+[data-bs-theme="light"] {
+    /* Surface Hierarchy */
+    --eve-canvas: #F7F7F4;
+    --eve-surface: #FFFFFF;
+    --eve-surface-subtle: #F1F2EE;
+    --eve-surface-hover: #ECEEE9;
+    --eve-sidebar-bg: #F3F4F0;
+    --eve-topbar-bg: rgba(247, 247, 244, 0.88);
+
+    /* Borders & Hairlines */
+    --eve-border: #E8EAE5;
+    --eve-border-strong: #D5D9D0;
+    --eve-divider: #E8EAE5;
+
+    /* Typography */
+    --eve-text: #202824;
+    --eve-text-secondary: #56605A;
+    --eve-text-muted: #76807A;
+
+    /* Brand Accent (Forest Emerald — used with restraint) */
+    --eve-accent: #176B4D;
+    --eve-accent-hover: #12563E;
+    --eve-accent-subtle: #E3F1E9;
+    --eve-accent-text: #12563E;
+
+    /* Semantic Status Tints & Text (WCAG AA contrast) */
+    --eve-success-bg: #E3F1E9;
+    --eve-success-text: #145B40;
+    --eve-success-border: #BFE0CD;
+
+    --eve-warning-bg: #FFF1D8;
+    --eve-warning-text: #855200;
+    --eve-warning-border: #F2D39B;
+
+    --eve-danger-bg: #FCE8E7;
+    --eve-danger-text: #A22622;
+    --eve-danger-border: #F2C0BE;
+
+    --eve-info-bg: #E6F0FA;
+    --eve-info-text: #18518A;
+    --eve-info-border: #C1D9F2;
+
+    --eve-neutral-bg: #ECEEE9;
+    --eve-neutral-text: #47524C;
+    --eve-neutral-border: #D5D9D0;
+
+    /* Shadows (restrained) */
+    --eve-shadow-xs: 0 1px 2px rgba(20, 28, 24, 0.04);
+    --eve-shadow-sm: 0 2px 8px rgba(20, 28, 24, 0.06);
+    --eve-shadow-md: 0 8px 24px rgba(20, 28, 24, 0.08);
+    --eve-focus-ring: 0 0 0 3px rgba(23, 107, 77, 0.22);
+
+    /* Layout & Spacing Scale (4px base) */
+    --eve-sidebar-width: 248px;
+    --eve-sidebar-collapsed: 72px;
+    --eve-topbar-height: 58px;
+    --eve-max-width: 1440px;
+
+    --eve-space-1: 4px;
+    --eve-space-2: 8px;
+    --eve-space-3: 12px;
+    --eve-space-4: 16px;
+    --eve-space-5: 20px;
+    --eve-space-6: 24px;
+    --eve-space-8: 32px;
+    --eve-space-10: 40px;
+    --eve-space-12: 48px;
+
+    /* Radii */
+    --eve-radius-sm: 8px;
+    --eve-radius-md: 12px;
+    --eve-radius-lg: 14px;
+    --eve-radius-pill: 9999px;
+
+    /* Font Stacks */
+    --eve-font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --eve-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+    /* Motion */
+    --eve-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --eve-duration: 180ms;
+
+    /* Legacy token aliases for seamless phased migration */
+    --eve-bg: var(--eve-canvas);
+    --apple-bg: var(--eve-canvas);
+    --apple-surface: var(--eve-surface);
+    --apple-surface-subtle: var(--eve-surface-subtle);
+    --apple-text: var(--eve-text);
+    --apple-text-secondary: var(--eve-text-secondary);
+    --apple-text-tertiary: var(--eve-text-muted);
+    --apple-divider: var(--eve-border);
+    --apple-border: var(--eve-border-strong);
+    --apple-blue: var(--eve-accent);
+    --apple-blue-hover: var(--eve-accent-hover);
+    --apple-blue-link: var(--eve-accent);
+}
+
+[data-theme="dark"],
+[data-bs-theme="dark"] {
+    /* Carbon Studio Surface Hierarchy */
+    --eve-canvas: #141916;
+    --eve-surface: #1C2420;
+    --eve-surface-subtle: #232C27;
+    --eve-surface-hover: #2A352F;
+    --eve-sidebar-bg: #101512;
+    --eve-topbar-bg: rgba(20, 25, 22, 0.88);
+
+    /* Borders & Hairlines */
+    --eve-border: #2B3630;
+    --eve-border-strong: #37453D;
+    --eve-divider: #2B3630;
+
+    /* Typography */
+    --eve-text: #F1F4F1;
+    --eve-text-secondary: #A9B5AE;
+    --eve-text-muted: #84928A;
+
+    /* Brand Accent (Carbon Emerald) */
+    --eve-accent: #10B981;
+    --eve-accent-hover: #34D399;
+    --eve-accent-subtle: rgba(16, 185, 129, 0.14);
+    --eve-accent-text: #5EEAD4;
+
+    /* Semantic Status Tints & Text */
+    --eve-success-bg: rgba(16, 185, 129, 0.14);
+    --eve-success-text: #5EEAD4;
+    --eve-success-border: rgba(16, 185, 129, 0.32);
+
+    --eve-warning-bg: rgba(245, 158, 11, 0.14);
+    --eve-warning-text: #FCD34D;
+    --eve-warning-border: rgba(245, 158, 11, 0.32);
+
+    --eve-danger-bg: rgba(239, 68, 68, 0.14);
+    --eve-danger-text: #FCA5A5;
+    --eve-danger-border: rgba(239, 68, 68, 0.32);
+
+    --eve-info-bg: rgba(59, 130, 246, 0.15);
+    --eve-info-text: #93C5FD;
+    --eve-info-border: rgba(59, 130, 246, 0.32);
+
+    --eve-neutral-bg: #25302A;
+    --eve-neutral-text: #C2CCC6;
+    --eve-neutral-border: #37453D;
+
+    /* Shadows */
+    --eve-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --eve-shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.32);
+    --eve-shadow-md: 0 12px 28px rgba(0, 0, 0, 0.45);
+    --eve-focus-ring: 0 0 0 3px rgba(52, 211, 153, 0.28);
+
+    /* Legacy token aliases */
+    --eve-bg: var(--eve-canvas);
+    --apple-bg: var(--eve-canvas);
+    --apple-surface: var(--eve-surface);
+    --apple-surface-subtle: var(--eve-surface-subtle);
+    --apple-text: var(--eve-text);
+    --apple-text-secondary: var(--eve-text-secondary);
+    --apple-text-tertiary: var(--eve-text-muted);
+    --apple-divider: var(--eve-border);
+    --apple-border: var(--eve-border-strong);
+    --apple-blue: var(--eve-accent);
+    --apple-blue-hover: var(--eve-accent-hover);
+    --apple-blue-link: var(--eve-accent);
+}
