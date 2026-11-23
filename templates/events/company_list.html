@@ -1,129 +1,128 @@
 {% extends "base.html" %}
 
-{% block title %}Organizations &amp; Roles{% endblock %}
+{% block title %}Organizations{% endblock %}
 
 {% block full_bleed %}
-<!-- 1. Left-Aligned Minimalist Workspace Header -->
-<section class="apple-section-white">
-    <div class="apple-container-wide">
-        <div class="eve-workspace-header">
-            <div>
-                <h1 class="apple-headline-section">Organizations &amp; team rosters</h1>
-                <p class="apple-subhead">
-                    Manage workspaces, assign Owner, Manager, or Staff roles, or join existing organizations across Eve.
-                </p>
-            </div>
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <a href="{% url 'events:company_create' %}" class="btn-apple-primary btn-apple-sm">
-                    <i class="bi bi-plus-lg"></i>
-                    <span>Create Organization</span>
-                </a>
-            </div>
-        </div>
+<!-- 1. Page Header -->
+<div class="eve-page-header">
+    <div>
+        <div class="eve-page-eyebrow">People &amp; Workspaces</div>
+        <h1 class="eve-page-title">Organizations</h1>
+        <p class="eve-page-subtitle">Manage your active workspaces, inspect team rosters, or join open organizations as Staff.</p>
     </div>
-</section>
+    <div class="eve-page-actions">
+        <a href="{% url 'events:company_create' %}" class="eve-btn eve-btn-primary eve-btn-sm">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            <span>Create Organization</span>
+        </a>
+    </div>
+</div>
 
-<!-- 2. Active Organization Memberships on Warm Alabaster Canvas -->
-<section class="apple-section-canvas">
-    <div class="apple-container-wide">
-        <div class="mb-4">
-            <h2 class="apple-headline-tile">Your workspaces ({{ my_memberships.count }})</h2>
-            <p class="apple-body mb-0">Organizations where you hold an active membership and schedule access.</p>
-        </div>
+<!-- 2. Your Organizations -->
+<section class="mb-5" aria-label="Your Organizations">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="h6 fw-bold mb-0">Your Workspaces <span class="eve-mono ms-1" style="color: var(--eve-text-muted);">({{ my_memberships.count }})</span></h2>
+    </div>
 
-        {% if my_memberships %}
-        <div class="apple-bento-grid">
-            {% for mem in my_memberships %}
-            <article class="apple-tile bento-span-6">
-                <div>
+    {% if my_memberships %}
+    <div class="row g-4">
+        {% for mem in my_memberships %}
+        <div class="col-lg-6">
+            <article class="eve-panel h-100 d-flex flex-column justify-content-between">
+                <div class="eve-panel-body">
                     <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
-                        <span class="eve-role-badge {% if mem.role == 'OWNER' %}eve-role-owner{% elif mem.role == 'MANAGER' %}eve-role-manager{% endif %}">
-                            {{ mem.get_role_display }}
+                        <span class="eve-badge {% if mem.role == 'OWNER' %}eve-badge-success{% elif mem.role == 'MANAGER' %}eve-badge-info{% else %}eve-badge-neutral{% endif %}">
+                            <span class="eve-badge-dot" aria-hidden="true"></span>
+                            <span>{{ mem.get_role_display }}</span>
                         </span>
-                        <span class="apple-caption tabular-nums">Joined {{ mem.joined_at|date:"M d, Y" }}</span>
+                        <span class="eve-mono" style="font-size: 12px; color: var(--eve-text-muted);">Joined {{ mem.joined_at|date:"M d, Y" }}</span>
                     </div>
 
-                    <h3 class="apple-headline-tile mb-2">{{ mem.company.name }}</h3>
-                    <p class="apple-body mb-0">
-                        {% if mem.company.address %}{{ mem.company.address }}{% else %}Primary headquarters not specified{% endif %}
+                    <h3 class="h5 fw-bold mb-1" style="color: var(--eve-text);">{{ mem.company.name }}</h3>
+                    <p class="mb-3" style="font-size: 13.5px; color: var(--eve-text-secondary);">
+                        {{ mem.company.address|default:"Primary headquarters not specified" }}
                     </p>
-                </div>
 
-                <div>
-                    <div class="apple-spec-strip" style="grid-template-columns: repeat(2, 1fr);">
-                        <div>
-                            <div class="apple-spec-label">Team Size</div>
-                            <div class="apple-spec-value tabular-nums">{{ mem.company.members.count }} member{{ mem.company.members.count|pluralize }}</div>
+                    <div class="row g-3 py-3" style="border-top: 1px solid var(--eve-border); border-bottom: 1px solid var(--eve-border);">
+                        <div class="col-6">
+                            <div style="font-size: 11px; color: var(--eve-text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Team Size</div>
+                            <div class="fw-semibold eve-mono mt-1">{{ mem.company.members.count }} member{{ mem.company.members.count|pluralize }}</div>
                         </div>
-                        <div>
-                            <div class="apple-spec-label">Dispatch Contact</div>
-                            <div class="apple-spec-value tabular-nums">{{ mem.company.contact_number|default:"Direct Roster" }}</div>
+                        <div class="col-6">
+                            <div style="font-size: 11px; color: var(--eve-text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Dispatch Contact</div>
+                            <div class="fw-semibold eve-mono mt-1">{{ mem.company.contact_number|default:"Direct Roster" }}</div>
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center pt-2">
-                        <a href="{% url 'events:event_list' %}?company_id={{ mem.company.id }}" class="apple-link-cta apple-link-cta-sm">
-                            View events <span class="chevron" aria-hidden="true">&rarr;</span>
+                    <div class="d-flex flex-wrap align-items-center gap-2 pt-3">
+                        <a href="{% url 'events:company_members' company_id=mem.company.id %}" class="eve-btn eve-btn-primary eve-btn-sm">
+                            <i class="bi bi-people" aria-hidden="true"></i>
+                            <span>Team Roster</span>
                         </a>
-                        <a href="{% url 'events:company_members' company_id=mem.company.id %}" class="btn-apple-secondary btn-apple-sm">
-                            Team Roster
+                        <a href="{% url 'events:event_list' %}?company_id={{ mem.company.id }}" class="eve-btn eve-btn-secondary eve-btn-sm">
+                            <span>Events</span>
+                        </a>
+                        <a href="{% url 'events:company_attendance_dashboard' company_id=mem.company.id %}" class="eve-btn eve-btn-ghost eve-btn-sm">
+                            <span>Attendance</span>
+                        </a>
+                        <a href="{% url 'events:company_availability_list' company_id=mem.company.id %}" class="eve-btn eve-btn-ghost eve-btn-sm">
+                            <span>Availability</span>
+                        </a>
+                        <a href="{% url 'events:company_analytics_report' company_id=mem.company.id %}" class="eve-btn eve-btn-ghost eve-btn-sm">
+                            <span>Analytics</span>
                         </a>
                     </div>
                 </div>
             </article>
-            {% endfor %}
         </div>
-        {% else %}
-        <div class="apple-tile text-center py-5 mx-auto" style="max-width: 600px;">
-            <div class="mx-auto py-2" style="max-width: 400px;">
-                <h3 class="apple-headline-tile mb-2">No organizations joined yet</h3>
-                <p class="apple-body mb-4">
-                    Create your own organization to automatically become Owner, or join one of the open workspaces listed below.
-                </p>
-                <a href="{% url 'events:company_create' %}" class="btn-apple-primary">Create Organization</a>
-            </div>
-        </div>
-        {% endif %}
+        {% endfor %}
     </div>
+    {% else %}
+    <div class="eve-panel">
+        {% url 'events:company_create' as create_org_url %}
+        {% include 'components/empty_state.html' with icon="bi-building" title="No organizations joined yet" description="Create your own organization to automatically become Owner, or join an open workspace below." cta_url=create_org_url cta_label="Create Organization" %}
+    </div>
+    {% endif %}
 </section>
 
-<!-- 3. Discover & Join Open Organizations -->
+<!-- 3. Discover Open Organizations -->
 {% if other_companies %}
-<section class="apple-section-white">
-    <div class="apple-container-wide">
-        <div class="mb-4">
-            <h2 class="apple-headline-section">Discover open workspaces</h2>
-            <p class="apple-subhead">Join an existing organization as Staff to receive shift assignments.</p>
+<section class="eve-panel overflow-hidden" aria-label="Discover Open Workspaces">
+    <div class="eve-panel-header">
+        <div>
+            <h2 class="eve-panel-title">Discover Open Organizations</h2>
+            <p class="eve-panel-subtitle">Join an existing organization as Staff to receive shift assignments</p>
         </div>
-
-        <div class="apple-row-list">
-            {% for comp in other_companies %}
-            <div class="apple-row-item">
-                <div>
-                    <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                        <span class="fw-bold" style="font-size: 16px; color: var(--eve-text);">{{ comp.name }}</span>
-                        <span class="eve-role-badge tabular-nums">{{ comp.members.count }} member{{ comp.members.count|pluralize }}</span>
-                    </div>
-                    <div class="apple-caption d-flex flex-wrap align-items-center gap-3">
-                        {% if comp.address %}
-                        <span>{{ comp.address }}</span>
-                        {% endif %}
-                        {% if comp.contact_number %}
-                        <span class="tabular-nums">&middot; {{ comp.contact_number }}</span>
-                        {% endif %}
-                        <span>&middot; Entry Role: Staff</span>
-                    </div>
-                </div>
-
-                <form method="post" action="{% url 'events:company_join' company_id=comp.id %}" class="m-0">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-apple-primary btn-apple-sm">
-                        Join Workspace
-                    </button>
-                </form>
-            </div>
-            {% endfor %}
-        </div>
+        <span class="eve-badge eve-badge-neutral eve-mono">{{ other_companies.count }} available</span>
+    </div>
+    <div class="table-responsive">
+        <table class="eve-data-table">
+            <thead>
+                <tr>
+                    <th>Organization</th>
+                    <th>Headquarters</th>
+                    <th>Contact</th>
+                    <th>Members</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comp in other_companies %}
+                <tr>
+                    <td class="fw-semibold">{{ comp.name }}</td>
+                    <td style="color: var(--eve-text-secondary);">{{ comp.address|default:"—" }}</td>
+                    <td class="eve-mono" style="font-size: 12.5px; color: var(--eve-text-secondary);">{{ comp.contact_number|default:"—" }}</td>
+                    <td class="eve-mono">{{ comp.members.count }}</td>
+                    <td class="text-end">
+                        <form method="post" action="{% url 'events:company_join' company_id=comp.id %}" class="m-0">
+                            {% csrf_token %}
+                            <button type="submit" class="eve-btn eve-btn-primary eve-btn-sm">Join as Staff</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </section>
 {% endif %}
