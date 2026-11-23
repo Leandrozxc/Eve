@@ -1,7 +1,10 @@
+import csv
 from datetime import date, datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -223,6 +226,9 @@ def event_list(request):
 
     status_filter = request.GET.get("status", "")
     company_filter = request.GET.get("company_id", "")
+    search_query = request.GET.get("q", "").strip()
+    date_from = request.GET.get("date_from", "").strip()
+    date_to = request.GET.get("date_to", "").strip()
 
     events_qs = (
         Event.objects.all()
@@ -241,6 +247,17 @@ def event_list(request):
 
     if status_filter in dict(Event.STATUS_CHOICES):
         events_qs = events_qs.filter(status=status_filter)
+
+    if search_query:
+        events_qs = events_qs.filter(
+            Q(title__icontains=search_query)
+            | Q(location__icontains=search_query)
+            | Q(description__icontains=search_query)
+        )
+    if date_from:
+        events_qs = events_qs.filter(event_date__gte=date_from)
+    if date_to:
+        events_qs = events_qs.filter(event_date__lte=date_to)
 
     # Compute progress stats for each event
     events_data = []
@@ -262,6 +279,9 @@ def event_list(request):
         "events_data": events_data,
         "status_filter": status_filter,
         "company_filter": company_filter,
+        "search_query": search_query,
+        "date_from": date_from,
+        "date_to": date_to,
         "status_choices": Event.STATUS_CHOICES,
         "my_memberships": my_memberships,
     }
@@ -1286,6 +1306,110 @@ def swap_request_respond(request, request_id):
         messages.error(request, "You do not have permission to perform that action.")
 
     return redirect("events:swap_board")
+
+
+
+
+
+# ==============================================================================
+# CSV REPORT EXPORTS
+# ==============================================================================
+
+@login_required
+def export_attendance_csv(request):
+    """Export attendance records across the user's companies as CSV."""
+    company_ids = list(
+        CompanyMember.objects.filter(user=request.user).values_list("company_id", flat=True)
+    )
+    records = (
+        AttendanceRecord.objects.filter(assignment__event__company_id__in=company_ids)
+        .select_related(
+            "assignment__event__company",
+            "assignment__member__user",
+            "verified_by__user",
+        )
+        .order_by("-clock_in_time")
+    )
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="eve_attendance_logs.csv"'
+    writer = csv.writer(response)
+    writer.writerow([
+        "Company",
+        "Event",
+        "Event Date",
+        "Team Member",
+        "Assigned Role",
+        "Clock In",
+        "Clock Out",
+        "Duration",
+        "Status",
+        "Verified By",
+    ])
+    for rec in records:
+        writer.writerow([
+            rec.assignment.event.company.name,
+            rec.assignment.event.title,
+            rec.assignment.event.event_date.isoformat(),
+            rec.assignment.member.user.get_full_name() or rec.assignment.member.user.username,
+            rec.assignment.assigned_role,
+            rec.clock_in_time.strftime("%Y-%m-%d %H:%M") if rec.clock_in_time else "",
+            rec.clock_out_time.strftime("%Y-%m-%d %H:%M") if rec.clock_out_time else "",
+            rec.duration_display(),
+            rec.get_status_display(),
+            (rec.verified_by.user.get_full_name() or rec.verified_by.user.username) if rec.verified_by else "",
+        ])
+    return response
+
+
+@login_required
+def export_analytics_csv(request):
+    """Export event & shift telemetry summary across the user's companies as CSV."""
+    company_ids = list(
+        CompanyMember.objects.filter(user=request.user).values_list("company_id", flat=True)
+    )
+    events = (
+        Event.objects.filter(company_id__in=company_ids)
+        .select_related("company")
+        .prefetch_related("assignments", "tasks")
+        .order_by("-event_date")
+    )
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="eve_analytics_report.csv"'
+    writer = csv.writer(response)
+    writer.writerow([
+        "Company",
+        "Event Title",
+        "Event Date",
+        "Start Time",
+        "End Time",
+        "Location",
+        "Status",
+        "Total Shifts",
+        "Confirmed/Completed Shifts",
+        "Completed Tasks",
+        "Total Tasks",
+    ])
+    for ev in events:
+        total_shifts = ev.assignments.count()
+        ready_shifts = ev.assignments.filter(status__in=["CONFIRMED", "COMPLETED"]).count()
+        total_tasks = ev.tasks.count()
+        done_tasks = ev.tasks.filter(is_completed=True).count()
+        writer.writerow([
+            ev.company.name,
+            ev.title,
+            ev.event_date.isoformat(),
+            ev.start_time.strftime("%H:%M"),
+            ev.end_time.strftime("%H:%M"),
+            ev.location,
+            ev.get_status_display(),
+            total_shifts,
+            ready_shifts,
+            done_tasks,
+            total_tasks,
+        ])
+    return response
 
 
 

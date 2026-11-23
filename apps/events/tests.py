@@ -630,6 +630,63 @@ class ShiftSwapWorkflowTest(TestCase):
         self.assertEqual(swap_req2.status, "DECLINED")
 
 
+class SearchAndExportTest(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(username="se_owner", password="pw")
+        self.company = Company.objects.create(name="ExportCo")
+        self.owner_m = CompanyMember.objects.create(company=self.company, user=self.owner, role="OWNER")
+        self.event1 = Event.objects.create(
+            company=self.company,
+            created_by=self.owner_m,
+            title="Tech Summit",
+            event_date=date(2026, 11, 20),
+            start_time=time(9, 0),
+            end_time=time(17, 0),
+            location="Convention Center",
+            status="UPCOMING",
+        )
+        self.event2 = Event.objects.create(
+            company=self.company,
+            created_by=self.owner_m,
+            title="Jazz Night",
+            event_date=date(2026, 12, 5),
+            start_time=time(18, 0),
+            end_time=time(22, 0),
+            location="Blue Note",
+            status="UPCOMING",
+        )
+        self.assignment = EventAssignment.objects.create(
+            event=self.event1,
+            member=self.owner_m,
+            assigned_role="Director",
+            start_time=time(9, 0),
+            end_time=time(17, 0),
+        )
+        AttendanceRecord.objects.create(assignment=self.assignment, status="CLOCKED_IN")
+        self.client.login(username="se_owner", password="pw")
+
+    def test_event_list_search_and_date_filter(self):
+        resp = self.client.get(reverse("events:event_list"), {"q": "Summit"})
+        self.assertContains(resp, "Tech Summit")
+        self.assertNotContains(resp, "Jazz Night")
+
+        resp_dates = self.client.get(reverse("events:event_list"), {"date_from": "2026-12-01"})
+        self.assertNotContains(resp_dates, "Tech Summit")
+        self.assertContains(resp_dates, "Jazz Night")
+
+    def test_export_attendance_and_analytics_csv(self):
+        att_resp = self.client.get(reverse("events:export_attendance_csv"))
+        self.assertEqual(att_resp.status_code, 200)
+        self.assertIn("text/csv", att_resp["Content-Type"])
+        self.assertIn("Tech Summit", att_resp.content.decode())
+
+        ana_resp = self.client.get(reverse("events:export_analytics_csv"))
+        self.assertEqual(ana_resp.status_code, 200)
+        self.assertIn("text/csv", ana_resp["Content-Type"])
+        self.assertIn("Jazz Night", ana_resp.content.decode())
+
+
+
 
 
 

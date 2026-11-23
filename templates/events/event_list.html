@@ -34,12 +34,15 @@
                 {% endfor %}
             </div>
 
-            {% if my_memberships %}
-            <form method="get" class="d-flex align-items-center gap-2 m-0">
+            <form method="get" class="d-flex flex-wrap align-items-center gap-2 m-0">
                 {% if status_filter %}
                 <input type="hidden" name="status" value="{{ status_filter }}">
                 {% endif %}
-                <label for="company_id" class="apple-caption fw-semibold text-nowrap">Workspace:</label>
+                <input type="search" name="q" value="{{ search_query }}" class="form-control eve-input eve-input-sm" placeholder="Search title or venue..." style="width: 190px;">
+                <input type="date" name="date_from" value="{{ date_from }}" class="form-control eve-input eve-input-sm" title="From date" style="width: 145px;">
+                <input type="date" name="date_to" value="{{ date_to }}" class="form-control eve-input eve-input-sm" title="To date" style="width: 145px;">
+                {% if my_memberships %}
+                <label for="company_id" class="apple-caption fw-semibold text-nowrap visually-hidden">Workspace:</label>
                 <select name="company_id" id="company_id" class="form-select eve-select eve-select-sm" onchange="this.form.submit()">
                     <option value="">All Organizations</option>
                     {% for mem in my_memberships %}
@@ -48,8 +51,12 @@
                     </option>
                     {% endfor %}
                 </select>
+                {% endif %}
+                <button type="submit" class="btn-apple-secondary btn-apple-sm">Filter</button>
+                {% if search_query or date_from or date_to or company_filter or status_filter %}
+                <a href="{% url 'events:event_list' %}" class="btn-apple-ghost btn-apple-sm">Reset</a>
+                {% endif %}
             </form>
-            {% endif %}
         </div>
     </div>
 </section>

@@ -45,4 +45,8 @@ urlpatterns = [
     path("swaps/", views.swap_board, name="swap_board"),
     path("assignments/<int:assignment_id>/swap/", views.swap_request_create, name="swap_request_create"),
     path("swaps/<int:request_id>/respond/", views.swap_request_respond, name="swap_request_respond"),
+
+    # CSV Report Exports
+    path("attendance/export/", views.export_attendance_csv, name="export_attendance_csv"),
+    path("analytics/export/", views.export_analytics_csv, name="export_analytics_csv"),
 ]
