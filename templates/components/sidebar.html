@@ -1,0 +1,118 @@
+<aside class="eve-sidebar" id="eveSidebar" aria-label="Workspace Navigation">
+    <div class="eve-sidebar-header">
+        <a class="eve-sidebar-brand" href="{% url 'home:home' %}" aria-label="Eve Overview">
+            <span class="eve-sidebar-brand-mark"><i class="bi bi-clock-history" aria-hidden="true"></i></span>
+            <span class="eve-sidebar-brand-text">Eve</span>
+        </a>
+        <button type="button" class="eve-sidebar-collapse-btn" id="eveSidebarCollapseBtn" aria-expanded="true" aria-controls="eveSidebar" title="Collapse sidebar">
+            <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    <div class="eve-sidebar-scroll">
+        <div class="eve-nav-group">
+            <div class="eve-nav-group-label">Workspace</div>
+            <ul class="eve-sidebar-nav">
+                <li>
+                    <a class="eve-sidebar-link {% if request.resolver_match.app_name == 'home' %}is-active{% endif %}" href="{% url 'home:home' %}" title="Overview">
+                        <i class="bi bi-grid-1x2" aria-hidden="true"></i>
+                        <span class="eve-sidebar-link-text">Overview</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="eve-nav-group">
+            <div class="eve-nav-group-label">Scheduling</div>
+            <ul class="eve-sidebar-nav">
+                <li>
+                    <a class="eve-sidebar-link {% if request.resolver_match.url_name in 'event_list event_detail event_create event_edit' %}is-active{% endif %}" href="{% url 'events:event_list' %}" title="Events & Shifts">
+                        <i class="bi bi-calendar3" aria-hidden="true"></i>
+                        <span class="eve-sidebar-link-text">Events &amp; Shifts</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="eve-sidebar-link {% if 'swap' in request.resolver_match.url_name %}is-active{% endif %}" href="{% url 'events:swap_board' %}" title="Shift Swaps">
+                        <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+                        <span class="eve-sidebar-link-text">Shift Swaps</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="eve-sidebar-link {% if 'availability' in request.resolver_match.url_name %}is-active{% endif %}" href="{% url 'events:availability_list' %}" title="Availability">
+                        <i class="bi bi-calendar-check" aria-hidden="true"></i>
+                        <span class="eve-sidebar-link-text">Availability</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="eve-nav-group">
+            <div class="eve-nav-group-label">People</div>
+            <ul class="eve-sidebar-nav">
+                <li>
+                    <a class="eve-sidebar-link {% if request.resolver_match.url_name in 'company_list company_create' %}is-active{% endif %}" href="{% url 'events:company_list' %}" title="Organizations">
+                        <i class="bi bi-building" aria-hidden="true"></i>
+                        <span class="eve-sidebar-link-text">Organizations</span>
+                    </a>
+                </li>
+                {% if nav_primary_membership %}
+                <li>
+                    <a class="eve-sidebar-link {% if request.resolver_match.url_name == 'company_members' %}is-active{% endif %}" href="{% url 'events:company_members' company_id=nav_primary_membership.company.id %}" title="Team Members">
+                        <i class="bi bi-people" aria-hidden="true"></i>
+                        <span class="eve-sidebar-link-text">Team Members</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <div class="eve-nav-group">
+            <div class="eve-nav-group-label">Operations</div>
+            <ul class="eve-sidebar-nav">
+                <li>
+                    <a class="eve-sidebar-link {% if 'attendance' in request.resolver_match.url_name %}is-active{% endif %}" href="{% url 'events:attendance_dashboard' %}" title="Attendance">
+                        <i class="bi bi-stopwatch" aria-hidden="true"></i>
+                        <span class="eve-sidebar-link-text">Attendance</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="eve-sidebar-link {% if 'analytics' in request.resolver_match.url_name %}is-active{% endif %}" href="{% url 'events:analytics_report' %}" title="Analytics & Reports">
+                        <i class="bi bi-bar-chart-line" aria-hidden="true"></i>
+                        <span class="eve-sidebar-link-text">Analytics &amp; Reports</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="eve-nav-group">
+            <div class="eve-nav-group-label">Personal</div>
+            <ul class="eve-sidebar-nav">
+                <li>
+                    <a class="eve-sidebar-link {% if request.resolver_match.app_name == 'userprofile' %}is-active{% endif %}" href="{% url 'userprofile:profile' %}" title="My Profile">
+                        <i class="bi bi-person" aria-hidden="true"></i>
+                        <span class="eve-sidebar-link-text">My Profile</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="eve-sidebar-link {% if request.resolver_match.app_name == 'usersettings' %}is-active{% endif %}" href="{% url 'usersettings:settings' %}" title="Settings">
+                        <i class="bi bi-sliders" aria-hidden="true"></i>
+                        <span class="eve-sidebar-link-text">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    {% if nav_primary_membership %}
+    <div class="eve-sidebar-footer">
+        <a href="{% url 'events:company_list' %}" class="eve-workspace-pill" title="{{ nav_primary_membership.company.name }} ({{ nav_primary_membership.get_role_display }})">
+            <span class="eve-workspace-dot" aria-hidden="true"></span>
+            <div class="eve-workspace-pill-text text-truncate">
+                <div class="fw-semibold text-truncate" style="font-size: 12.5px; line-height: 1.25;">{{ nav_primary_membership.company.name }}</div>
+                <div style="font-size: 11px; color: var(--eve-text-muted);">{{ nav_primary_membership.get_role_display }}{% if nav_memberships|length > 1 %} &middot; +{{ nav_memberships|length|add:"-1" }} more{% endif %}</div>
+            </div>
+        </a>
+    </div>
+    {% endif %}
+</aside>
+<div class="eve-sidebar-backdrop" id="eveSidebarBackdrop" aria-hidden="true"></div>

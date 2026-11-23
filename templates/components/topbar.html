@@ -1,0 +1,79 @@
+<header class="eve-topbar">
+    <div class="eve-topbar-left">
+        <button type="button" class="eve-icon-btn eve-mobile-menu-btn" id="eveMobileMenuBtn" aria-expanded="false" aria-controls="eveSidebar" aria-label="Open navigation menu">
+            <i class="bi bi-list fs-5" aria-hidden="true"></i>
+        </button>
+
+        <nav class="eve-breadcrumbs" aria-label="Breadcrumb">
+            <a href="{% url 'home:home' %}">Eve</a>
+            <i class="bi bi-chevron-right" style="font-size: 10px;" aria-hidden="true"></i>
+            <span class="is-current">
+                {% if request.resolver_match.app_name == 'home' %}Overview
+                {% elif request.resolver_match.url_name == 'event_list' %}Events &amp; Shifts
+                {% elif request.resolver_match.url_name == 'event_create' %}Schedule Event
+                {% elif request.resolver_match.url_name == 'event_detail' %}Event Workspace
+                {% elif request.resolver_match.url_name == 'event_edit' %}Edit Event
+                {% elif request.resolver_match.url_name == 'company_list' %}Organizations
+                {% elif request.resolver_match.url_name == 'company_create' %}Create Organization
+                {% elif request.resolver_match.url_name == 'company_members' %}Team Members
+                {% elif 'attendance' in request.resolver_match.url_name %}Attendance
+                {% elif 'availability' in request.resolver_match.url_name %}Availability
+                {% elif 'swap' in request.resolver_match.url_name %}Shift Swaps
+                {% elif 'analytics' in request.resolver_match.url_name %}Analytics &amp; Reports
+                {% elif request.resolver_match.app_name == 'userprofile' %}My Profile
+                {% elif request.resolver_match.app_name == 'usersettings' %}Settings
+                {% else %}Workspace{% endif %}
+            </span>
+        </nav>
+    </div>
+
+    <div class="eve-topbar-right">
+        {% if nav_primary_membership %}
+        <a href="{% url 'events:company_list' %}" class="eve-workspace-context-chip d-none d-md-inline-flex" title="Switch or manage organizations">
+            <i class="bi bi-building" aria-hidden="true"></i>
+            <span class="text-truncate">{{ nav_primary_membership.company.name }}</span>
+        </a>
+        {% endif %}
+
+        {% if nav_can_manage_any %}
+        <a href="{% url 'events:event_create' %}" class="eve-btn eve-btn-primary eve-btn-sm d-none d-sm-inline-flex">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            <span>Schedule Event</span>
+        </a>
+        {% endif %}
+
+        <button type="button" class="eve-icon-btn eve-theme-toggle-trigger" aria-label="Toggle light or dark theme" title="Toggle theme">
+            <i class="bi eve-theme-icon-indicator" aria-hidden="true"></i>
+        </button>
+
+        <div class="dropdown">
+            <button class="eve-user-chip dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu">
+                <span class="eve-avatar-xs">{{ user.first_name|default:user.username|make_list|first|upper }}</span>
+                <span class="d-none d-sm-inline">{{ user.first_name|default:user.username }}</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end eve-dropdown-menu">
+                <div class="eve-dropdown-header">
+                    <div class="fw-bold" style="font-size: 13px; color: var(--eve-text);">{{ user.get_full_name|default:user.username }}</div>
+                    <div class="apple-caption text-truncate">{{ user.email|default:user.username }}</div>
+                </div>
+                <a class="eve-dropdown-item {% if request.resolver_match.app_name == 'userprofile' %}active{% endif %}" href="{% url 'userprofile:profile' %}">
+                    <i class="bi bi-person" aria-hidden="true"></i>
+                    <span>My Profile</span>
+                </a>
+                <a class="eve-dropdown-item {% if request.resolver_match.app_name == 'usersettings' %}active{% endif %}" href="{% url 'usersettings:settings' %}">
+                    <i class="bi bi-sliders" aria-hidden="true"></i>
+                    <span>Settings</span>
+                </a>
+                <button type="button" class="eve-dropdown-item w-100 border-0 bg-transparent text-start eve-theme-toggle-trigger">
+                    <i class="bi eve-theme-icon-indicator" aria-hidden="true"></i>
+                    <span>Switch to <span class="eve-theme-target-label">Dark</span></span>
+                </button>
+                <div class="my-1 apple-divider-top"></div>
+                <a class="eve-dropdown-item eve-dropdown-item-danger" href="{% url 'login:logout' %}">
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>

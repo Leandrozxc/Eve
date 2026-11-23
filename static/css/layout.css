@@ -1,0 +1,458 @@
+/* ==========================================================================
+   EVE APPLICATION SHELL — SIDEBAR, TOPBAR & RESPONSIVE WORKSPACE LAYOUT
+   ========================================================================== */
+
+body.eve-body {
+    background-color: var(--eve-canvas);
+    color: var(--eve-text);
+    font-family: var(--eve-font-sans);
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 0;
+    overflow-x: clip;
+}
+
+.eve-mono,
+.tabular-nums {
+    font-family: var(--eve-font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Authenticated Workspace Shell */
+.eve-app-shell {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    background-color: var(--eve-canvas);
+}
+
+/* Persistent Left Sidebar */
+.eve-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--eve-sidebar-width);
+    background-color: var(--eve-sidebar-bg);
+    border-right: 1px solid var(--eve-border);
+    display: flex;
+    flex-direction: column;
+    z-index: 1040;
+    transition: width var(--eve-duration) var(--eve-ease),
+                transform var(--eve-duration) var(--eve-ease);
+}
+
+.eve-sidebar-header {
+    height: var(--eve-topbar-height);
+    padding: 0 var(--eve-space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--eve-border);
+    flex-shrink: 0;
+}
+
+.eve-sidebar-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--eve-text);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -0.02em;
+    min-width: 0;
+}
+
+.eve-sidebar-brand-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--eve-radius-sm);
+    background-color: var(--eve-accent);
+    color: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.eve-sidebar-collapse-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--eve-text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 140ms ease, color 140ms ease;
+}
+
+.eve-sidebar-collapse-btn:hover {
+    background-color: var(--eve-surface-hover);
+    color: var(--eve-text);
+}
+
+.eve-sidebar-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--eve-space-3) var(--eve-space-3) var(--eve-space-6);
+}
+
+.eve-nav-group {
+    margin-bottom: var(--eve-space-5);
+}
+
+.eve-nav-group:last-child {
+    margin-bottom: 0;
+}
+
+.eve-nav-group-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--eve-text-muted);
+    padding: 0 var(--eve-space-3) var(--eve-space-2);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.eve-sidebar-nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.eve-sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--eve-radius-sm);
+    color: var(--eve-text-secondary);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: background-color 140ms ease, color 140ms ease;
+}
+
+.eve-sidebar-link i {
+    font-size: 15px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+    color: var(--eve-text-muted);
+    transition: color 140ms ease;
+}
+
+.eve-sidebar-link:hover {
+    background-color: var(--eve-surface-hover);
+    color: var(--eve-text);
+}
+
+.eve-sidebar-link:hover i {
+    color: var(--eve-text);
+}
+
+.eve-sidebar-link.is-active {
+    background-color: var(--eve-accent-subtle);
+    color: var(--eve-accent-text);
+    font-weight: 600;
+}
+
+.eve-sidebar-link.is-active i {
+    color: var(--eve-accent);
+}
+
+.eve-sidebar-footer {
+    padding: var(--eve-space-3);
+    border-top: 1px solid var(--eve-border);
+    flex-shrink: 0;
+}
+
+.eve-workspace-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--eve-radius-sm);
+    background-color: var(--eve-surface);
+    border: 1px solid var(--eve-border);
+    text-decoration: none;
+    color: var(--eve-text);
+}
+
+.eve-workspace-pill:hover {
+    border-color: var(--eve-border-strong);
+    color: var(--eve-text);
+}
+
+.eve-workspace-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--eve-accent);
+    flex-shrink: 0;
+}
+
+/* Collapsed Desktop Sidebar State */
+@media (min-width: 992px) {
+    html.eve-sidebar-collapsed .eve-sidebar {
+        width: var(--eve-sidebar-collapsed);
+    }
+
+    html.eve-sidebar-collapsed .eve-main-shell {
+        margin-left: var(--eve-sidebar-collapsed);
+    }
+
+    html.eve-sidebar-collapsed .eve-sidebar-brand-text,
+    html.eve-sidebar-collapsed .eve-nav-group-label,
+    html.eve-sidebar-collapsed .eve-sidebar-link-text,
+    html.eve-sidebar-collapsed .eve-workspace-pill-text {
+        display: none;
+    }
+
+    html.eve-sidebar-collapsed .eve-sidebar-header {
+        justify-content: center;
+        padding: 0 var(--eve-space-2);
+    }
+
+    html.eve-sidebar-collapsed .eve-sidebar-collapse-btn {
+        position: absolute;
+        right: -13px;
+        top: 15px;
+        background-color: var(--eve-surface);
+        border-color: var(--eve-border);
+        box-shadow: var(--eve-shadow-xs);
+    }
+
+    html.eve-sidebar-collapsed .eve-sidebar-link {
+        justify-content: center;
+        padding: 10px 0;
+    }
+
+    html.eve-sidebar-collapsed .eve-workspace-pill {
+        justify-content: center;
+        padding: 10px 0;
+    }
+}
+
+/* Main Content Shell */
+.eve-main-shell {
+    flex: 1;
+    min-width: 0;
+    margin-left: var(--eve-sidebar-width);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: margin-left var(--eve-duration) var(--eve-ease);
+}
+
+/* Compact Sticky Topbar */
+.eve-topbar {
+    position: sticky;
+    top: 0;
+    height: var(--eve-topbar-height);
+    background-color: var(--eve-topbar-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--eve-border);
+    padding: 0 var(--eve-space-8);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--eve-space-4);
+    z-index: 1020;
+}
+
+.eve-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: var(--eve-space-3);
+    min-width: 0;
+}
+
+.eve-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--eve-space-2);
+    flex-shrink: 0;
+}
+
+.eve-breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--eve-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.eve-breadcrumbs a {
+    color: var(--eve-text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.eve-breadcrumbs a:hover {
+    color: var(--eve-text);
+}
+
+.eve-breadcrumbs .is-current {
+    color: var(--eve-text);
+    font-weight: 600;
+}
+
+.eve-icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--eve-radius-sm);
+    border: 1px solid var(--eve-border);
+    background-color: var(--eve-surface);
+    color: var(--eve-text-secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 140ms ease, color 140ms ease, background-color 140ms ease;
+}
+
+.eve-icon-btn:hover {
+    border-color: var(--eve-border-strong);
+    background-color: var(--eve-surface-subtle);
+    color: var(--eve-text);
+}
+
+.eve-workspace-context-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: var(--eve-radius-sm);
+    border: 1px solid var(--eve-border);
+    background-color: var(--eve-surface);
+    color: var(--eve-text-secondary);
+    font-size: 12.5px;
+    font-weight: 500;
+    text-decoration: none;
+    max-width: 210px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.eve-workspace-context-chip:hover {
+    border-color: var(--eve-border-strong);
+    color: var(--eve-text);
+}
+
+/* Main Content Stage */
+.eve-main-content {
+    flex: 1;
+    width: 100%;
+    max-width: var(--eve-max-width);
+    margin: 0 auto;
+    padding: var(--eve-space-8);
+}
+
+/* Keep legacy full-bleed sections harmonious inside the new shell */
+.eve-main-shell .apple-section-white,
+.eve-main-shell .apple-section-canvas {
+    background-color: transparent;
+    border: none;
+    padding: 0 0 var(--eve-space-6) 0;
+}
+
+.eve-main-shell .apple-container-wide,
+.eve-main-shell .apple-container {
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* Mobile / Tablet Drawer Behavior */
+.eve-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(12, 16, 14, 0.5);
+    z-index: 1035;
+}
+
+.eve-mobile-menu-btn {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .eve-sidebar {
+        transform: translateX(-100%);
+        width: 264px;
+    }
+
+    body.eve-drawer-open .eve-sidebar {
+        transform: translateX(0);
+    }
+
+    body.eve-drawer-open .eve-sidebar-backdrop {
+        display: block;
+    }
+
+    .eve-main-shell {
+        margin-left: 0;
+    }
+
+    .eve-mobile-menu-btn {
+        display: inline-flex;
+    }
+
+    .eve-sidebar-collapse-btn {
+        display: none;
+    }
+
+    .eve-topbar {
+        padding: 0 var(--eve-space-5);
+    }
+
+    .eve-main-content {
+        padding: var(--eve-space-5);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .eve-topbar {
+        padding: 0 var(--eve-space-4);
+    }
+
+    .eve-main-content {
+        padding: var(--eve-space-4);
+    }
+}
+
+/* Unauthenticated Auth Shell */
+.eve-auth-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--eve-canvas);
+}
+
+.eve-auth-topbar {
+    height: var(--eve-topbar-height);
+    padding: 0 var(--eve-space-6);
+    border-bottom: 1px solid var(--eve-border);
+    background-color: var(--eve-surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
