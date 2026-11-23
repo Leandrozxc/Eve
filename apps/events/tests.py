@@ -444,6 +444,110 @@ class TimeWindowValidationTest(TestCase):
         self.assertEqual(assignment.end_time, time(13, 0))
 
 
+class ScheduleConflictAndAvailabilityTest(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(username="sc_owner", password="pw")
+        self.staff = User.objects.create_user(username="sc_staff", password="pw")
+        self.company = Company.objects.create(name="ConflictCo")
+        self.owner_m = CompanyMember.objects.create(company=self.company, user=self.owner, role="OWNER")
+        self.staff_m = CompanyMember.objects.create(company=self.company, user=self.staff, role="STAFF")
+        self.event1 = Event.objects.create(
+            company=self.company,
+            created_by=self.owner_m,
+            title="Morning Shift Event",
+            event_date=date(2026, 11, 28),
+            start_time=time(9, 0),
+            end_time=time(13, 0),
+            location="Hall A",
+            status="UPCOMING",
+        )
+        self.event2 = Event.objects.create(
+            company=self.company,
+            created_by=self.owner_m,
+            title="Overlapping Event",
+            event_date=date(2026, 11, 28),
+            start_time=time(11, 0),
+            end_time=time(15, 0),
+            location="Hall B",
+            status="UPCOMING",
+        )
+        self.event3 = Event.objects.create(
+            company=self.company,
+            created_by=self.owner_m,
+            title="Evening Event",
+            event_date=date(2026, 11, 28),
+            start_time=time(14, 0),
+            end_time=time(18, 0),
+            location="Hall C",
+            status="UPCOMING",
+        )
+        self.client.login(username="sc_owner", password="pw")
+
+    def test_blocks_overlapping_shift_and_allows_non_overlapping(self):
+        EventAssignment.objects.create(
+            event=self.event1,
+            member=self.staff_m,
+            assigned_role="Usher",
+            start_time=time(9, 0),
+            end_time=time(13, 0),
+        )
+        # Overlapping assignment should be blocked
+        self.client.post(
+            reverse("events:assignment_create", kwargs={"event_id": self.event2.id}),
+            {
+                "member_id": self.staff_m.id,
+                "assigned_role": "Stage Hand",
+                "start_time": "11:00",
+                "end_time": "15:00",
+            },
+        )
+        self.assertFalse(EventAssignment.objects.filter(event=self.event2, member=self.staff_m).exists())
+
+        # Non-overlapping assignment on the same day should succeed
+        self.client.post(
+            reverse("events:assignment_create", kwargs={"event_id": self.event3.id}),
+            {
+                "member_id": self.staff_m.id,
+                "assigned_role": "Closer",
+                "start_time": "14:00",
+                "end_time": "18:00",
+            },
+        )
+        self.assertTrue(EventAssignment.objects.filter(event=self.event3, member=self.staff_m).exists())
+
+    def test_blocks_unavailable_member_unless_overridden(self):
+        MemberAvailability.objects.create(
+            member=self.staff_m,
+            availability_type="UNAVAILABLE",
+            specific_date=date(2026, 11, 28),
+            reason="Doctor appointment",
+        )
+        self.client.post(
+            reverse("events:assignment_create", kwargs={"event_id": self.event1.id}),
+            {
+                "member_id": self.staff_m.id,
+                "assigned_role": "Usher",
+                "start_time": "09:00",
+                "end_time": "13:00",
+            },
+        )
+        self.assertFalse(EventAssignment.objects.filter(event=self.event1, member=self.staff_m).exists())
+
+        # With override_unavailable=1 it succeeds
+        self.client.post(
+            reverse("events:assignment_create", kwargs={"event_id": self.event1.id}),
+            {
+                "member_id": self.staff_m.id,
+                "assigned_role": "Usher",
+                "start_time": "09:00",
+                "end_time": "13:00",
+                "override_unavailable": "1",
+            },
+        )
+        self.assertTrue(EventAssignment.objects.filter(event=self.event1, member=self.staff_m).exists())
+
+
+
 
 
 

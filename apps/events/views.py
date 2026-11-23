@@ -35,6 +35,56 @@ def _validate_time_window(start_val, end_val):
     return start_obj, end_obj, None
 
 
+def _times_overlap(start_a, end_a, start_b, end_b):
+    """Return True when two [start, end) time intervals overlap."""
+    return start_a < end_b and end_a > start_b
+
+
+def _find_shift_conflicts(user, event_date, start_time, end_time, exclude_assignment_id=None):
+    """Return non-cancelled assignments for user on event_date that overlap [start_time, end_time)."""
+    qs = (
+        EventAssignment.objects.filter(
+            member__user=user,
+            event__event_date=event_date,
+        )
+        .exclude(status="CANCELLED")
+        .exclude(event__status="CANCELLED")
+        .select_related("event", "event__company")
+    )
+    if exclude_assignment_id is not None:
+        qs = qs.exclude(id=exclude_assignment_id)
+    return [a for a in qs if _times_overlap(a.start_time, a.end_time, start_time, end_time)]
+
+
+def _evaluate_member_availability(member, event_date, start_time, end_time):
+    """Return ('UNAVAILABLE'|'AVAILABLE'|'NEUTRAL', reason_label) for a member on a given window."""
+    prefs = list(member.availability_preferences.all())
+    weekday = event_date.weekday()
+
+    matching_unavail = []
+    matching_avail = []
+    for pref in prefs:
+        date_matches = (pref.specific_date == event_date) or (
+            pref.specific_date is None and pref.day_of_week == weekday
+        )
+        if not date_matches:
+            continue
+        if pref.start_time and pref.end_time:
+            if not _times_overlap(pref.start_time, pref.end_time, start_time, end_time):
+                continue
+        if pref.availability_type == "UNAVAILABLE":
+            matching_unavail.append(pref)
+        elif pref.availability_type == "AVAILABLE":
+            matching_avail.append(pref)
+
+    if matching_unavail:
+        reason = matching_unavail[0].reason or "Marked unavailable"
+        return "UNAVAILABLE", reason
+    if matching_avail:
+        return "AVAILABLE", "Preferred available"
+    return "NEUTRAL", ""
+
+
 # ==============================================================================
 # COMPANY & ROLES VIEWS
 # ==============================================================================
@@ -365,9 +415,25 @@ def event_detail(request, event_id):
     active_assignments = confirmed_count + completed_count
     progress_pct = int((active_assignments / total_assignments * 100)) if total_assignments > 0 else 0
 
-    # Company members not yet assigned to this event
+    # Company members not yet assigned to this event, annotated with conflict/availability status
     assigned_member_ids = assignments.values_list("member_id", flat=True)
-    available_members = event.company.members.exclude(id__in=assigned_member_ids).select_related("user")
+    raw_available_members = (
+        event.company.members.exclude(id__in=assigned_member_ids)
+        .select_related("user")
+        .prefetch_related("availability_preferences")
+    )
+    available_members = []
+    for member in raw_available_members:
+        conflicts = _find_shift_conflicts(
+            member.user, event.event_date, event.start_time, event.end_time
+        )
+        avail_status, avail_note = _evaluate_member_availability(
+            member, event.event_date, event.start_time, event.end_time
+        )
+        member.conflict_label = f"CONFLICT: {conflicts[0].event.title}" if conflicts else ""
+        member.availability_status = avail_status
+        member.availability_note = avail_note
+        available_members.append(member)
 
     # Check if current logged in user has an assignment
     my_assignment = assignments.filter(member__user=request.user).first()
@@ -451,6 +517,33 @@ def assignment_create(request, event_id):
             messages.warning(request, f"{target_member.user.username} is already assigned to this event.")
             return redirect("events:event_detail", event_id=event.id)
 
+        # Check overlapping shift conflicts on the same date
+        if status != "CANCELLED":
+            conflicts = _find_shift_conflicts(
+                target_member.user, event.event_date, start_obj, end_obj
+            )
+            if conflicts:
+                c = conflicts[0]
+                messages.error(
+                    request,
+                    f"Schedule conflict: {target_member.user.get_full_name() or target_member.user.username} "
+                    f"is already assigned to \"{c.event.title}\" ({c.start_time.strftime('%H:%M')}–{c.end_time.strftime('%H:%M')}).",
+                )
+                return redirect("events:event_detail", event_id=event.id)
+
+        # Check member unavailability unless manager explicitly overrides
+        override_unavail = request.POST.get("override_unavailable") == "1"
+        avail_status, avail_note = _evaluate_member_availability(
+            target_member, event.event_date, start_obj, end_obj
+        )
+        if avail_status == "UNAVAILABLE" and not override_unavail:
+            messages.error(
+                request,
+                f"Availability conflict: {target_member.user.get_full_name() or target_member.user.username} "
+                f"is marked unavailable ({avail_note}). Check 'Override unavailability' to assign anyway.",
+            )
+            return redirect("events:event_detail", event_id=event.id)
+
         EventAssignment.objects.create(
             event=event,
             member=target_member,
@@ -501,6 +594,21 @@ def assignment_update(request, assignment_id):
                 if time_error:
                     messages.error(request, time_error)
                     return redirect("events:event_detail", event_id=assignment.event.id)
+                if assignment.status != "CANCELLED":
+                    conflicts = _find_shift_conflicts(
+                        assignment.member.user,
+                        assignment.event.event_date,
+                        start_obj,
+                        end_obj,
+                        exclude_assignment_id=assignment.id,
+                    )
+                    if conflicts:
+                        c = conflicts[0]
+                        messages.error(
+                            request,
+                            f"Schedule conflict with \"{c.event.title}\" ({c.start_time.strftime('%H:%M')}–{c.end_time.strftime('%H:%M')}).",
+                        )
+                        return redirect("events:event_detail", event_id=assignment.event.id)
                 assignment.start_time = start_obj
                 assignment.end_time = end_obj
 
