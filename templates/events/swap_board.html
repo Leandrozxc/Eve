@@ -1,175 +1,224 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Shift Swaps &amp; Cover Requests — Eve{% endblock %}
+{% block title %}Shift Swaps &amp; Cover Board{% endblock %}
 
-{% block content %}
-<section class="apple-section-canvas">
-    <div class="apple-container-wide">
-        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
-            <div>
-                <p class="apple-eyebrow mb-1">Workforce Flexibility</p>
-                <h1 class="apple-headline-page mb-1">Shift Swaps &amp; Cover Board</h1>
-                <p class="apple-body mb-0">Request coverage for upcoming shifts, claim open teammate shifts, or approve swaps.</p>
-            </div>
-            <a href="{% url 'events:event_list' %}" class="btn-apple-secondary btn-apple-sm">
-                Back to Events &amp; Shifts
-            </a>
+{% block full_bleed %}
+<!-- 1. Page Header -->
+<div class="eve-page-header">
+    <div>
+        <div class="eve-page-eyebrow">Workforce Flexibility</div>
+        <h1 class="eve-page-title">Shift Swaps &amp; Cover Requests</h1>
+        <p class="eve-page-subtitle">Claim open teammate shifts without schedule conflicts, track your own requests, or approve pending transfers.</p>
+    </div>
+    <div class="eve-page-actions">
+        <a href="{% url 'events:event_list' %}" class="eve-btn eve-btn-secondary eve-btn-sm">
+            <i class="bi bi-calendar3" aria-hidden="true"></i>
+            <span>Events &amp; Shifts</span>
+        </a>
+    </div>
+</div>
+
+<!-- 2. Summary Metrics Strip -->
+<div class="eve-metric-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+    {% include 'components/metric_card.html' with label="Available to Cover" value=claimable_requests|length meta="Conflict-free open teammate shifts" icon="bi-hand-thumbs-up" %}
+    {% include 'components/metric_card.html' with label="My Requests" value=my_requests|length meta="Submitted cover & swap history" icon="bi-send" %}
+    {% include 'components/metric_card.html' with label="Manager Queue" value=pending_approvals|length meta="Awaiting manager sign-off" icon="bi-shield-check" %}
+</div>
+
+<!-- 3. Manager Approval Queue -->
+{% if is_manager_anywhere %}
+<section class="eve-panel overflow-hidden mb-4" aria-label="Manager Approval Queue">
+    <div class="eve-panel-header">
+        <div>
+            <h2 class="eve-panel-title">Manager Approval Queue</h2>
+            <p class="eve-panel-subtitle">Approving a claimed swap automatically reassigns the shift and confirms the covering teammate</p>
         </div>
+        <span class="eve-badge eve-badge-warning eve-mono">{{ pending_approvals|length }} pending</span>
+    </div>
 
-        {% if is_manager_anywhere %}
-        <div class="apple-tile mb-4 p-0 overflow-hidden">
-            <div class="p-4 apple-divider-bottom">
-                <h2 class="apple-headline-tile mb-0">Manager Approval Queue</h2>
-                <p class="apple-caption mb-0">Claimed or targeted swap requests waiting for manager sign-off.</p>
+    {% if pending_approvals %}
+    <div class="table-responsive">
+        <table class="eve-data-table">
+            <thead>
+                <tr>
+                    <th>Event &amp; Shift Window</th>
+                    <th>Requester</th>
+                    <th>Covering Teammate</th>
+                    <th>Reason</th>
+                    <th class="text-end">Decision</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in pending_approvals %}
+                <tr>
+                    <td>
+                        <a href="{% url 'events:event_detail' event_id=req.assignment.event.id %}" class="fw-semibold text-decoration-none" style="color: var(--eve-text);">{{ req.assignment.event.title }}</a>
+                        <div class="eve-mono" style="font-size: 12px; color: var(--eve-text-muted);">{{ req.assignment.event.event_date|date:"M d, Y" }} &middot; {{ req.assignment.start_time|time:"g:i A" }}&ndash;{{ req.assignment.end_time|time:"g:i A" }}</div>
+                    </td>
+                    <td class="fw-medium">{{ req.requested_by.user.get_full_name|default:req.requested_by.user.username }}</td>
+                    <td>
+                        {% if req.target_member %}
+                            <span class="fw-semibold">{{ req.target_member.user.get_full_name|default:req.target_member.user.username }}</span>
+                        {% else %}
+                            <span style="font-size: 12.5px; color: var(--eve-text-muted);">Open &mdash; awaiting volunteer</span>
+                        {% endif %}
+                    </td>
+                    <td style="color: var(--eve-text-secondary); font-size: 13px;">{{ req.reason|default:"No reason provided" }}</td>
+                    <td class="text-end">
+                        <div class="d-inline-flex align-items-center gap-2">
+                            {% if req.target_member %}
+                            <form method="post" action="{% url 'events:swap_request_respond' request_id=req.id %}" class="m-0">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="eve-btn eve-btn-primary eve-btn-sm">Approve Transfer</button>
+                            </form>
+                            {% endif %}
+                            <form method="post" action="{% url 'events:swap_request_respond' request_id=req.id %}" class="m-0">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="decline">
+                                <button type="submit" class="eve-btn eve-btn-danger eve-btn-sm">Decline</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    {% include 'components/empty_state.html' with icon="bi-check2-all" title="No pending swap approvals" description="All team shift swap requests have been resolved." %}
+    {% endif %}
+</section>
+{% endif %}
+
+<!-- 4. Split Row: Claimable Shifts + My Requests -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <section class="eve-panel overflow-hidden h-100" aria-label="Available Shifts to Cover">
+            <div class="eve-panel-header">
+                <div>
+                    <h2 class="eve-panel-title">Available Shifts to Cover</h2>
+                    <p class="eve-panel-subtitle">Filtered automatically to exclude schedule conflicts</p>
+                </div>
             </div>
+            {% if claimable_requests %}
             <div class="table-responsive">
-                <table class="eve-table">
+                <table class="eve-data-table">
                     <thead>
                         <tr>
-                            <th class="ps-4">Event &amp; Shift</th>
-                            <th>Requester</th>
-                            <th>Covering Teammate</th>
-                            <th>Reason</th>
-                            <th class="text-end pe-4">Actions</th>
+                            <th>Shift</th>
+                            <th>Requested By</th>
+                            <th class="text-end">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for req in pending_approvals %}
+                        {% for req in claimable_requests %}
                         <tr>
-                            <td class="ps-4">
-                                <div class="fw-semibold" style="color: var(--eve-text);">{{ req.assignment.event.title }}</div>
-                                <div class="apple-caption tabular-nums">{{ req.assignment.event.event_date|date:"M d, Y" }} &middot; {{ req.assignment.start_time|time:"g:i A" }}&ndash;{{ req.assignment.end_time|time:"g:i A" }}</div>
-                            </td>
-                            <td>{{ req.requested_by.user.get_full_name|default:req.requested_by.user.username }}</td>
                             <td>
-                                {% if req.target_member %}
-                                    <span class="fw-semibold">{{ req.target_member.user.get_full_name|default:req.target_member.user.username }}</span>
-                                {% else %}
-                                    <span class="apple-caption">Open — awaiting volunteer</span>
-                                {% endif %}
+                                <div class="fw-semibold">{{ req.assignment.event.title }}</div>
+                                <div class="eve-mono" style="font-size: 12px; color: var(--eve-text-muted);">{{ req.assignment.event.event_date|date:"M d" }} &middot; {{ req.assignment.start_time|time:"g:i A" }}&ndash;{{ req.assignment.end_time|time:"g:i A" }} &middot; {{ req.assignment.assigned_role }}</div>
                             </td>
-                            <td><span class="apple-caption">{{ req.reason|default:"No reason provided" }}</span></td>
-                            <td class="text-end pe-4">
-                                <div class="d-inline-flex gap-2">
-                                    {% if req.target_member %}
-                                    <form method="post" action="{% url 'events:swap_request_respond' request_id=req.id %}" class="m-0">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="approve">
-                                        <button type="submit" class="btn-apple-primary btn-apple-sm">Approve</button>
-                                    </form>
-                                    {% endif %}
-                                    <form method="post" action="{% url 'events:swap_request_respond' request_id=req.id %}" class="m-0">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="decline">
-                                        <button type="submit" class="btn-apple-ghost btn-apple-sm text-danger">Decline</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" class="text-center py-4">
-                                <p class="apple-caption mb-0">No pending swap approvals right now.</p>
+                            <td style="color: var(--eve-text-secondary);">{{ req.requested_by.user.get_full_name|default:req.requested_by.user.username }}</td>
+                            <td class="text-end">
+                                <form method="post" action="{% url 'events:swap_request_respond' request_id=req.id %}" class="m-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="claim">
+                                    <button type="submit" class="eve-btn eve-btn-primary eve-btn-sm">Claim Shift</button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-        </div>
-        {% endif %}
+            {% else %}
+            {% include 'components/empty_state.html' with icon="bi-calendar-heart" title="No open cover requests" description="There are currently no open teammate shifts available for you to claim." %}
+            {% endif %}
+        </section>
+    </div>
 
-        <div class="apple-bento-grid mb-4">
-            <div class="apple-tile bento-span-6 p-0 overflow-hidden">
-                <div class="p-4 apple-divider-bottom">
-                    <h2 class="apple-headline-tile mb-0">Available Shifts to Cover</h2>
-                    <p class="apple-caption mb-0">Open requests from teammates with no schedule conflict for you.</p>
-                </div>
-                <div class="table-responsive">
-                    <table class="eve-table">
-                        <thead>
-                            <tr>
-                                <th class="ps-4">Event</th>
-                                <th>From</th>
-                                <th class="text-end pe-4">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for req in claimable_requests %}
-                            <tr>
-                                <td class="ps-4">
-                                    <div class="fw-semibold">{{ req.assignment.event.title }}</div>
-                                    <div class="apple-caption tabular-nums">{{ req.assignment.event.event_date|date:"M d" }} &middot; {{ req.assignment.start_time|time:"g:i A" }}&ndash;{{ req.assignment.end_time|time:"g:i A" }} ({{ req.assignment.assigned_role }})</div>
-                                </td>
-                                <td>{{ req.requested_by.user.get_full_name|default:req.requested_by.user.username }}</td>
-                                <td class="text-end pe-4">
-                                    <form method="post" action="{% url 'events:swap_request_respond' request_id=req.id %}" class="m-0">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="claim">
-                                        <button type="submit" class="btn-apple-primary btn-apple-sm">Claim Shift</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="3" class="text-center py-4">
-                                    <p class="apple-caption mb-0">No open cover requests available.</p>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <div class="col-lg-6">
+        <section class="eve-panel overflow-hidden h-100" aria-label="My Swap Requests">
+            <div class="eve-panel-header">
+                <div>
+                    <h2 class="eve-panel-title">My Swap Requests</h2>
+                    <p class="eve-panel-subtitle">Submit new requests from any assigned Event Detail page</p>
                 </div>
             </div>
-
-            <div class="apple-tile bento-span-6 p-0 overflow-hidden">
-                <div class="p-4 apple-divider-bottom">
-                    <h2 class="apple-headline-tile mb-0">My Swap Requests</h2>
-                    <p class="apple-caption mb-0">Track cover requests you submitted.</p>
-                </div>
-                <div class="table-responsive">
-                    <table class="eve-table">
-                        <thead>
-                            <tr>
-                                <th class="ps-4">Event</th>
-                                <th>Status</th>
-                                <th class="text-end pe-4">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for req in my_requests %}
-                            <tr>
-                                <td class="ps-4">
-                                    <div class="fw-semibold">{{ req.assignment.event.title }}</div>
-                                    <div class="apple-caption">{{ req.reason|default:"Cover requested" }}</div>
-                                </td>
-                                <td>
-                                    <span class="eve-status-pill {% if req.status == 'APPROVED' %}eve-status-confirmed{% elif req.status == 'DECLINED' or req.status == 'CANCELLED' %}eve-status-declined{% else %}eve-status-pending{% endif %}">
-                                        <span class="eve-status-dot"></span> {{ req.get_status_display }}
-                                    </span>
-                                </td>
-                                <td class="text-end pe-4">
-                                    {% if req.status == 'PENDING' %}
-                                    <form method="post" action="{% url 'events:swap_request_respond' request_id=req.id %}" class="m-0">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="cancel">
-                                        <button type="submit" class="btn-apple-ghost btn-apple-sm text-danger">Cancel</button>
-                                    </form>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="3" class="text-center py-4">
-                                    <p class="apple-caption mb-0">You have not submitted any swap requests.</p>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            {% if my_requests %}
+            <div class="table-responsive">
+                <table class="eve-data-table">
+                    <thead>
+                        <tr>
+                            <th>Event &amp; Reason</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in my_requests %}
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">{{ req.assignment.event.title }}</div>
+                                <div style="font-size: 12px; color: var(--eve-text-muted);">{{ req.reason|default:"Cover requested" }}</div>
+                            </td>
+                            <td>
+                                {% include 'components/status_badge.html' with status=req.status label=req.get_status_display %}
+                            </td>
+                            <td class="text-end">
+                                {% if req.status == 'PENDING' %}
+                                <form method="post" action="{% url 'events:swap_request_respond' request_id=req.id %}" class="m-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="cancel">
+                                    <button type="submit" class="eve-btn eve-btn-danger eve-btn-sm">Cancel</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
+            {% else %}
+            {% include 'components/empty_state.html' with icon="bi-arrow-left-right" title="No swap requests submitted" description="Open any upcoming event you are assigned to and click Request Cover if you need a teammate to take over." %}
+            {% endif %}
+        </section>
+    </div>
+</div>
+
+<!-- 5. Recent Resolved History -->
+{% if recent_history %}
+<section class="eve-panel overflow-hidden" aria-label="Resolved Swap History">
+    <div class="eve-panel-header">
+        <div>
+            <h2 class="eve-panel-title">Recent Resolved Requests</h2>
+            <p class="eve-panel-subtitle">Audit trail of approved, declined, and cancelled shift swaps</p>
         </div>
     </div>
+    <div class="table-responsive">
+        <table class="eve-data-table">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Requester</th>
+                    <th>Covering Member</th>
+                    <th>Outcome</th>
+                    <th>Reviewed</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in recent_history %}
+                <tr>
+                    <td class="fw-medium">{{ req.assignment.event.title }}</td>
+                    <td style="color: var(--eve-text-secondary);">{{ req.requested_by.user.get_full_name|default:req.requested_by.user.username }}</td>
+                    <td style="color: var(--eve-text-secondary);">{% if req.target_member %}{{ req.target_member.user.get_full_name|default:req.target_member.user.username }}{% else %}—{% endif %}</td>
+                    <td>{% include 'components/status_badge.html' with status=req.status label=req.get_status_display %}</td>
+                    <td class="eve-mono" style="font-size: 12px; color: var(--eve-text-muted);">{{ req.reviewed_at|date:"M d, Y g:i A"|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </section>
+{% endif %}
 {% endblock %}
