@@ -456,3 +456,23 @@ body.eve-body {
     align-items: center;
     justify-content: space-between;
 }
+
+/* Clean Print Mode (Analytics & Reports) */
+@media print {
+    .eve-sidebar,
+    .eve-topbar,
+    .eve-footer,
+    .eve-page-actions,
+    .eve-filter-bar {
+        display: none !important;
+    }
+
+    .eve-main-shell {
+        margin-left: 0 !important;
+    }
+
+    .eve-main-content {
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+}
