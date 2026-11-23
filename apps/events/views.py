@@ -261,7 +261,10 @@ def event_list(request):
 
     # Compute progress stats for each event
     events_data = []
+    calendar_events = []
+    event_ids = []
     for ev in events_qs:
+        event_ids.append(ev.id)
         total_assignments = ev.assignments.count()
         confirmed_count = ev.assignments.filter(status__in=["CONFIRMED", "COMPLETED"]).count()
         completed_count = ev.assignments.filter(status="COMPLETED").count()
@@ -274,9 +277,33 @@ def event_list(request):
             "completed_count": completed_count,
             "progress_pct": progress_pct,
         })
+        calendar_events.append({
+            "id": ev.id,
+            "title": ev.title,
+            "date": ev.event_date.isoformat(),
+            "start": ev.start_time.strftime("%H:%M"),
+            "end": ev.end_time.strftime("%H:%M"),
+            "status": ev.status,
+            "status_label": ev.get_status_display(),
+            "company": ev.company.name,
+            "url": reverse("events:event_detail", kwargs={"event_id": ev.id}),
+        })
+
+    view_mode = request.GET.get("view", "list")
+    if view_mode not in ("list", "calendar", "schedule"):
+        view_mode = "list"
+
+    schedule_assignments = (
+        EventAssignment.objects.filter(event_id__in=event_ids)
+        .select_related("event__company", "member__user")
+        .order_by("event__event_date", "start_time", "assigned_role")
+    )
 
     context = {
         "events_data": events_data,
+        "calendar_events": calendar_events,
+        "schedule_assignments": schedule_assignments,
+        "view_mode": view_mode,
         "status_filter": status_filter,
         "company_filter": company_filter,
         "search_query": search_query,
