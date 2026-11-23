@@ -1,254 +1,279 @@
 {% extends "base.html" %}
 
-{% block title %}Employee Availability &amp; Shift Requests{% endblock %}
+{% block title %}Availability &amp; Preferences{% endblock %}
+
+{% block extra_css %}
+<style>
+.eve-week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 10px;
+}
+@media (max-width: 1199.98px) {
+    .eve-week-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 767.98px) {
+    .eve-week-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.eve-day-col {
+    background-color: var(--eve-surface-subtle);
+    border: 1px solid var(--eve-border);
+    border-radius: var(--eve-radius-sm);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 120px;
+}
+.eve-day-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--eve-text-secondary);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--eve-border);
+}
+.eve-avail-chip {
+    background-color: var(--eve-surface);
+    border: 1px solid var(--eve-border);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 12px;
+}
+</style>
+{% endblock %}
 
 {% block full_bleed %}
-<section class="apple-section-white">
-    <div class="apple-container-wide">
-        <div class="eve-workspace-header mb-4">
-            <div>
-                <h1 class="apple-headline-section">Staff Availability &amp; Preferences</h1>
-                <p class="apple-subhead">
-                    Declare weekly shift availability, request blackout days, and assist managers with schedule planning.
-                </p>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <button type="button" class="btn-apple-primary btn-apple-sm" data-bs-toggle="modal" data-bs-target="#newAvailabilityModal">
-                    <i class="bi bi-plus-lg"></i>
-                    <span>Set Availability</span>
-                </button>
-            </div>
-        </div>
+<!-- 1. Page Header -->
+<div class="eve-page-header">
+    <div>
+        <div class="eve-page-eyebrow">Scheduling Preferences</div>
+        <h1 class="eve-page-title">Availability &amp; Time Off</h1>
+        <p class="eve-page-subtitle">Manage recurring weekly availability, declare specific-date time off, and inspect team availability when scheduling shifts.</p>
+    </div>
+    <div class="eve-page-actions">
+        <button type="button" class="eve-btn eve-btn-primary eve-btn-sm" data-bs-toggle="modal" data-bs-target="#newAvailabilityModal">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            <span>Set Availability</span>
+        </button>
+    </div>
+</div>
 
-        <!-- Telemetry Stats Cards -->
-        <div class="row g-3 mb-4">
-            <div class="col-sm-6 col-lg-3">
-                <div class="card eve-feature-card p-3 h-100">
-                    <span class="apple-caption text-uppercase fw-semibold text-muted">Preferred Working</span>
-                    <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold text-success">{{ available_count }}</span>
-                        <span class="small text-muted">Availability Windows</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card eve-feature-card p-3 h-100">
-                    <span class="apple-caption text-uppercase fw-semibold text-muted">Time-Off Requests</span>
-                    <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold text-danger">{{ timeoff_count }}</span>
-                        <span class="small text-muted">Blackout Dates</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card eve-feature-card p-3 h-100">
-                    <span class="apple-caption text-uppercase fw-semibold text-muted">My Preferences</span>
-                    <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold text-primary">{{ my_records|length }}</span>
-                        <span class="small text-muted">Entries Logged</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card eve-feature-card p-3 h-100">
-                    <span class="apple-caption text-uppercase fw-semibold text-muted">Team Records</span>
-                    <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold text-secondary">{{ team_records|length }}</span>
-                        <span class="small text-muted">Colleague Entries</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!-- 2. Metrics Strip -->
+<div class="eve-metric-grid">
+    {% include 'components/metric_card.html' with label="Preferred Available" value=available_count meta="Declared working windows" icon="bi-check2-circle" %}
+    {% include 'components/metric_card.html' with label="Time Off / Blackout" value=timeoff_count meta="Unavailable declarations" icon="bi-slash-circle" %}
+    {% include 'components/metric_card.html' with label="My Preferences" value=my_records|length meta="Your active entries" icon="bi-person-check" %}
+    {% include 'components/metric_card.html' with label="Team Entries" value=team_records|length meta="Colleague records visible" icon="bi-people" %}
+</div>
 
-        <!-- Workspace Selector -->
-        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 pt-3 apple-divider-top">
-            <div class="eve-segmented-control" role="tablist">
-                <a href="{% url 'events:availability_list' %}" class="eve-segmented-item {% if not selected_company %}active{% endif %}">
-                    All Workspaces
-                </a>
-                {% for mem in user_memberships %}
-                <a href="{% url 'events:company_availability_list' company_id=mem.company.id %}" class="eve-segmented-item {% if selected_company and selected_company.id == mem.company.id %}active{% endif %}">
-                    {{ mem.company.name }}
-                </a>
+<!-- 3. Workspace Filter Bar -->
+<div class="eve-filter-bar">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <a href="{% url 'events:availability_list' %}" class="eve-btn eve-btn-sm {% if not selected_company %}eve-btn-primary{% else %}eve-btn-secondary{% endif %}">
+            All Workspaces
+        </a>
+        {% for mem in user_memberships %}
+        <a href="{% url 'events:company_availability_list' company_id=mem.company.id %}" class="eve-btn eve-btn-sm {% if selected_company and selected_company.id == mem.company.id %}eve-btn-primary{% else %}eve-btn-secondary{% endif %}">
+            {{ mem.company.name }}
+        </a>
+        {% endfor %}
+    </div>
+    <span class="eve-mono" style="font-size: 12px; color: var(--eve-text-muted);">{{ availabilities|length }} total record{{ availabilities|length|pluralize }}</span>
+</div>
+
+<!-- 4. Weekly Recurring Availability Planner (Mon–Sun) -->
+<section class="eve-panel mb-4" aria-label="Weekly Recurring Availability">
+    <div class="eve-panel-header">
+        <div>
+            <h2 class="eve-panel-title">My Weekly Recurring Availability</h2>
+            <p class="eve-panel-subtitle">Monday through Sunday recurring schedule preferences</p>
+        </div>
+        <button type="button" class="eve-btn eve-btn-secondary eve-btn-sm" data-bs-toggle="modal" data-bs-target="#newAvailabilityModal">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i><span>Add Entry</span>
+        </button>
+    </div>
+    <div class="eve-panel-body">
+        <div class="eve-week-grid">
+            {% for day_val, day_name in days_of_week %}
+            <div class="eve-day-col">
+                <div class="eve-day-title">{{ day_name|slice:":3" }}</div>
+                {% for item in my_records %}
+                    {% if item.day_of_week == day_val %}
+                    <div class="eve-avail-chip">
+                        <div class="d-flex justify-content-between align-items-start gap-1 mb-1">
+                            {% if item.availability_type == 'AVAILABLE' %}
+                                {% include 'components/status_badge.html' with status="AVAILABLE" label="Available" %}
+                            {% else %}
+                                {% include 'components/status_badge.html' with status="UNAVAILABLE" label="Time Off" %}
+                            {% endif %}
+                            <form method="post" action="{% url 'events:availability_delete' record_id=item.id %}" class="m-0" onsubmit="return confirm('Delete this availability entry?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm p-0 border-0 bg-transparent" style="color: var(--eve-text-muted);" title="Delete">
+                                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="eve-mono fw-semibold" style="font-size: 11.5px;">
+                            {% if item.start_time and item.end_time %}{{ item.start_time|time:"g:i A" }}&ndash;{{ item.end_time|time:"g:i A" }}{% else %}All day{% endif %}
+                        </div>
+                        {% if item.reason %}<div style="font-size: 11px; color: var(--eve-text-muted);">{{ item.reason }}</div>{% endif %}
+                        <div style="font-size: 11px; color: var(--eve-text-muted); margin-top: 2px;">{{ item.member.company.name }}</div>
+                    </div>
+                    {% endif %}
                 {% endfor %}
             </div>
+            {% endfor %}
         </div>
     </div>
 </section>
 
-<section class="apple-section-canvas">
-    <div class="apple-container-wide">
-
-        <!-- My Availability Section -->
-        <div class="card shadow-sm border rounded-4 p-4 mb-4">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary-subtle text-primary p-2 rounded-circle"><i class="bi bi-person-check-fill"></i></span>
-                    <h5 class="fw-bold mb-0">My Personal Shift Availability</h5>
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#newAvailabilityModal">
-                    <i class="bi bi-plus-circle me-1"></i> Add Entry
-                </button>
-            </div>
-
-            {% if my_records %}
-            <div class="row g-3">
-                {% for item in my_records %}
+<!-- 5. Specific-Date Overrides & Time Off -->
+<section class="eve-panel mb-4" aria-label="Specific Date Preferences">
+    <div class="eve-panel-header">
+        <div>
+            <h2 class="eve-panel-title">My Specific-Date Overrides &amp; Time Off</h2>
+            <p class="eve-panel-subtitle">Single-date blackout requests or overrides that take precedence over weekly defaults</p>
+        </div>
+    </div>
+    <div class="eve-panel-body">
+        <div class="row g-3">
+            {% for item in my_records %}
+                {% if item.specific_date %}
                 <div class="col-md-6 col-lg-4">
-                    <div class="card eve-feature-card p-3 border position-relative">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <div>
-                                {% if item.availability_type == 'AVAILABLE' %}
-                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle mb-1">
-                                        <i class="bi bi-check2-circle me-1"></i>Available
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle mb-1">
-                                        <i class="bi bi-slash-circle me-1"></i>Time Off
-                                    </span>
-                                {% endif %}
-                                <div class="fw-bold fs-6">
-                                    {% if item.day_of_week is not None %}
-                                        Every {{ item.get_day_of_week_display }}
-                                    {% else %}
-                                        {{ item.specific_date|date:"l, M d, Y" }}
-                                    {% endif %}
-                                </div>
-                            </div>
+                    <div class="p-3 rounded-3 h-100" style="border: 1px solid var(--eve-border); background-color: var(--eve-surface-subtle);">
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                            {% if item.availability_type == 'AVAILABLE' %}
+                                {% include 'components/status_badge.html' with status="AVAILABLE" label="Available Override" %}
+                            {% else %}
+                                {% include 'components/status_badge.html' with status="UNAVAILABLE" label="Time Off" %}
+                            {% endif %}
                             <form method="post" action="{% url 'events:availability_delete' record_id=item.id %}" class="m-0" onsubmit="return confirm('Delete this availability entry?');">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-link text-muted p-0" title="Delete">
-                                    <i class="bi bi-trash"></i>
+                                <button type="submit" class="eve-btn eve-btn-ghost eve-btn-sm text-danger p-1" title="Delete">
+                                    <i class="bi bi-trash" aria-hidden="true"></i>
                                 </button>
                             </form>
                         </div>
-                        <div class="small text-muted mb-1">
-                            <i class="bi bi-clock me-1"></i>
-                            {% if item.start_time and item.end_time %}
-                                {{ item.start_time|time:"g:i A" }} – {{ item.end_time|time:"g:i A" }}
-                            {% else %}
-                                All day
-                            {% endif %}
+                        <div class="fw-semibold eve-mono">{{ item.specific_date|date:"D, M d, Y" }}</div>
+                        <div class="eve-mono" style="font-size: 12px; color: var(--eve-text-secondary);">
+                            {% if item.start_time and item.end_time %}{{ item.start_time|time:"g:i A" }}&ndash;{{ item.end_time|time:"g:i A" }}{% else %}All day{% endif %}
                         </div>
-                        {% if item.reason %}
-                        <div class="small text-secondary fst-italic">"{{ item.reason }}"</div>
-                        {% endif %}
-                        <div class="apple-caption text-muted mt-2 pt-2 border-top">{{ item.member.company.name }}</div>
+                        {% if item.reason %}<div class="mt-1" style="font-size: 12.5px; color: var(--eve-text-secondary);">"{{ item.reason }}"</div>{% endif %}
+                        <div class="mt-2 pt-2" style="font-size: 11.5px; color: var(--eve-text-muted); border-top: 1px solid var(--eve-border);">{{ item.member.company.name }}</div>
                     </div>
                 </div>
-                {% endfor %}
+                {% endif %}
+            {% empty %}
+            <div class="col-12">
+                <p class="mb-0" style="font-size: 13px; color: var(--eve-text-muted);">No availability entries submitted yet. Click <strong>Set Availability</strong> to add a weekly window or date override.</p>
             </div>
-            {% else %}
-            <p class="text-muted small mb-0 py-2">You have not submitted any shift availability preferences or time-off requests yet.</p>
-            {% endif %}
+            {% endfor %}
         </div>
-
-        <!-- Team Availability Directory Table -->
-        <div class="card shadow-sm border rounded-4 overflow-hidden">
-            <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
-                <h5 class="fw-bold mb-0">Team Availability Matrix</h5>
-                <span class="badge bg-secondary-subtle text-secondary">{{ availabilities|length }} records</span>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th class="ps-4">Team Member</th>
-                            <th>Organization</th>
-                            <th>Schedule Scope</th>
-                            <th>Time Window</th>
-                            <th>Availability Status</th>
-                            <th>Notes / Reason</th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in availabilities %}
-                        <tr>
-                            <td class="ps-4">
-                                <div class="fw-semibold">{{ item.member.user.get_full_name|default:item.member.user.username }}</div>
-                                <small class="text-muted">{{ item.member.role|title }}</small>
-                            </td>
-                            <td>
-                                <span class="badge bg-secondary-subtle text-body border">{{ item.member.company.name }}</span>
-                            </td>
-                            <td>
-                                {% if item.day_of_week is not None %}
-                                    <span class="fw-semibold">Every {{ item.get_day_of_week_display }}</span>
-                                    <small class="d-block text-muted">Weekly recurring</small>
-                                {% else %}
-                                    <span class="fw-semibold">{{ item.specific_date|date:"M d, Y" }}</span>
-                                    <small class="d-block text-muted">Specific date override</small>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if item.start_time and item.end_time %}
-                                    <span class="tabular-nums">{{ item.start_time|time:"g:i A" }} – {{ item.end_time|time:"g:i A" }}</span>
-                                {% else %}
-                                    <span class="text-muted">Full day window</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if item.availability_type == 'AVAILABLE' %}
-                                    <span class="badge bg-success">Preferred Available</span>
-                                {% else %}
-                                    <span class="badge bg-danger">Time Off / Blackout</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span class="text-muted small">{{ item.reason|default:"—" }}</span>
-                            </td>
-                            <td class="text-end pe-4">
-                                {% if item.member.user == request.user %}
-                                <form method="post" action="{% url 'events:availability_delete' record_id=item.id %}" class="d-inline" onsubmit="return confirm('Delete this record?');">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">
-                                <i class="bi bi-calendar-check fs-1 d-block mb-2 text-secondary"></i>
-                                <p class="mb-0">No team availability entries logged for this organization.</p>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
     </div>
+</section>
+
+<!-- 6. Team Availability Matrix Table -->
+<section class="eve-panel overflow-hidden" aria-label="Team Availability Matrix">
+    <div class="eve-panel-header">
+        <div>
+            <h2 class="eve-panel-title">Team Availability Directory</h2>
+            <p class="eve-panel-subtitle">All declared availability windows and blackout dates across your workspaces</p>
+        </div>
+        <span class="eve-badge eve-badge-neutral eve-mono">{{ availabilities|length }} records</span>
+    </div>
+
+    {% if availabilities %}
+    <div class="table-responsive">
+        <table class="eve-data-table">
+            <thead>
+                <tr>
+                    <th>Team Member</th>
+                    <th>Organization</th>
+                    <th>Schedule Scope</th>
+                    <th>Time Window</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in availabilities %}
+                <tr>
+                    <td>
+                        <div class="fw-semibold">{{ item.member.user.get_full_name|default:item.member.user.username }}</div>
+                        <div style="font-size: 12px; color: var(--eve-text-muted);">{{ item.member.get_role_display }}</div>
+                    </td>
+                    <td style="color: var(--eve-text-secondary);">{{ item.member.company.name }}</td>
+                    <td>
+                        {% if item.day_of_week is not None %}
+                            <div class="fw-semibold">Every {{ item.get_day_of_week_display }}</div>
+                            <div style="font-size: 12px; color: var(--eve-text-muted);">Weekly recurring</div>
+                        {% else %}
+                            <div class="fw-semibold eve-mono">{{ item.specific_date|date:"M d, Y" }}</div>
+                            <div style="font-size: 12px; color: var(--eve-text-muted);">Specific-date override</div>
+                        {% endif %}
+                    </td>
+                    <td class="eve-mono" style="font-size: 12.5px;">
+                        {% if item.start_time and item.end_time %}
+                            {{ item.start_time|time:"g:i A" }}&ndash;{{ item.end_time|time:"g:i A" }}
+                        {% else %}
+                            <span style="color: var(--eve-text-muted);">All day</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.availability_type == 'AVAILABLE' %}
+                            {% include 'components/status_badge.html' with status="AVAILABLE" label="Preferred Available" %}
+                        {% else %}
+                            {% include 'components/status_badge.html' with status="UNAVAILABLE" label="Time Off / Blackout" %}
+                        {% endif %}
+                    </td>
+                    <td style="color: var(--eve-text-secondary); font-size: 13px;">{{ item.reason|default:"—" }}</td>
+                    <td class="text-end">
+                        {% if item.member.user == request.user %}
+                        <form method="post" action="{% url 'events:availability_delete' record_id=item.id %}" class="d-inline" onsubmit="return confirm('Delete this record?');">
+                            {% csrf_token %}
+                            <button type="submit" class="eve-btn eve-btn-danger eve-btn-sm" title="Delete">
+                                <i class="bi bi-trash" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    {% include 'components/empty_state.html' with icon="bi-calendar-check" title="No team availability entries" description="No staff availability or blackout dates have been logged for this workspace yet." %}
+    {% endif %}
 </section>
 
 <!-- Submission Modal -->
 <div class="modal fade" id="newAvailabilityModal" tabindex="-1" aria-labelledby="newAvailabilityModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-bottom p-4">
-                <h5 class="modal-title fw-bold" id="newAvailabilityModalLabel">Submit Availability / Time Off</h5>
+        <div class="modal-content rounded-4">
+            <div class="modal-header border-bottom px-4 py-3">
+                <h5 class="modal-title fw-bold" id="newAvailabilityModalLabel" style="font-size: 16px;">Set Availability / Time Off</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" action="{% url 'events:availability_create' %}">
                 {% csrf_token %}
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label for="company_id" class="form-label fw-semibold">Workspace</label>
+                <div class="modal-body p-4 d-flex flex-column gap-3">
+                    <div>
+                        <label for="company_id" class="form-label fw-semibold" style="font-size: 13px;">Organization</label>
                         <select name="company_id" id="company_id" class="form-select" required>
                             {% for mem in user_memberships %}
                             <option value="{{ mem.company.id }}" {% if selected_company and selected_company.id == mem.company.id %}selected{% endif %}>
-                                {{ mem.company.name }} (Role: {{ mem.role }})
+                                {{ mem.company.name }} ({{ mem.get_role_display }})
                             </option>
                             {% endfor %}
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Preference Type</label>
+                    <div>
+                        <label class="form-label fw-semibold" style="font-size: 13px;">Preference Type</label>
                         <div class="d-flex gap-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="availability_type" id="type_avail" value="AVAILABLE" checked>
@@ -261,12 +286,12 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Recurrence</label>
-                        <div class="d-flex gap-3 mb-2">
+                    <div>
+                        <label class="form-label fw-semibold" style="font-size: 13px;">Recurrence</label>
+                        <div class="d-flex gap-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="timing_type" id="timing_weekly" value="weekly" checked onchange="toggleTiming()">
-                                <label class="form-check-label" for="timing_weekly">Weekly Day</label>
+                                <label class="form-check-label" for="timing_weekly">Weekly Recurring Day</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="timing_type" id="timing_date" value="date" onchange="toggleTiming()">
@@ -275,8 +300,8 @@
                         </div>
                     </div>
 
-                    <div class="mb-3" id="weekly_select_group">
-                        <label for="day_of_week" class="form-label fw-semibold">Day of Week</label>
+                    <div id="weekly_select_group">
+                        <label for="day_of_week" class="form-label fw-semibold" style="font-size: 13px;">Day of Week</label>
                         <select name="day_of_week" id="day_of_week" class="form-select">
                             {% for val, name in days_of_week %}
                             <option value="{{ val }}">{{ name }}</option>
@@ -284,36 +309,38 @@
                         </select>
                     </div>
 
-                    <div class="mb-3 d-none" id="date_select_group">
-                        <label for="specific_date" class="form-label fw-semibold">Date</label>
-                        <input type="date" name="specific_date" id="specific_date" class="form-control">
+                    <div class="d-none" id="date_select_group">
+                        <label for="specific_date" class="form-label fw-semibold" style="font-size: 13px;">Specific Date</label>
+                        <input type="date" name="specific_date" id="specific_date" class="form-control eve-mono">
                     </div>
 
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label for="start_time" class="form-label fw-semibold">From Time</label>
-                            <input type="time" name="start_time" id="start_time" class="form-control" value="08:00">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label for="start_time" class="form-label fw-semibold" style="font-size: 13px;">From Time</label>
+                            <input type="time" name="start_time" id="start_time" class="form-control eve-mono" value="08:00">
                         </div>
-                        <div class="col-6 mb-3">
-                            <label for="end_time" class="form-label fw-semibold">Until Time</label>
-                            <input type="time" name="end_time" id="end_time" class="form-control" value="17:00">
+                        <div class="col-6">
+                            <label for="end_time" class="form-label fw-semibold" style="font-size: 13px;">Until Time</label>
+                            <input type="time" name="end_time" id="end_time" class="form-control eve-mono" value="17:00">
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="reason" class="form-label fw-semibold">Notes / Reason</label>
-                        <input type="text" name="reason" id="reason" class="form-control" placeholder="e.g. Free for morning shifts, or Exam conflict">
+                    <div>
+                        <label for="reason" class="form-label fw-semibold" style="font-size: 13px;">Notes / Reason</label>
+                        <input type="text" name="reason" id="reason" class="form-control" placeholder="e.g. Available for morning shifts, or Exam conflict">
                     </div>
                 </div>
-                <div class="modal-footer border-top p-3">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-apple-primary">Save Preference</button>
+                <div class="modal-footer border-top px-4 py-3">
+                    <button type="button" class="eve-btn eve-btn-secondary eve-btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="eve-btn eve-btn-primary eve-btn-sm">Save Preference</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
 function toggleTiming() {
     const isWeekly = document.getElementById('timing_weekly').checked;
