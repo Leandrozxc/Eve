@@ -1,305 +1,262 @@
 {% extends 'base.html' %}
 
-{% block title %}Overview — Shift Scheduling{% endblock %}
+{% block title %}Overview{% endblock %}
 
 {% block full_bleed %}
-<!-- 1. Eve Minimalist Studio Workspace Header -->
-<section class="apple-section-white">
-    <div class="apple-container-wide">
-        <div class="eve-workspace-header">
-            <div>
-                <h1 class="apple-headline-hero">
-                    Welcome, {{ user.first_name|default:user.username }}.
-                </h1>
-                <p class="apple-lead mt-2 mb-0">
-                    Shift Scheduling, organization rosters, and live attendance coordination across your active workspaces.
-                </p>
-            </div>
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <a href="{% url 'events:event_create' %}" class="btn-apple-primary">
-                    <i class="bi bi-plus-lg"></i>
-                    <span>Schedule Event</span>
-                </a>
-            </div>
-        </div>
+<!-- 1. Welcome Header -->
+<div class="eve-page-header">
+    <div>
+        <div class="eve-page-eyebrow eve-mono">{{ today|date:"l, F j, Y" }}</div>
+        <h1 class="eve-page-title">Welcome back, {{ user.first_name|default:user.username }}</h1>
+        <p class="eve-page-subtitle">
+            {% if nav_primary_membership %}
+                Active workspace: <strong>{{ nav_primary_membership.company.name }}</strong> ({{ nav_primary_membership.get_role_display }}){% if user_memberships.count > 1 %} &middot; {{ user_memberships.count }} organizations total{% endif %}.
+            {% else %}
+                Create or join an organization to start coordinating events and shifts.
+            {% endif %}
+        </p>
     </div>
-</section>
+    <div class="eve-page-actions">
+        <a href="{% url 'events:event_list' %}" class="eve-btn eve-btn-secondary eve-btn-sm">
+            <i class="bi bi-calendar3" aria-hidden="true"></i>
+            <span>View Schedule</span>
+        </a>
+        {% if user_memberships %}
+        <a href="{% url 'events:event_create' %}" class="eve-btn eve-btn-primary eve-btn-sm">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            <span>Schedule Event</span>
+        </a>
+        {% else %}
+        <a href="{% url 'events:company_create' %}" class="eve-btn eve-btn-primary eve-btn-sm">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            <span>Create Organization</span>
+        </a>
+        {% endif %}
+    </div>
+</div>
 
-<!-- 2. Asymmetric Chronometer Dispatch & Readiness Grid (8 + 4 Split) -->
-<section class="apple-section-canvas">
-    <div class="apple-container-wide">
-        <div class="apple-bento-grid">
-            <!-- 8-Column Next Shift Dispatch Card -->
-            <div class="apple-tile bento-span-8">
+<!-- 2. Operational Metrics Strip -->
+<div class="eve-metric-grid">
+    {% include 'components/metric_card.html' with label="Upcoming Events" value=upcoming_events_count meta="Scheduled across your workspaces" icon="bi-calendar-event" %}
+    {% include 'components/metric_card.html' with label="Total Assignments" value=total_assignments_count meta="Active shift slots staffed" icon="bi-people" %}
+    {% include 'components/metric_card.html' with label="Confirmation Rate" value=confirmation_rate|stringformat:"s"|add:"%" meta="Confirmed or completed shifts" icon="bi-check2-circle" %}
+    {% include 'components/metric_card.html' with label="Pending Swaps" value=pending_swaps_count meta="Open cover & swap requests" icon="bi-arrow-left-right" %}
+</div>
+
+<!-- 3. Primary Two-Column Operational Stage -->
+<div class="row g-4">
+    <!-- Left Column: Personal Next Shift + Upcoming Schedule -->
+    <div class="col-lg-8 d-flex flex-column gap-4">
+        <!-- Personal Next Shift Panel -->
+        <section class="eve-panel" aria-label="Your Next Shift">
+            <div class="eve-panel-header">
+                <div>
+                    <h2 class="eve-panel-title">Your Next Shift</h2>
+                    <p class="eve-panel-subtitle">Personal assignment status and one-tap check-in controls</p>
+                </div>
                 {% with next_shift=my_assignments|first %}
                 {% if next_shift %}
-                <div>
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-                        <span class="eve-status-pill {% if next_shift.status == 'CONFIRMED' or next_shift.status == 'COMPLETED' %}eve-status-confirmed{% elif next_shift.status == 'CANCELLED' %}eve-status-declined{% else %}eve-status-pending{% endif %}">
-                            <span class="eve-status-dot"></span> {{ next_shift.get_status_display }}
-                        </span>
-                        <span class="apple-caption tabular-nums">{{ next_shift.event.company.name }}</span>
-                    </div>
-                    <h2 class="apple-headline-tile mb-2">
-                        <a href="{% url 'events:event_detail' event_id=next_shift.event.id %}" class="text-decoration-none" style="color: inherit;">
-                            {{ next_shift.event.title }}
-                        </a>
-                    </h2>
-                    <p class="apple-body" style="max-width: 58ch;">
-                        Assigned duty: <strong>{{ next_shift.assigned_role }}</strong>. {{ next_shift.event.description|default:"Review your station assignment and confirm your arrival window below."|truncatewords:24 }}
-                    </p>
-                </div>
-
-                <div>
-                    <div class="apple-spec-strip">
-                        <div>
-                            <div class="apple-spec-label">Date</div>
-                            <div class="apple-spec-value tabular-nums">{{ next_shift.event.event_date|date:"D, M d, Y" }}</div>
-                        </div>
-                        <div>
-                            <div class="apple-spec-label">Shift Window</div>
-                            <div class="apple-spec-value tabular-nums">{{ next_shift.start_time|time:"g:i A" }} &ndash; {{ next_shift.end_time|time:"g:i A" }}</div>
-                        </div>
-                        <div>
-                            <div class="apple-spec-label">Station / Venue</div>
-                            <div class="apple-spec-value">{{ next_shift.assigned_location|default:next_shift.event.location }}</div>
-                        </div>
+                    {% include 'components/status_badge.html' with status=next_shift.status label=next_shift.get_status_display %}
+                {% endif %}
+                {% endwith %}
+            </div>
+            <div class="eve-panel-body">
+                {% with next_shift=my_assignments|first %}
+                {% if next_shift %}
+                <div class="d-flex flex-column gap-3">
+                    <div>
+                        <div class="small fw-semibold mb-1" style="color: var(--eve-text-muted);">{{ next_shift.event.company.name }}</div>
+                        <h3 class="h5 fw-bold mb-1">
+                            <a href="{% url 'events:event_detail' event_id=next_shift.event.id %}" class="text-decoration-none" style="color: var(--eve-text);">
+                                {{ next_shift.event.title }}
+                            </a>
+                        </h3>
+                        <p class="mb-0" style="color: var(--eve-text-secondary); font-size: 13.5px;">
+                            Assigned role: <strong style="color: var(--eve-text);">{{ next_shift.assigned_role }}</strong>
+                            {% if next_shift.event.description %} &mdash; {{ next_shift.event.description|truncatewords:20 }}{% endif %}
+                        </p>
                     </div>
 
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3">
+                    <div class="row g-3 py-3" style="border-top: 1px solid var(--eve-border); border-bottom: 1px solid var(--eve-border);">
+                        <div class="col-sm-4">
+                            <div style="font-size: 11.5px; color: var(--eve-text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Date</div>
+                            <div class="fw-semibold eve-mono mt-1">{{ next_shift.event.event_date|date:"D, M d, Y" }}</div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div style="font-size: 11.5px; color: var(--eve-text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Shift Window</div>
+                            <div class="fw-semibold eve-mono mt-1">{{ next_shift.start_time|time:"g:i A" }} &ndash; {{ next_shift.end_time|time:"g:i A" }}</div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div style="font-size: 11.5px; color: var(--eve-text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Station / Venue</div>
+                            <div class="fw-semibold mt-1">{{ next_shift.assigned_location|default:next_shift.event.location }}</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                         <div class="d-flex flex-wrap align-items-center gap-2">
                             {% if next_shift.status == 'ASSIGNED' %}
-                            <form method="POST" action="{% url 'events:assignment_update' assignment_id=next_shift.id %}" class="m-0">
+                            <form method="post" action="{% url 'events:assignment_update' assignment_id=next_shift.id %}" class="m-0">
                                 {% csrf_token %}
                                 <input type="hidden" name="status" value="CONFIRMED">
-                                <button type="submit" class="btn-apple-primary btn-apple-sm">
-                                    Confirm Shift
+                                <button type="submit" class="eve-btn eve-btn-primary eve-btn-sm">
+                                    <i class="bi bi-check-lg" aria-hidden="true"></i>
+                                    <span>Confirm Shift</span>
                                 </button>
                             </form>
                             {% elif next_shift.status == 'CONFIRMED' %}
-                            <form method="POST" action="{% url 'events:clock_in' assignment_id=next_shift.id %}" class="m-0">
+                            <form method="post" action="{% url 'events:clock_in' assignment_id=next_shift.id %}" class="m-0">
                                 {% csrf_token %}
-                                <button type="submit" class="btn-apple-primary btn-apple-sm">
-                                    <i class="bi bi-box-arrow-in-right"></i> Clock In
+                                <button type="submit" class="eve-btn eve-btn-primary eve-btn-sm">
+                                    <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+                                    <span>Clock In</span>
                                 </button>
                             </form>
-                            <form method="POST" action="{% url 'events:assignment_update' assignment_id=next_shift.id %}" class="m-0">
+                            <form method="post" action="{% url 'events:assignment_update' assignment_id=next_shift.id %}" class="m-0">
                                 {% csrf_token %}
                                 <input type="hidden" name="status" value="COMPLETED">
-                                <button type="submit" class="btn-apple-secondary btn-apple-sm">
-                                    Mark Completed
+                                <button type="submit" class="eve-btn eve-btn-secondary eve-btn-sm">
+                                    <span>Mark Completed</span>
                                 </button>
                             </form>
                             {% endif %}
                         </div>
-                        <a href="{% url 'events:event_detail' event_id=next_shift.event.id %}" class="apple-link-cta apple-link-cta-sm">
-                            Open shift brief <span class="chevron" aria-hidden="true">&rarr;</span>
+                        <a href="{% url 'events:event_detail' event_id=next_shift.event.id %}" class="eve-btn eve-btn-ghost eve-btn-sm">
+                            <span>Open Shift Brief</span>
+                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
                         </a>
                     </div>
                 </div>
                 {% else %}
-                <div>
-                    <h2 class="apple-headline-tile mb-2">No upcoming shift dispatches.</h2>
-                    <p class="apple-body" style="max-width: 52ch;">
-                        Your personal shift queue is currently clear. Schedule a new event for your organization or inspect upcoming schedules across your teams.
-                    </p>
-                </div>
-                <div class="d-flex flex-wrap align-items-center gap-3 pt-4">
-                    <a href="{% url 'events:event_create' %}" class="btn-apple-primary btn-apple-sm">Schedule Event</a>
-                    <a href="{% url 'events:event_list' %}" class="apple-link-cta apple-link-cta-sm">
-                        Browse all events <span class="chevron" aria-hidden="true">&rarr;</span>
-                    </a>
-                </div>
+                {% url 'events:event_list' as events_url %}
+                {% include 'components/empty_state.html' with icon="bi-calendar-check" title="No upcoming personal shifts" description="Your personal shift queue is currently clear. Browse organization events or update your weekly availability." cta_url=events_url cta_label="Browse Events" %}
                 {% endif %}
                 {% endwith %}
             </div>
+        </section>
 
-            <!-- 4-Column Readiness Ledger -->
-            <div class="apple-tile bento-span-4">
+        <!-- Upcoming Schedule Table -->
+        <section class="eve-panel overflow-hidden" aria-label="Upcoming Schedule">
+            <div class="eve-panel-header">
                 <div>
-                    <div class="apple-caption mb-2">Shift Confirmation Index</div>
-                    <div class="apple-stat-figure">{{ confirmation_rate }}%</div>
-                    <p class="apple-caption mt-2 mb-3">
-                        Confirmed or completed across {{ total_assignments_count }} total shifts.
-                    </p>
-                    <div class="eve-progress" role="progressbar" aria-label="Shift confirmation rate" aria-valuenow="{{ confirmation_rate }}" aria-valuemin="0" aria-valuemax="100">
-                        <div class="eve-progress-bar" style="width: {{ confirmation_rate }}%;"></div>
-                    </div>
+                    <h2 class="eve-panel-title">Upcoming Schedule</h2>
+                    <p class="eve-panel-subtitle">Next scheduled events across your organizations</p>
                 </div>
-
-                <div class="apple-spec-strip mt-4" style="grid-template-columns: repeat(2, 1fr);">
-                    <div>
-                        <div class="apple-spec-label">Upcoming Events</div>
-                        <div class="apple-spec-value tabular-nums">{{ upcoming_events_count }}</div>
-                    </div>
-                    <div>
-                        <div class="apple-spec-label">Workspaces</div>
-                        <div class="apple-spec-value tabular-nums">{{ user_memberships.count }}</div>
-                    </div>
-                </div>
+                <a href="{% url 'events:event_list' %}" class="eve-btn eve-btn-ghost eve-btn-sm">
+                    <span>All Events</span>
+                    <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </a>
             </div>
-        </div>
-    </div>
-</section>
-
-<!-- 3. Personal Shift Timeline -->
-<section class="apple-section-white">
-    <div class="apple-container-wide">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
-            <div>
-                <h2 class="apple-headline-section">Upcoming shift timeline</h2>
-                <p class="apple-subhead">Confirm attendance or open any event to review the full team roster.</p>
-            </div>
-            <a href="{% url 'events:event_list' %}" class="apple-link-cta">
-                All scheduled events <span class="chevron" aria-hidden="true">&rarr;</span>
-            </a>
-        </div>
-
-        {% if my_assignments %}
-        <div class="apple-row-list">
-            {% for assign in my_assignments %}
-            <div class="apple-row-item">
-                <div class="d-flex align-items-center gap-3 gap-md-4">
-                    <div class="apple-date-badge" aria-hidden="true">
-                        <span class="apple-date-month">{{ assign.event.event_date|date:"M" }}</span>
-                        <span class="apple-date-day">{{ assign.event.event_date|date:"d" }}</span>
-                    </div>
-                    <div>
-                        <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                            <a href="{% url 'events:event_detail' event_id=assign.event.id %}" class="fw-bold text-decoration-none" style="font-size: 16px; color: var(--eve-text);">
-                                {{ assign.event.title }}
-                            </a>
-                            <span class="eve-status-pill {% if assign.status == 'CONFIRMED' or assign.status == 'COMPLETED' %}eve-status-confirmed{% elif assign.status == 'CANCELLED' %}eve-status-declined{% else %}eve-status-pending{% endif %}">
-                                <span class="eve-status-dot"></span> {{ assign.get_status_display }}
-                            </span>
-                        </div>
-                        <div class="apple-caption d-flex flex-wrap align-items-center gap-2 gap-md-3">
-                            <span class="fw-semibold" style="color: var(--eve-text);">{{ assign.assigned_role }}</span>
-                            <span>&middot;</span>
-                            <span>{{ assign.event.company.name }}</span>
-                            <span>&middot;</span>
-                            <span class="tabular-nums">{{ assign.start_time|time:"g:i A" }} &ndash; {{ assign.end_time|time:"g:i A" }}</span>
-                            {% if assign.assigned_location %}
-                            <span>&middot;</span>
-                            <span>{{ assign.assigned_location }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex flex-wrap align-items-center gap-2">
-                    {% if assign.status == 'ASSIGNED' %}
-                    <form method="POST" action="{% url 'events:assignment_update' assignment_id=assign.id %}" class="m-0">
-                        {% csrf_token %}
-                        <input type="hidden" name="status" value="CONFIRMED">
-                        <button type="submit" class="btn-apple-primary btn-apple-sm">Confirm</button>
-                    </form>
-                    {% endif %}
-                    <a href="{% url 'events:event_detail' event_id=assign.event.id %}" class="btn-apple-secondary btn-apple-sm">
-                        Briefing
-                    </a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="apple-tile text-center py-5">
-            <div class="mx-auto" style="max-width: 440px;">
-                <h3 class="apple-headline-tile mb-2">No shifts assigned yet</h3>
-                <p class="apple-body mb-4">
-                    When an organization manager assigns you to an event shift, it will appear in this timeline for one-tap confirmation.
-                </p>
-                <a href="{% url 'events:event_list' %}" class="btn-apple-primary btn-apple-sm">Explore Events</a>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-</section>
-
-<!-- 4. Workspaces & Quick Dispatch (7 + 5 Asymmetric Grid) -->
-<section class="apple-section-canvas">
-    <div class="apple-container-wide">
-        <div class="apple-bento-grid">
-            <!-- 7-Column Active Organizations Directory -->
-            <div class="apple-tile bento-span-7">
-                <div>
-                    <div class="d-flex justify-content-between align-items-baseline mb-2">
-                        <h2 class="apple-headline-tile">Active workspaces</h2>
-                        <a href="{% url 'events:company_list' %}" class="apple-link-cta apple-link-cta-sm">
-                            Directory ({{ user_memberships.count }}) <span class="chevron" aria-hidden="true">&rarr;</span>
-                        </a>
-                    </div>
-                    <p class="apple-body mb-3">
-                        Switch between organizations, review member rosters, and manage access permissions.
-                    </p>
-
-                    {% if user_memberships %}
-                    <div class="apple-row-list">
-                        {% for membership in user_memberships %}
-                        <div class="apple-row-item py-3">
-                            <div>
-                                <div class="fw-bold" style="font-size: 15px; color: var(--eve-text);">
-                                    {{ membership.company.name }}
-                                </div>
-                                <div class="apple-caption tabular-nums">
-                                    Joined {{ membership.joined_at|date:"M Y" }}
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center gap-3">
-                                <span class="eve-role-badge {% if membership.role == 'OWNER' %}eve-role-owner{% elif membership.role == 'MANAGER' %}eve-role-manager{% endif %}">
-                                    {{ membership.get_role_display }}
-                                </span>
-                                <a href="{% url 'events:company_members' company_id=membership.company.id %}" class="apple-link-cta apple-link-cta-sm">
-                                    Roster <span class="chevron" aria-hidden="true">&rarr;</span>
+            {% if upcoming_events_list %}
+            <div class="table-responsive">
+                <table class="eve-data-table">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Organization</th>
+                            <th>Date &amp; Window</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ev in upcoming_events_list %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'events:event_detail' event_id=ev.id %}" class="fw-semibold text-decoration-none" style="color: var(--eve-text);">
+                                    {{ ev.title }}
                                 </a>
-                            </div>
-                        </div>
+                                <div style="font-size: 12px; color: var(--eve-text-muted);">{{ ev.location }}</div>
+                            </td>
+                            <td style="color: var(--eve-text-secondary);">{{ ev.company.name }}</td>
+                            <td class="eve-mono" style="font-size: 12.5px;">
+                                <div>{{ ev.event_date|date:"M d, Y" }}</div>
+                                <div style="color: var(--eve-text-muted);">{{ ev.start_time|time:"g:i A" }}&ndash;{{ ev.end_time|time:"g:i A" }}</div>
+                            </td>
+                            <td>
+                                {% include 'components/status_badge.html' with status=ev.status label=ev.get_status_display %}
+                            </td>
+                        </tr>
                         {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="py-4">
-                        <p class="apple-body mb-3">You haven't joined an organization yet.</p>
-                        <a href="{% url 'events:company_list' %}" class="btn-apple-primary btn-apple-sm">Find or Create an Organization</a>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="pt-3 mt-3 apple-divider-top">
-                    <a href="{% url 'events:company_create' %}" class="apple-link-cta apple-link-cta-sm">
-                        Create a new organization <span class="chevron" aria-hidden="true">&rarr;</span>
-                    </a>
-                </div>
+                    </tbody>
+                </table>
             </div>
-
-            <!-- 5-Column Dark Forest Studio Surface -->
-            <div class="apple-tile apple-tile-pro bento-span-5">
-                <div>
-                    <h2 class="apple-headline-tile mb-2">Command &amp; preferences</h2>
-                    <p class="apple-body mb-4">
-                        Publish new multi-shift events, assign verified staff to stations, or toggle between Warm Alabaster and Carbon Dark themes.
-                    </p>
-                </div>
-
-                <div class="apple-pro-list">
-                    <div class="apple-pro-row">
-                        <div>
-                            <div class="fw-semibold" style="font-size: 15px;">Schedule an Event</div>
-                            <div class="apple-caption">Set dates, shift windows, and venue</div>
-                        </div>
-                        <a href="{% url 'events:event_create' %}" class="btn-apple-primary btn-apple-sm">New Event</a>
-                    </div>
-                    <div class="apple-pro-row">
-                        <div>
-                            <div class="fw-semibold" style="font-size: 15px;">Interface Theme</div>
-                            <div class="apple-caption">Switch Warm Alabaster or Carbon Dark</div>
-                        </div>
-                        <a href="{% url 'usersettings:settings' %}" class="apple-link-cta apple-link-cta-sm">
-                            Configure <span class="chevron" aria-hidden="true">&rarr;</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+            {% else %}
+            {% url 'events:event_create' as create_event_url %}
+            {% include 'components/empty_state.html' with icon="bi-calendar-plus" title="No upcoming events scheduled" description="Create an event to start assigning team members and tracking shift attendance." cta_url=create_event_url cta_label="Schedule Event" %}
+            {% endif %}
+        </section>
     </div>
-</section>
+
+    <!-- Right Rail: Needs Attention + Organizations -->
+    <div class="col-lg-4 d-flex flex-column gap-4">
+        <!-- Needs Attention Queue -->
+        <section class="eve-panel" aria-label="Needs Attention">
+            <div class="eve-panel-header">
+                <div>
+                    <h2 class="eve-panel-title">Needs Attention</h2>
+                    <p class="eve-panel-subtitle">Actionable items from live workspace records</p>
+                </div>
+            </div>
+            <div class="eve-panel-body d-flex flex-column gap-2">
+                <a href="{% url 'events:event_list' %}?status=UPCOMING" class="d-flex align-items-center justify-content-between p-2 rounded-2 text-decoration-none" style="background: var(--eve-surface-subtle); color: var(--eve-text);">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check2-circle" style="color: var(--eve-accent);" aria-hidden="true"></i>
+                        <span style="font-size: 13px; font-weight: 500;">Shifts awaiting your confirmation</span>
+                    </div>
+                    <span class="eve-mono fw-bold" style="font-size: 13px;">{{ pending_confirmations_count }}</span>
+                </a>
+
+                <a href="{% url 'events:swap_board' %}" class="d-flex align-items-center justify-content-between p-2 rounded-2 text-decoration-none" style="background: var(--eve-surface-subtle); color: var(--eve-text);">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-arrow-left-right" style="color: var(--eve-warning-text);" aria-hidden="true"></i>
+                        <span style="font-size: 13px; font-weight: 500;">Pending shift swap requests</span>
+                    </div>
+                    <span class="eve-mono fw-bold" style="font-size: 13px;">{{ pending_swaps_count }}</span>
+                </a>
+
+                {% if can_manage_any %}
+                <a href="{% url 'events:attendance_dashboard' %}" class="d-flex align-items-center justify-content-between p-2 rounded-2 text-decoration-none" style="background: var(--eve-surface-subtle); color: var(--eve-text);">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-stopwatch" style="color: var(--eve-info-text);" aria-hidden="true"></i>
+                        <span style="font-size: 13px; font-weight: 500;">Attendance awaiting verification</span>
+                    </div>
+                    <span class="eve-mono fw-bold" style="font-size: 13px;">{{ unverified_attendance_count }}</span>
+                </a>
+                {% endif %}
+
+                <a href="{% url 'events:event_list' %}" class="d-flex align-items-center justify-content-between p-2 rounded-2 text-decoration-none" style="background: var(--eve-surface-subtle); color: var(--eve-text);">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-list-check" style="color: var(--eve-text-secondary);" aria-hidden="true"></i>
+                        <span style="font-size: 13px; font-weight: 500;">Open operational tasks</span>
+                    </div>
+                    <span class="eve-mono fw-bold" style="font-size: 13px;">{{ incomplete_tasks_count }}</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Your Organizations -->
+        <section class="eve-panel" aria-label="Your Organizations">
+            <div class="eve-panel-header">
+                <div>
+                    <h2 class="eve-panel-title">Your Organizations</h2>
+                    <p class="eve-panel-subtitle">{{ user_memberships.count }} active workspace{{ user_memberships.count|pluralize }}</p>
+                </div>
+                <a href="{% url 'events:company_list' %}" class="eve-btn eve-btn-ghost eve-btn-sm">Manage</a>
+            </div>
+            <div class="eve-panel-body d-flex flex-column gap-2">
+                {% for mem in user_memberships %}
+                <div class="d-flex align-items-center justify-content-between gap-2 p-2 rounded-2" style="border: 1px solid var(--eve-border);">
+                    <div class="text-truncate">
+                        <div class="fw-semibold text-truncate" style="font-size: 13.5px;">{{ mem.company.name }}</div>
+                        <div style="font-size: 12px; color: var(--eve-text-muted);">{{ mem.get_role_display }}</div>
+                    </div>
+                    <a href="{% url 'events:company_members' company_id=mem.company.id %}" class="eve-btn eve-btn-secondary eve-btn-sm">Roster</a>
+                </div>
+                {% empty %}
+                <p class="mb-2" style="font-size: 13px; color: var(--eve-text-secondary);">You are not a member of any organization yet.</p>
+                <a href="{% url 'events:company_create' %}" class="eve-btn eve-btn-primary eve-btn-sm">Create Organization</a>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
 {% endblock %}
