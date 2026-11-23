@@ -274,7 +274,7 @@
             {% if tasks %}
             <div class="list-group list-group-flush mb-4 border rounded-3 overflow-hidden">
                 {% for t in tasks %}
-                <div class="list-group-item d-flex align-items-center justify-content-between py-3 px-3 {% if t.is_completed %}bg-light text-muted{% endif %}">
+                <div class="list-group-item d-flex align-items-center justify-content-between py-3 px-3 {% if t.is_completed %}opacity-75 text-muted{% endif %}">
                     <div class="d-flex align-items-center gap-3">
                         <form method="post" action="{% url 'events:task_toggle' task_id=t.id %}" class="m-0">
                             {% csrf_token %}
@@ -294,7 +294,7 @@
                                 {% endif %}
                                 {% if t.due_time %}Due by {{ t.due_time|time:"g:i A" }} &bull;{% endif %}
                                 Priority:
-                                <span class="badge {% if t.priority == 'URGENT' %}bg-danger{% elif t.priority == 'HIGH' %}bg-warning text-dark{% else %}bg-light text-dark border{% endif %}">
+                                <span class="badge {% if t.priority == 'URGENT' %}bg-danger{% elif t.priority == 'HIGH' %}bg-warning text-dark{% else %}bg-secondary-subtle text-body border{% endif %}">
                                     {{ t.priority|title }}
                                 </span>
                             </div>
@@ -316,7 +316,7 @@
             {% endif %}
 
             <!-- Add Task Form -->
-            <form method="post" action="{% url 'events:task_create' event_id=event.id %}" class="p-3 bg-light rounded-3 border">
+            <form method="post" action="{% url 'events:task_create' event_id=event.id %}" class="p-3 rounded-3 border" style="background-color: var(--eve-surface-subtle);">
                 {% csrf_token %}
                 <div class="row g-2 align-items-end">
                     <div class="col-md-5">

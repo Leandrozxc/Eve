@@ -57,7 +57,7 @@
                 <div class="card eve-feature-card p-3 h-100">
                     <span class="apple-caption text-uppercase fw-semibold text-muted">Total Logs</span>
                     <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold text-dark">{{ records|length }}</span>
+                        <span class="fs-2 fw-bold">{{ records|length }}</span>
                         <span class="small text-muted">Records Logged</span>
                     </div>
                 </div>
@@ -102,7 +102,7 @@
                                 <span class="fw-bold d-block">{{ a.event.title }}</span>
                                 <small class="text-muted">{{ a.assigned_role }} &bull; {{ a.assigned_location|default:a.event.location }}</small>
                             </div>
-                            <span class="badge bg-light text-dark border">{{ a.start_time|time:"g:i A" }} – {{ a.end_time|time:"g:i A" }}</span>
+                            <span class="badge bg-secondary-subtle text-body border">{{ a.start_time|time:"g:i A" }} – {{ a.end_time|time:"g:i A" }}</span>
                         </div>
                         <form method="post" action="{% url 'events:clock_in' assignment_id=a.id %}" class="mt-2">
                             {% csrf_token %}
