@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Shift Swaps &amp; Cover Requests — Eve{% endblock %}
+
+{% block content %}
+<section class="apple-section-canvas">
+    <div class="apple-container-wide">
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+            <div>
+                <p class="apple-eyebrow mb-1">Workforce Flexibility</p>
+                <h1 class="apple-headline-page mb-1">Shift Swaps &amp; Cover Board</h1>
+                <p class="apple-body mb-0">Request coverage for upcoming shifts, claim open teammate shifts, or approve swaps.</p>
+            </div>
+            <a href="{% url 'events:event_list' %}" class="btn-apple-secondary btn-apple-sm">
+                Back to Events &amp; Shifts
+            </a>
+        </div>
+
+        {% if is_manager_anywhere %}
+        <div class="apple-tile mb-4 p-0 overflow-hidden">
+            <div class="p-4 apple-divider-bottom">
+                <h2 class="apple-headline-tile mb-0">Manager Approval Queue</h2>
+                <p class="apple-caption mb-0">Claimed or targeted swap requests waiting for manager sign-off.</p>
+            </div>
+            <div class="table-responsive">
+                <table class="eve-table">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Event &amp; Shift</th>
+                            <th>Requester</th>
+                            <th>Covering Teammate</th>
+                            <th>Reason</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in pending_approvals %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-semibold" style="color: var(--eve-text);">{{ req.assignment.event.title }}</div>
+                                <div class="apple-caption tabular-nums">{{ req.assignment.event.event_date|date:"M d, Y" }} &middot; {{ req.assignment.start_time|time:"g:i A" }}&ndash;{{ req.assignment.end_time|time:"g:i A" }}</div>
+                            </td>
+                            <td>{{ req.requested_by.user.get_full_name|default:req.requested_by.user.username }}</td>
+                            <td>
+                                {% if req.target_member %}
+                                    <span class="fw-semibold">{{ req.target_member.user.get_full_name|default:req.target_member.user.username }}</span>
+                                {% else %}
+                                    <span class="apple-caption">Open — awaiting volunteer</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="apple-caption">{{ req.reason|default:"No reason provided" }}</span></td>
+                            <td class="text-end pe-4">
+                                <div class="d-inline-flex gap-2">
+                                    {% if req.target_member %}
+                                    <form method="post" action="{% url 'events:swap_request_respond' request_id=req.id %}" class="m-0">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="btn-apple-primary btn-apple-sm">Approve</button>
+                                    </form>
+                                    {% endif %}
+                                    <form method="post" action="{% url 'events:swap_request_respond' request_id=req.id %}" class="m-0">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="decline">
+                                        <button type="submit" class="btn-apple-ghost btn-apple-sm text-danger">Decline</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                <p class="apple-caption mb-0">No pending swap approvals right now.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="apple-bento-grid mb-4">
+            <div class="apple-tile bento-span-6 p-0 overflow-hidden">
+                <div class="p-4 apple-divider-bottom">
+                    <h2 class="apple-headline-tile mb-0">Available Shifts to Cover</h2>
+                    <p class="apple-caption mb-0">Open requests from teammates with no schedule conflict for you.</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="eve-table">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Event</th>
+                                <th>From</th>
+                                <th class="text-end pe-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in claimable_requests %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-semibold">{{ req.assignment.event.title }}</div>
+                                    <div class="apple-caption tabular-nums">{{ req.assignment.event.event_date|date:"M d" }} &middot; {{ req.assignment.start_time|time:"g:i A" }}&ndash;{{ req.assignment.end_time|time:"g:i A" }} ({{ req.assignment.assigned_role }})</div>
+                                </td>
+                                <td>{{ req.requested_by.user.get_full_name|default:req.requested_by.user.username }}</td>
+                                <td class="text-end pe-4">
+                                    <form method="post" action="{% url 'events:swap_request_respond' request_id=req.id %}" class="m-0">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="claim">
+                                        <button type="submit" class="btn-apple-primary btn-apple-sm">Claim Shift</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4">
+                                    <p class="apple-caption mb-0">No open cover requests available.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="apple-tile bento-span-6 p-0 overflow-hidden">
+                <div class="p-4 apple-divider-bottom">
+                    <h2 class="apple-headline-tile mb-0">My Swap Requests</h2>
+                    <p class="apple-caption mb-0">Track cover requests you submitted.</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="eve-table">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Event</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in my_requests %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-semibold">{{ req.assignment.event.title }}</div>
+                                    <div class="apple-caption">{{ req.reason|default:"Cover requested" }}</div>
+                                </td>
+                                <td>
+                                    <span class="eve-status-pill {% if req.status == 'APPROVED' %}eve-status-confirmed{% elif req.status == 'DECLINED' or req.status == 'CANCELLED' %}eve-status-declined{% else %}eve-status-pending{% endif %}">
+                                        <span class="eve-status-dot"></span> {{ req.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    {% if req.status == 'PENDING' %}
+                                    <form method="post" action="{% url 'events:swap_request_respond' request_id=req.id %}" class="m-0">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="cancel">
+                                        <button type="submit" class="btn-apple-ghost btn-apple-sm text-danger">Cancel</button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4">
+                                    <p class="apple-caption mb-0">You have not submitted any swap requests.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

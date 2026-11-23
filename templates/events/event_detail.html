@@ -73,7 +73,7 @@
                     &middot; Window: <strong class="tabular-nums">{{ my_assignment.start_time|time:"g:i A" }} &ndash; {{ my_assignment.end_time|time:"g:i A" }}</strong>
                 </div>
             </div>
-            <div>
+            <div class="d-flex flex-wrap align-items-center gap-2">
                 {% if my_assignment.status == 'ASSIGNED' %}
                 <form method="post" action="{% url 'events:assignment_update' assignment_id=my_assignment.id %}" class="m-0">
                     {% csrf_token %}
@@ -90,6 +90,21 @@
                         Mark Shift Completed
                     </button>
                 </form>
+                {% endif %}
+                {% if my_assignment.status == 'ASSIGNED' or my_assignment.status == 'CONFIRMED' %}
+                    {% if my_pending_swap %}
+                    <a href="{% url 'events:swap_board' %}" class="btn-apple-secondary btn-apple-sm">
+                        Swap Pending
+                    </a>
+                    {% else %}
+                    <form method="post" action="{% url 'events:swap_request_create' assignment_id=my_assignment.id %}" class="d-inline-flex align-items-center gap-2 m-0">
+                        {% csrf_token %}
+                        <input type="text" name="reason" class="form-control eve-input form-control-sm" placeholder="Cover reason (optional)" style="max-width: 180px;">
+                        <button type="submit" class="btn-apple-secondary btn-apple-sm">
+                            Request Cover
+                        </button>
+                    </form>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>

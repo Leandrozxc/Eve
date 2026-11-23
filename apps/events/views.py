@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord, MemberAvailability, EventTask
+from .models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord, MemberAvailability, EventTask, ShiftSwapRequest
 
 
 def _parse_time_value(value):
@@ -437,6 +437,11 @@ def event_detail(request, event_id):
 
     # Check if current logged in user has an assignment
     my_assignment = assignments.filter(member__user=request.user).first()
+    my_pending_swap = (
+        ShiftSwapRequest.objects.filter(assignment=my_assignment, status="PENDING").first()
+        if my_assignment
+        else None
+    )
 
     context = {
         "event": event,
@@ -445,6 +450,7 @@ def event_detail(request, event_id):
         "can_manage": can_manage,
         "available_members": available_members,
         "my_assignment": my_assignment,
+        "my_pending_swap": my_pending_swap,
         "total_assignments": total_assignments,
         "assigned_count": assigned_count,
         "confirmed_count": confirmed_count,
@@ -1080,6 +1086,206 @@ def analytics_report(request, company_id=None):
         "events": events.order_by("-event_date")[:10],
     }
     return render(request, "events/analytics_report.html", context)
+
+
+# ==============================================================================
+# SHIFT SWAP & COVER REQUEST WORKFLOW
+# ==============================================================================
+
+@login_required
+def swap_board(request):
+    """View and manage shift swap/cover requests across the user's companies."""
+    user_memberships = (
+        CompanyMember.objects.filter(user=request.user)
+        .select_related("company")
+        .order_by("company__name")
+    )
+    company_ids = list(user_memberships.values_list("company_id", flat=True))
+    membership_by_company = {m.company_id: m for m in user_memberships}
+    managed_company_ids = [
+        m.company_id for m in user_memberships if m.role in ("OWNER", "MANAGER")
+    ]
+
+    all_requests = (
+        ShiftSwapRequest.objects.filter(assignment__event__company_id__in=company_ids)
+        .select_related(
+            "assignment__event__company",
+            "requested_by__user",
+            "target_member__user",
+            "reviewed_by__user",
+        )
+        .order_by("-created_at")
+    )
+
+    my_requests = [r for r in all_requests if r.requested_by.user_id == request.user.id]
+    pending_approvals = [
+        r
+        for r in all_requests
+        if r.status == "PENDING" and r.assignment.event.company_id in managed_company_ids
+    ]
+
+    claimable_requests = []
+    for r in all_requests:
+        if r.status != "PENDING" or r.requested_by.user_id == request.user.id:
+            continue
+        my_member = membership_by_company.get(r.assignment.event.company_id)
+        if not my_member:
+            continue
+        if r.target_member is not None and r.target_member_id != my_member.id:
+            continue
+        already_assigned = EventAssignment.objects.filter(
+            event=r.assignment.event, member=my_member
+        ).exists()
+        if already_assigned:
+            continue
+        conflicts = _find_shift_conflicts(
+            request.user,
+            r.assignment.event.event_date,
+            r.assignment.start_time,
+            r.assignment.end_time,
+        )
+        if not conflicts:
+            claimable_requests.append(r)
+
+    context = {
+        "my_requests": my_requests,
+        "claimable_requests": claimable_requests,
+        "pending_approvals": pending_approvals,
+        "recent_history": [r for r in all_requests if r.status != "PENDING"][:15],
+        "is_manager_anywhere": bool(managed_company_ids),
+    }
+    return render(request, "events/swap_board.html", context)
+
+
+@login_required
+def swap_request_create(request, assignment_id):
+    """Submit a cover or swap request for the current user's shift assignment."""
+    assignment = get_object_or_404(
+        EventAssignment.objects.select_related("event__company", "member__user"),
+        id=assignment_id,
+    )
+    if assignment.member.user != request.user:
+        messages.error(request, "You can only request a swap for your own shift assignment.")
+        return redirect("events:event_detail", event_id=assignment.event.id)
+
+    if assignment.status in ("COMPLETED", "CANCELLED"):
+        messages.error(request, "Completed or cancelled shifts cannot be swapped.")
+        return redirect("events:event_detail", event_id=assignment.event.id)
+
+    if request.method == "POST":
+        if ShiftSwapRequest.objects.filter(assignment=assignment, status="PENDING").exists():
+            messages.warning(request, "A pending swap request already exists for this shift.")
+            return redirect("events:event_detail", event_id=assignment.event.id)
+
+        reason = request.POST.get("reason", "").strip()
+        target_member_id = request.POST.get("target_member_id")
+        target_member = None
+        if target_member_id:
+            target_member = get_object_or_404(
+                CompanyMember,
+                id=target_member_id,
+                company=assignment.event.company,
+            )
+            if target_member == assignment.member:
+                messages.error(request, "You cannot request a swap with yourself.")
+                return redirect("events:event_detail", event_id=assignment.event.id)
+
+        ShiftSwapRequest.objects.create(
+            assignment=assignment,
+            requested_by=assignment.member,
+            target_member=target_member,
+            reason=reason,
+        )
+        messages.success(request, "Shift cover/swap request submitted!")
+
+    return redirect("events:event_detail", event_id=assignment.event.id)
+
+
+@login_required
+def swap_request_respond(request, request_id):
+    """Handle claim, cancel, approve, or decline actions on a ShiftSwapRequest."""
+    swap_req = get_object_or_404(
+        ShiftSwapRequest.objects.select_related(
+            "assignment__event__company",
+            "requested_by__user",
+            "target_member__user",
+        ),
+        id=request_id,
+    )
+    company = swap_req.assignment.event.company
+    my_member = CompanyMember.objects.filter(company=company, user=request.user).first()
+    if not my_member:
+        messages.error(request, "You do not belong to this organization.")
+        return redirect("events:swap_board")
+
+    if request.method != "POST":
+        return redirect("events:swap_board")
+
+    if swap_req.status != "PENDING":
+        messages.info(request, "This swap request has already been resolved.")
+        return redirect("events:swap_board")
+
+    action = request.POST.get("action")
+    is_manager = my_member.role in ("OWNER", "MANAGER")
+
+    if action == "cancel" and swap_req.requested_by_id == my_member.id:
+        swap_req.status = "CANCELLED"
+        swap_req.reviewed_at = timezone.now()
+        swap_req.save()
+        messages.info(request, "Swap request cancelled.")
+
+    elif action == "claim" and swap_req.requested_by_id != my_member.id:
+        if swap_req.target_member_id and swap_req.target_member_id != my_member.id:
+            messages.error(request, "This swap request is targeted at another teammate.")
+            return redirect("events:swap_board")
+        if EventAssignment.objects.filter(event=swap_req.assignment.event, member=my_member).exists():
+            messages.error(request, "You are already assigned to this event.")
+            return redirect("events:swap_board")
+        conflicts = _find_shift_conflicts(
+            request.user,
+            swap_req.assignment.event.event_date,
+            swap_req.assignment.start_time,
+            swap_req.assignment.end_time,
+        )
+        if conflicts:
+            messages.error(request, f"Cannot claim shift due to conflict with \"{conflicts[0].event.title}\".")
+            return redirect("events:swap_board")
+        swap_req.target_member = my_member
+        swap_req.save()
+        messages.success(request, "You claimed this cover request. Awaiting manager approval.")
+
+    elif action == "approve" and is_manager:
+        replacement = swap_req.target_member
+        if not replacement:
+            messages.error(request, "A teammate must claim or be targeted before approving a swap.")
+            return redirect("events:swap_board")
+        if EventAssignment.objects.filter(event=swap_req.assignment.event, member=replacement).exclude(id=swap_req.assignment_id).exists():
+            messages.error(request, "Replacement member is already assigned to this event.")
+            return redirect("events:swap_board")
+        with transaction.atomic():
+            swap_req.assignment.member = replacement
+            swap_req.assignment.status = "CONFIRMED"
+            swap_req.assignment.save()
+            swap_req.status = "APPROVED"
+            swap_req.reviewed_by = my_member
+            swap_req.reviewed_at = timezone.now()
+            swap_req.save()
+        messages.success(
+            request,
+            f"Swap approved: {replacement.user.get_full_name() or replacement.user.username} now covers {swap_req.assignment.event.title}.",
+        )
+
+    elif action == "decline" and (is_manager or swap_req.target_member_id == my_member.id):
+        swap_req.status = "DECLINED"
+        swap_req.reviewed_by = my_member
+        swap_req.reviewed_at = timezone.now()
+        swap_req.save()
+        messages.info(request, "Swap request declined.")
+
+    else:
+        messages.error(request, "You do not have permission to perform that action.")
+
+    return redirect("events:swap_board")
 
 
 

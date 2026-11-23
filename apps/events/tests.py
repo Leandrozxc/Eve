@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from apps.events.models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord, MemberAvailability, EventTask
+from apps.events.models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord, MemberAvailability, EventTask, ShiftSwapRequest
 
 User = get_user_model()
 
@@ -545,6 +545,90 @@ class ScheduleConflictAndAvailabilityTest(TestCase):
             },
         )
         self.assertTrue(EventAssignment.objects.filter(event=self.event1, member=self.staff_m).exists())
+
+
+class ShiftSwapWorkflowTest(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(username="sw_owner", password="pw")
+        self.staff1 = User.objects.create_user(username="sw_staff1", password="pw")
+        self.staff2 = User.objects.create_user(username="sw_staff2", password="pw")
+        self.company = Company.objects.create(name="SwapCo")
+        self.owner_m = CompanyMember.objects.create(company=self.company, user=self.owner, role="OWNER")
+        self.staff1_m = CompanyMember.objects.create(company=self.company, user=self.staff1, role="STAFF")
+        self.staff2_m = CompanyMember.objects.create(company=self.company, user=self.staff2, role="STAFF")
+        self.event = Event.objects.create(
+            company=self.company,
+            created_by=self.owner_m,
+            title="Weekend Gala",
+            event_date=date(2026, 11, 29),
+            start_time=time(10, 0),
+            end_time=time(16, 0),
+            location="Ballroom",
+            status="UPCOMING",
+        )
+        self.assignment = EventAssignment.objects.create(
+            event=self.event,
+            member=self.staff1_m,
+            assigned_role="Check-in Lead",
+            start_time=time(10, 0),
+            end_time=time(16, 0),
+            status="CONFIRMED",
+        )
+
+    def test_create_claim_and_approve_swap_transfers_assignment(self):
+        self.client.login(username="sw_staff1", password="pw")
+        self.client.post(
+            reverse("events:swap_request_create", kwargs={"assignment_id": self.assignment.id}),
+            {"reason": "Family commitment"},
+        )
+        swap_req = ShiftSwapRequest.objects.get(assignment=self.assignment, status="PENDING")
+
+        self.client.login(username="sw_staff2", password="pw")
+        self.client.post(
+            reverse("events:swap_request_respond", kwargs={"request_id": swap_req.id}),
+            {"action": "claim"},
+        )
+        swap_req.refresh_from_db()
+        self.assertEqual(swap_req.target_member, self.staff2_m)
+
+        self.client.login(username="sw_owner", password="pw")
+        self.client.post(
+            reverse("events:swap_request_respond", kwargs={"request_id": swap_req.id}),
+            {"action": "approve"},
+        )
+        swap_req.refresh_from_db()
+        self.assignment.refresh_from_db()
+        self.assertEqual(swap_req.status, "APPROVED")
+        self.assertEqual(self.assignment.member, self.staff2_m)
+
+    def test_requester_can_cancel_and_manager_can_decline(self):
+        self.client.login(username="sw_staff1", password="pw")
+        self.client.post(
+            reverse("events:swap_request_create", kwargs={"assignment_id": self.assignment.id}),
+            {"reason": "Need cover"},
+        )
+        swap_req = ShiftSwapRequest.objects.get(assignment=self.assignment, status="PENDING")
+        self.client.post(
+            reverse("events:swap_request_respond", kwargs={"request_id": swap_req.id}),
+            {"action": "cancel"},
+        )
+        swap_req.refresh_from_db()
+        self.assertEqual(swap_req.status, "CANCELLED")
+
+        swap_req2 = ShiftSwapRequest.objects.create(
+            assignment=self.assignment,
+            requested_by=self.staff1_m,
+            target_member=self.staff2_m,
+            reason="Sick",
+        )
+        self.client.login(username="sw_owner", password="pw")
+        self.client.post(
+            reverse("events:swap_request_respond", kwargs={"request_id": swap_req2.id}),
+            {"action": "decline"},
+        )
+        swap_req2.refresh_from_db()
+        self.assertEqual(swap_req2.status, "DECLINED")
+
 
 
 

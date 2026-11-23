@@ -67,6 +67,9 @@
                             <a class="nav-link {% if 'availability' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'events:availability_list' %}">Availability</a>
                         </li>
                         <li>
+                            <a class="nav-link {% if 'swap' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'events:swap_board' %}">Shift Swaps</a>
+                        </li>
+                        <li>
                             <a class="nav-link {% if 'analytics' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'events:analytics_report' %}">Analytics &amp; Reports</a>
                         </li>
                         <!-- Mobile-only Account & Preferences section -->

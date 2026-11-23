@@ -263,3 +263,52 @@ class EventTask(models.Model):
         return f"[{status}] {self.title} ({self.event.title})"
 
 
+class ShiftSwapRequest(models.Model):
+    STATUS_CHOICES = [
+        ("PENDING", "Pending"),
+        ("APPROVED", "Approved"),
+        ("DECLINED", "Declined"),
+        ("CANCELLED", "Cancelled"),
+    ]
+
+    assignment = models.ForeignKey(
+        EventAssignment,
+        on_delete=models.CASCADE,
+        related_name="swap_requests",
+    )
+    requested_by = models.ForeignKey(
+        CompanyMember,
+        on_delete=models.CASCADE,
+        related_name="swap_requests_sent",
+    )
+    target_member = models.ForeignKey(
+        CompanyMember,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="swap_requests_received",
+        help_text="Optional specific teammate; leave blank for an open cover request.",
+    )
+    reason = models.CharField(max_length=255, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="PENDING",
+    )
+    reviewed_by = models.ForeignKey(
+        CompanyMember,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="swap_requests_reviewed",
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"SwapRequest({self.assignment.event.title}: {self.requested_by.user.username} -> {self.get_status_display()})"
+
+

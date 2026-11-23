@@ -40,4 +40,9 @@ urlpatterns = [
     path("tasks/<int:task_id>/delete/", views.task_delete, name="task_delete"),
     path("analytics/", views.analytics_report, name="analytics_report"),
     path("analytics/company/<int:company_id>/", views.analytics_report, name="company_analytics_report"),
+
+    # Shift Swap & Cover Requests
+    path("swaps/", views.swap_board, name="swap_board"),
+    path("assignments/<int:assignment_id>/swap/", views.swap_request_create, name="swap_request_create"),
+    path("swaps/<int:request_id>/respond/", views.swap_request_respond, name="swap_request_respond"),
 ]
