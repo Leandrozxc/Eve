@@ -686,6 +686,58 @@ class SearchAndExportTest(TestCase):
         self.assertIn("Jazz Night", ana_resp.content.decode())
 
 
+class RedesignedUIRegressionTest(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(username="ui_owner", email="ui_owner@example.com", password="pw")
+        self.company = Company.objects.create(name="Studio UI Co")
+        self.owner_m = CompanyMember.objects.create(company=self.company, user=self.owner, role="OWNER")
+        self.event = Event.objects.create(
+            company=self.company,
+            created_by=self.owner_m,
+            title="Annual Summit",
+            event_date=date(2026, 11, 28),
+            start_time=time(9, 0),
+            end_time=time(17, 0),
+            location="Main Auditorium",
+            status="UPCOMING",
+        )
+        self.assignment = EventAssignment.objects.create(
+            event=self.event,
+            member=self.owner_m,
+            assigned_role="Lead",
+            start_time=time(9, 0),
+            end_time=time(17, 0),
+            status="CONFIRMED",
+        )
+        self.client.login(username="ui_owner", password="pw")
+
+    def test_all_redesigned_pages_render_in_workspace_shell(self):
+        urls = [
+            reverse("home:home"),
+            reverse("events:event_list"),
+            reverse("events:event_list") + "?view=calendar",
+            reverse("events:event_list") + "?view=schedule",
+            reverse("events:event_create"),
+            reverse("events:event_detail", kwargs={"event_id": self.event.id}),
+            reverse("events:event_edit", kwargs={"event_id": self.event.id}),
+            reverse("events:company_list"),
+            reverse("events:company_create"),
+            reverse("events:company_members", kwargs={"company_id": self.company.id}),
+            reverse("events:attendance_dashboard"),
+            reverse("events:availability_list"),
+            reverse("events:swap_board"),
+            reverse("events:analytics_report"),
+            reverse("userprofile:profile"),
+            reverse("usersettings:settings"),
+        ]
+        for url in urls:
+            resp = self.client.get(url)
+            self.assertEqual(resp.status_code, 200, f"Failed rendering {url}")
+            self.assertContains(resp, "eveSidebar")
+            self.assertContains(resp, "eve-topbar")
+
+
+
 
 
 
