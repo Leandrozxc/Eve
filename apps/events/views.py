@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -7,6 +7,32 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .models import Company, CompanyMember, Event, EventAssignment, AttendanceRecord, MemberAvailability, EventTask
+
+
+def _parse_time_value(value):
+    """Parse a time string in HH:MM or HH:MM:SS format into a datetime.time object."""
+    if not value:
+        return None
+    if hasattr(value, "hour") and hasattr(value, "minute"):
+        return value
+    raw = str(value).strip()
+    for fmt in ("%H:%M", "%H:%M:%S"):
+        try:
+            return datetime.strptime(raw, fmt).time()
+        except ValueError:
+            continue
+    return None
+
+
+def _validate_time_window(start_val, end_val):
+    """Validate that start and end times parse cleanly and end_time is after start_time."""
+    start_obj = _parse_time_value(start_val)
+    end_obj = _parse_time_value(end_val)
+    if start_obj is None or end_obj is None:
+        return None, None, "Please provide valid start and end times."
+    if end_obj <= start_obj:
+        return None, None, "End time must be after start time."
+    return start_obj, end_obj, None
 
 
 # ==============================================================================
@@ -219,7 +245,12 @@ def event_create(request):
 
         if not title or not event_date or not start_time or not end_time or not location:
             messages.error(request, "Please fill in all required fields.")
-            return render(request, "events/event_form.html", {"memberships": eligible_memberships})
+            return render(request, "events/event_form.html", {"memberships": eligible_memberships, "is_edit": False})
+
+        start_obj, end_obj, time_error = _validate_time_window(start_time, end_time)
+        if time_error:
+            messages.error(request, time_error)
+            return render(request, "events/event_form.html", {"memberships": eligible_memberships, "is_edit": False})
 
         event = Event.objects.create(
             company=membership.company,
@@ -227,8 +258,8 @@ def event_create(request):
             title=title,
             description=description,
             event_date=event_date,
-            start_time=start_time,
-            end_time=end_time,
+            start_time=start_obj,
+            end_time=end_obj,
             location=location,
             status=status,
         )
@@ -263,11 +294,16 @@ def event_edit(request, event_id):
             messages.error(request, "Please fill in all required fields.")
             return render(request, "events/event_form.html", {"event": event, "is_edit": True})
 
+        start_obj, end_obj, time_error = _validate_time_window(start_time, end_time)
+        if time_error:
+            messages.error(request, time_error)
+            return render(request, "events/event_form.html", {"event": event, "is_edit": True})
+
         event.title = title
         event.description = description
         event.event_date = event_date
-        event.start_time = start_time
-        event.end_time = end_time
+        event.start_time = start_obj
+        event.end_time = end_obj
         event.location = location
         if status in dict(Event.STATUS_CHOICES):
             event.status = status
@@ -403,6 +439,11 @@ def assignment_create(request, event_id):
             messages.error(request, "Please select a member and assign a role.")
             return redirect("events:event_detail", event_id=event.id)
 
+        start_obj, end_obj, time_error = _validate_time_window(start_time, end_time)
+        if time_error:
+            messages.error(request, time_error)
+            return redirect("events:event_detail", event_id=event.id)
+
         target_member = get_object_or_404(CompanyMember, id=member_id, company=event.company)
 
         # Check unique constraint
@@ -415,8 +456,8 @@ def assignment_create(request, event_id):
             member=target_member,
             assigned_role=assigned_role,
             assigned_location=assigned_location,
-            start_time=start_time,
-            end_time=end_time,
+            start_time=start_obj,
+            end_time=end_obj,
             status=status,
         )
         messages.success(request, f"Assigned {target_member.user.get_full_name() or target_member.user.username} as {assigned_role}!")
@@ -452,14 +493,21 @@ def assignment_update(request, assignment_id):
             start_time = request.POST.get("start_time")
             end_time = request.POST.get("end_time")
 
+            if start_time or end_time:
+                start_obj, end_obj, time_error = _validate_time_window(
+                    start_time or assignment.start_time,
+                    end_time or assignment.end_time,
+                )
+                if time_error:
+                    messages.error(request, time_error)
+                    return redirect("events:event_detail", event_id=assignment.event.id)
+                assignment.start_time = start_obj
+                assignment.end_time = end_obj
+
             if role:
                 assignment.assigned_role = role
             if location:
                 assignment.assigned_location = location
-            if start_time:
-                assignment.start_time = start_time
-            if end_time:
-                assignment.end_time = end_time
 
         assignment.save()
         messages.success(request, f"Assignment for {assignment.member.user.username} updated to {assignment.get_status_display()}.")

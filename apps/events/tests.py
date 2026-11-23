@@ -363,5 +363,87 @@ class TaskAndAnalyticsWorkflowTest(TestCase):
         self.assertFalse(EventTask.objects.filter(id=task.id).exists())
 
 
+class TimeWindowValidationTest(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(username="tw_owner", password="pw")
+        self.staff = User.objects.create_user(username="tw_staff", password="pw")
+        self.company = Company.objects.create(name="TimeCo")
+        self.owner_m = CompanyMember.objects.create(company=self.company, user=self.owner, role="OWNER")
+        self.staff_m = CompanyMember.objects.create(company=self.company, user=self.staff, role="STAFF")
+        self.event = Event.objects.create(
+            company=self.company,
+            created_by=self.owner_m,
+            title="Valid Event",
+            event_date=date(2026, 11, 25),
+            start_time=time(9, 0),
+            end_time=time(17, 0),
+            location="Main Hall",
+            status="UPCOMING",
+        )
+        self.client.login(username="tw_owner", password="pw")
+
+    def test_event_create_rejects_end_before_start(self):
+        response = self.client.post(
+            reverse("events:event_create"),
+            {
+                "company_id": self.company.id,
+                "title": "Bad Window Event",
+                "event_date": "2026-11-26",
+                "start_time": "17:00",
+                "end_time": "09:00",
+                "location": "Room A",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Event.objects.filter(title="Bad Window Event").exists())
+
+    def test_event_edit_rejects_equal_start_and_end(self):
+        self.client.post(
+            reverse("events:event_edit", kwargs={"event_id": self.event.id}),
+            {
+                "title": "Valid Event",
+                "event_date": "2026-11-25",
+                "start_time": "10:00",
+                "end_time": "10:00",
+                "location": "Main Hall",
+            },
+        )
+        self.event.refresh_from_db()
+        self.assertEqual(self.event.start_time, time(9, 0))
+        self.assertEqual(self.event.end_time, time(17, 0))
+
+    def test_assignment_create_and_update_reject_invalid_window(self):
+        self.client.post(
+            reverse("events:assignment_create", kwargs={"event_id": self.event.id}),
+            {
+                "member_id": self.staff_m.id,
+                "assigned_role": "Usher",
+                "start_time": "15:00",
+                "end_time": "12:00",
+            },
+        )
+        self.assertFalse(EventAssignment.objects.filter(event=self.event, member=self.staff_m).exists())
+
+        assignment = EventAssignment.objects.create(
+            event=self.event,
+            member=self.staff_m,
+            assigned_role="Usher",
+            start_time=time(9, 0),
+            end_time=time(13, 0),
+        )
+        self.client.post(
+            reverse("events:assignment_update", kwargs={"assignment_id": assignment.id}),
+            {
+                "start_time": "14:00",
+                "end_time": "11:00",
+                "status": "ASSIGNED",
+            },
+        )
+        assignment.refresh_from_db()
+        self.assertEqual(assignment.start_time, time(9, 0))
+        self.assertEqual(assignment.end_time, time(13, 0))
+
+
+
 
 
