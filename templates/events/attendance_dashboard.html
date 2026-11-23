@@ -1,222 +1,219 @@
 {% extends "base.html" %}
 
-{% block title %}Real-Time Attendance &amp; Check-In{% endblock %}
+{% block title %}Attendance &amp; Check-In Logs{% endblock %}
 
 {% block full_bleed %}
-<section class="apple-section-white">
-    <div class="apple-container-wide">
-        <div class="eve-workspace-header mb-4">
-            <div>
-                <h1 class="apple-headline-section">Attendance &amp; Check-In Logs</h1>
-                <p class="apple-subhead">
-                    Monitor crew check-in times, verify shift completions, and review real-time attendance telemetry.
-                </p>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <a href="{% url 'events:export_attendance_csv' %}" class="btn-apple-secondary btn-apple-sm">
-                    <i class="bi bi-download"></i>
-                    <span>Export CSV</span>
-                </a>
-                <a href="{% url 'events:event_list' %}" class="btn-apple-secondary btn-apple-sm">
-                    <i class="bi bi-calendar-event"></i>
-                    <span>Events Schedule</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- Telemetry Statistics Cards -->
-        <div class="row g-3 mb-4">
-            <div class="col-sm-6 col-lg-3">
-                <div class="card eve-feature-card p-3 h-100">
-                    <span class="apple-caption text-uppercase fw-semibold text-muted">Currently Active</span>
-                    <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold text-primary">{{ total_clocked_in }}</span>
-                        <span class="small text-muted">Crew Clocked In</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card eve-feature-card p-3 h-100">
-                    <span class="apple-caption text-uppercase fw-semibold text-muted">Completed Shifts</span>
-                    <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold text-success">{{ total_clocked_out }}</span>
-                        <span class="small text-muted">Clocked Out</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card eve-feature-card p-3 h-100">
-                    <span class="apple-caption text-uppercase fw-semibold text-muted">Manager Verified</span>
-                    <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold text-info">{{ total_verified }}</span>
-                        <span class="small text-muted">Audit Approved</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card eve-feature-card p-3 h-100">
-                    <span class="apple-caption text-uppercase fw-semibold text-muted">Total Logs</span>
-                    <div class="d-flex align-items-baseline gap-2 mt-1">
-                        <span class="fs-2 fw-bold">{{ records|length }}</span>
-                        <span class="small text-muted">Records Logged</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filter bar -->
-        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 pt-3 apple-divider-top">
-            <div class="eve-segmented-control" role="tablist">
-                <a href="{% url 'events:attendance_dashboard' %}" class="eve-segmented-item {% if not selected_company %}active{% endif %}">
-                    All Workspaces
-                </a>
-                {% for mem in user_memberships %}
-                <a href="{% url 'events:company_attendance_dashboard' company_id=mem.company.id %}" class="eve-segmented-item {% if selected_company and selected_company.id == mem.company.id %}active{% endif %}">
-                    {{ mem.company.name }}
-                </a>
-                {% endfor %}
-            </div>
-        </div>
+<!-- 1. Page Header -->
+<div class="eve-page-header">
+    <div>
+        <div class="eve-page-eyebrow">Operations Console</div>
+        <h1 class="eve-page-title">Attendance &amp; Check-In Logs</h1>
+        <p class="eve-page-subtitle">Monitor live crew check-ins, track shift durations, and verify completed attendance records.</p>
     </div>
-</section>
+    <div class="eve-page-actions">
+        <a href="{% url 'events:export_attendance_csv' %}" class="eve-btn eve-btn-secondary eve-btn-sm">
+            <i class="bi bi-download" aria-hidden="true"></i>
+            <span>Export CSV</span>
+        </a>
+        <a href="{% url 'events:event_list' %}" class="eve-btn eve-btn-primary eve-btn-sm">
+            <i class="bi bi-calendar3" aria-hidden="true"></i>
+            <span>Events Schedule</span>
+        </a>
+    </div>
+</div>
 
-<section class="apple-section-canvas">
-    <div class="apple-container-wide">
+<!-- 2. Summary Metrics Strip -->
+<div class="eve-metric-grid">
+    {% include 'components/metric_card.html' with label="Currently Clocked In" value=total_clocked_in meta="Active crew on duty" icon="bi-stopwatch" %}
+    {% include 'components/metric_card.html' with label="Clocked Out" value=total_clocked_out meta="Completed shifts awaiting or done" icon="bi-box-arrow-right" %}
+    {% include 'components/metric_card.html' with label="Verified Records" value=total_verified meta="Manager audit approved" icon="bi-patch-check" %}
+    {% include 'components/metric_card.html' with label="Total Logs" value=records|length meta="Records in current view" icon="bi-journal-check" %}
+</div>
 
-        <!-- Pending Clock-Ins for Current User -->
-        {% if my_pending_clockins %}
-        <div class="card shadow-sm border rounded-4 p-4 mb-4">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-warning text-dark p-2 rounded-circle"><i class="bi bi-clock-history"></i></span>
-                    <h5 class="fw-bold mb-0">Your Upcoming Shift Check-Ins</h5>
-                </div>
-                <span class="small text-muted">Direct Actions</span>
-            </div>
-            <div class="row g-3">
-                {% for a in my_pending_clockins %}
-                <div class="col-md-6 col-lg-4">
-                    <div class="card eve-feature-card p-3 border">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <div>
-                                <span class="fw-bold d-block">{{ a.event.title }}</span>
-                                <small class="text-muted">{{ a.assigned_role }} &bull; {{ a.assigned_location|default:a.event.location }}</small>
-                            </div>
-                            <span class="badge bg-secondary-subtle text-body border">{{ a.start_time|time:"g:i A" }} – {{ a.end_time|time:"g:i A" }}</span>
+<!-- 3. Workspace & Table Filter Bar -->
+<div class="eve-filter-bar">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <a href="{% url 'events:attendance_dashboard' %}" class="eve-btn eve-btn-sm {% if not selected_company %}eve-btn-primary{% else %}eve-btn-secondary{% endif %}">
+            All Workspaces
+        </a>
+        {% for mem in user_memberships %}
+        <a href="{% url 'events:company_attendance_dashboard' company_id=mem.company.id %}" class="eve-btn eve-btn-sm {% if selected_company and selected_company.id == mem.company.id %}eve-btn-primary{% else %}eve-btn-secondary{% endif %}">
+            {{ mem.company.name }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <input type="search" id="eveAttSearch" class="form-control form-control-sm" placeholder="Filter member or event..." style="max-width: 210px;">
+        <select id="eveAttStatusFilter" class="form-select form-select-sm" style="max-width: 170px;" aria-label="Filter by attendance status">
+            <option value="">All Statuses</option>
+            <option value="CLOCKED_IN">Clocked In</option>
+            <option value="CLOCKED_OUT">Clocked Out</option>
+            <option value="VERIFIED">Verified</option>
+        </select>
+    </div>
+</div>
+
+<!-- 4. Pending Clock-Ins for Current User -->
+{% if my_pending_clockins %}
+<section class="eve-panel mb-4" aria-label="Your Upcoming Shift Check-Ins">
+    <div class="eve-panel-header">
+        <div>
+            <h2 class="eve-panel-title">Ready to Clock In</h2>
+            <p class="eve-panel-subtitle">Your upcoming shift assignments without an active check-in record</p>
+        </div>
+        <span class="eve-badge eve-badge-warning eve-mono">{{ my_pending_clockins|length }} pending</span>
+    </div>
+    <div class="eve-panel-body">
+        <div class="row g-3">
+            {% for a in my_pending_clockins %}
+            <div class="col-md-6 col-lg-4">
+                <div class="p-3 rounded-3 h-100 d-flex flex-column justify-content-between" style="border: 1px solid var(--eve-border); background-color: var(--eve-surface-subtle);">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                            <span class="fw-semibold">{{ a.event.title }}</span>
+                            <span class="eve-badge eve-badge-neutral eve-mono">{{ a.start_time|time:"g:i A" }}&ndash;{{ a.end_time|time:"g:i A" }}</span>
                         </div>
-                        <form method="post" action="{% url 'events:clock_in' assignment_id=a.id %}" class="mt-2">
-                            {% csrf_token %}
-                            <input type="text" name="notes" class="form-control form-control-sm mb-2" placeholder="Optional check-in note (e.g. On-site at Station A)">
-                            <button type="submit" class="btn btn-sm btn-apple-primary w-100">
-                                <i class="bi bi-box-arrow-in-right me-1"></i> Clock In Now
-                            </button>
-                        </form>
+                        <div style="font-size: 12.5px; color: var(--eve-text-secondary);">{{ a.assigned_role }} &middot; {{ a.assigned_location|default:a.event.location }}</div>
                     </div>
+                    <form method="post" action="{% url 'events:clock_in' assignment_id=a.id %}" class="m-0">
+                        {% csrf_token %}
+                        <input type="text" name="notes" class="form-control form-control-sm mb-2" placeholder="Optional check-in note (e.g. On-site at Station A)">
+                        <button type="submit" class="eve-btn eve-btn-primary eve-btn-sm w-100">
+                            <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+                            <span>Clock In Now</span>
+                        </button>
+                    </form>
                 </div>
-                {% endfor %}
             </div>
+            {% endfor %}
         </div>
-        {% endif %}
-
-        <!-- Master Attendance Log Table -->
-        <div class="card shadow-sm border rounded-4 overflow-hidden">
-            <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
-                <h5 class="fw-bold mb-0">Live Attendance Records</h5>
-                <span class="badge bg-secondary-subtle text-secondary">{{ records|length }} total</span>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th class="ps-4">Member &amp; Role</th>
-                            <th>Event &amp; Company</th>
-                            <th>Clock In</th>
-                            <th>Clock Out</th>
-                            <th>Duration</th>
-                            <th>Status</th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in records %}
-                        <tr>
-                            <td class="ps-4">
-                                <div class="fw-bold">{{ record.assignment.member.user.get_full_name|default:record.assignment.member.user.username }}</div>
-                                <small class="text-muted">{{ record.assignment.assigned_role }} &bull; {{ record.assignment.member.role|title }}</small>
-                            </td>
-                            <td>
-                                <div class="fw-semibold">{{ record.assignment.event.title }}</div>
-                                <small class="text-muted">{{ record.assignment.event.company.name }}</small>
-                            </td>
-                            <td>
-                                <div class="fw-semibold">{{ record.clock_in_time|date:"M d, Y" }}</div>
-                                <small class="text-success"><i class="bi bi-clock me-1"></i>{{ record.clock_in_time|time:"g:i:s A" }}</small>
-                                {% if record.clock_in_notes %}
-                                <small class="d-block text-muted fst-italic">"{{ record.clock_in_notes }}"</small>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if record.clock_out_time %}
-                                    <div class="fw-semibold">{{ record.clock_out_time|date:"M d, Y" }}</div>
-                                    <small class="text-danger"><i class="bi bi-clock-history me-1"></i>{{ record.clock_out_time|time:"g:i:s A" }}</small>
-                                    {% if record.clock_out_notes %}
-                                    <small class="d-block text-muted fst-italic">"{{ record.clock_out_notes }}"</small>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">Active on Duty</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span class="fw-semibold text-secondary">{{ record.duration_display }}</span>
-                            </td>
-                            <td>
-                                {% if record.status == 'CLOCKED_IN' %}
-                                    <span class="badge bg-primary">Clocked In</span>
-                                {% elif record.status == 'CLOCKED_OUT' %}
-                                    <span class="badge bg-secondary">Clocked Out</span>
-                                {% elif record.status == 'VERIFIED' %}
-                                    <span class="badge bg-success"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>
-                                    {% if record.verified_by %}
-                                    <small class="d-block text-muted">by {{ record.verified_by.user.username }}</small>
-                                    {% endif %}
-                                {% endif %}
-                            </td>
-                            <td class="text-end pe-4">
-                                <div class="d-inline-flex gap-1">
-                                    {% if not record.clock_out_time and record.assignment.member.user == request.user or is_manager and not record.clock_out_time %}
-                                    <form method="post" action="{% url 'events:clock_out' assignment_id=record.assignment.id %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Clock Out">
-                                            <i class="bi bi-box-arrow-right me-1"></i> Clock Out
-                                        </button>
-                                    </form>
-                                    {% endif %}
-
-                                    {% if is_manager and record.status != 'VERIFIED' %}
-                                    <form method="post" action="{% url 'events:verify_attendance' record_id=record.id %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Verify Attendance">
-                                            <i class="bi bi-check-circle me-1"></i> Verify
-                                        </button>
-                                    </form>
-                                    {% endif %}
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">
-                                <i class="bi bi-clipboard2-x fs-1 d-block mb-2 text-secondary"></i>
-                                <p class="mb-0">No attendance records found yet.</p>
-                                <small class="text-muted">Staff members can clock in from their assigned events or above.</small>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
     </div>
 </section>
+{% endif %}
+
+<!-- 5. Master Attendance Log Table -->
+<section class="eve-panel overflow-hidden" aria-label="Live Attendance Records">
+    <div class="eve-panel-header">
+        <div>
+            <h2 class="eve-panel-title">Live Attendance Records</h2>
+            <p class="eve-panel-subtitle">Clock-in timestamps, shift durations, and manager verification status</p>
+        </div>
+        <span class="eve-badge eve-badge-neutral eve-mono" id="eveAttCount">{{ records|length }} total</span>
+    </div>
+
+    {% if records %}
+    <div class="table-responsive">
+        <table class="eve-data-table" id="eveAttendanceTable">
+            <thead>
+                <tr>
+                    <th>Member &amp; Role</th>
+                    <th>Event &amp; Organization</th>
+                    <th>Clock In</th>
+                    <th>Clock Out</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr data-search="{{ record.assignment.member.user.get_full_name|default:record.assignment.member.user.username|lower }} {{ record.assignment.event.title|lower }} {{ record.assignment.event.company.name|lower }}" data-status="{{ record.status }}">
+                    <td>
+                        <div class="fw-semibold">{{ record.assignment.member.user.get_full_name|default:record.assignment.member.user.username }}</div>
+                        <div style="font-size: 12px; color: var(--eve-text-muted);">{{ record.assignment.assigned_role }} &middot; {{ record.assignment.member.get_role_display }}</div>
+                    </td>
+                    <td>
+                        <a href="{% url 'events:event_detail' event_id=record.assignment.event.id %}" class="fw-medium text-decoration-none" style="color: var(--eve-text);">{{ record.assignment.event.title }}</a>
+                        <div style="font-size: 12px; color: var(--eve-text-muted);">{{ record.assignment.event.company.name }}</div>
+                    </td>
+                    <td class="eve-mono" style="font-size: 12.5px;">
+                        <div class="fw-semibold">{{ record.clock_in_time|date:"M d, Y" }}</div>
+                        <div style="color: var(--eve-success-text);">{{ record.clock_in_time|time:"g:i:s A" }}</div>
+                        {% if record.clock_in_notes %}
+                        <div class="fst-italic" style="font-family: var(--eve-font-sans); font-size: 11.5px; color: var(--eve-text-muted);">"{{ record.clock_in_notes }}"</div>
+                        {% endif %}
+                    </td>
+                    <td class="eve-mono" style="font-size: 12.5px;">
+                        {% if record.clock_out_time %}
+                            <div class="fw-semibold">{{ record.clock_out_time|date:"M d, Y" }}</div>
+                            <div style="color: var(--eve-danger-text);">{{ record.clock_out_time|time:"g:i:s A" }}</div>
+                            {% if record.clock_out_notes %}
+                            <div class="fst-italic" style="font-family: var(--eve-font-sans); font-size: 11.5px; color: var(--eve-text-muted);">"{{ record.clock_out_notes }}"</div>
+                            {% endif %}
+                        {% else %}
+                            {% include 'components/status_badge.html' with status="CLOCKED_IN" label="On Duty" %}
+                        {% endif %}
+                    </td>
+                    <td class="eve-mono fw-semibold" style="font-size: 12.5px; color: var(--eve-text-secondary);">
+                        {{ record.duration_display }}
+                    </td>
+                    <td>
+                        {% include 'components/status_badge.html' with status=record.status label=record.get_status_display %}
+                        {% if record.verified_by %}
+                        <div style="font-size: 11.5px; color: var(--eve-text-muted); margin-top: 2px;">by {{ record.verified_by.user.username }}</div>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <div class="d-inline-flex align-items-center gap-1">
+                            {% if not record.clock_out_time and record.assignment.member.user == request.user or is_manager and not record.clock_out_time %}
+                            <form method="post" action="{% url 'events:clock_out' assignment_id=record.assignment.id %}" class="m-0">
+                                {% csrf_token %}
+                                <button type="submit" class="eve-btn eve-btn-danger eve-btn-sm" title="Clock Out">
+                                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                                    <span>Clock Out</span>
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            {% if is_manager and record.status != 'VERIFIED' %}
+                            <form method="post" action="{% url 'events:verify_attendance' record_id=record.id %}" class="m-0">
+                                {% csrf_token %}
+                                <button type="submit" class="eve-btn eve-btn-primary eve-btn-sm" title="Verify Attendance">
+                                    <i class="bi bi-check2" aria-hidden="true"></i>
+                                    <span>Verify</span>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    {% url 'events:event_list' as events_url %}
+    {% include 'components/empty_state.html' with icon="bi-stopwatch" title="No attendance records yet" description="Staff members can clock in from their assigned events or the Ready to Clock In panel above." cta_url=events_url cta_label="View Events" %}
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    const searchInput = document.getElementById('eveAttSearch');
+    const statusSelect = document.getElementById('eveAttStatusFilter');
+    const countEl = document.getElementById('eveAttCount');
+    const rows = document.querySelectorAll('#eveAttendanceTable tbody tr');
+    if (!searchInput || !statusSelect) return;
+
+    function filterAttendance() {
+        const q = searchInput.value.trim().toLowerCase();
+        const st = statusSelect.value;
+        let visible = 0;
+        rows.forEach(function (row) {
+            const matchText = !q || (row.dataset.search || '').includes(q);
+            const matchStatus = !st || row.dataset.status === st;
+            const show = matchText && matchStatus;
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        if (countEl) countEl.textContent = visible + ' shown';
+    }
+
+    searchInput.addEventListener('input', filterAttendance);
+    statusSelect.addEventListener('change', filterAttendance);
+})();
+</script>
 {% endblock %}
